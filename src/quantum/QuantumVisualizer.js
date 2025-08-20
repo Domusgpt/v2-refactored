@@ -158,6 +158,42 @@ export class QuantumHolographicVisualizer {
     }
     
     /**
+     * Reinitialize WebGL context and resources after SmartCanvasPool context recreation
+     */
+    reinitializeContext() {
+        console.log(`🔄 Reinitializing WebGL context for ${this.canvas.id}`);
+        
+        // Get new WebGL context from recreated canvas
+        const contextOptions = {
+            alpha: true,
+            depth: true,
+            stencil: false,
+            antialias: false,
+            premultipliedAlpha: true,
+            preserveDrawingBuffer: false,
+            powerPreference: 'high-performance',
+            failIfMajorPerformanceCaveat: false
+        };
+        
+        this.gl = this.canvas.getContext('webgl2', contextOptions) || 
+                  this.canvas.getContext('webgl', contextOptions) ||
+                  this.canvas.getContext('experimental-webgl', contextOptions);
+        
+        if (!this.gl) {
+            console.error(`❌ Failed to reinitialize WebGL context for ${this.canvas.id}`);
+            return false;
+        }
+        
+        // Reinitialize all WebGL resources
+        this.initShaders();
+        this.initBuffers();
+        this.resize();
+        
+        console.log(`✅ WebGL context reinitialized for ${this.canvas.id}`);
+        return true;
+    }
+    
+    /**
      * Initialize shaders with complex 3D lattice functions and holographic effects
      */
     initShaders() {

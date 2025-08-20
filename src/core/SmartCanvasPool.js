@@ -153,7 +153,7 @@ export class SmartCanvasPool {
     const configs = this.canvasConfigs[systemName];
     if (!configs) return;
     
-    console.log(`🧹 Destroying ${configs.length} WebGL contexts for ${systemName}`);
+    console.log(`🧽 Cleaning up ${configs.length} WebGL contexts for ${systemName}`);
     
     configs.forEach(config => {
       const canvas = document.getElementById(config.id);
@@ -161,18 +161,19 @@ export class SmartCanvasPool {
         // Get WebGL context to clean up
         const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
         if (gl) {
-          // Force context loss to free GPU memory
-          const ext = gl.getExtension('WEBGL_lose_context');
-          if (ext) {
-            ext.loseContext();
-          }
+          // DON'T call loseContext() - it permanently breaks canvas elements!
+          // const ext = gl.getExtension('WEBGL_lose_context');
+          // if (ext) {
+          //   ext.loseContext(); // THIS BREAKS WEBGL PERMANENTLY!
+          // }
+          console.log(`🚫 Skipping loseContext() to preserve canvas element`);
         }
         
         // Clear canvas
         canvas.width = 1;
         canvas.height = 1;
         
-        console.log(`🗑️ Destroyed context: ${config.id}`);
+        console.log(`✨ Cleaned context: ${config.id} (canvas preserved)`);
       }
     });
   }
@@ -193,13 +194,21 @@ export class SmartCanvasPool {
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         
-        // Force creation of new WebGL context
-        const gl = canvas.getContext('webgl2', {
+        // Force creation of new WebGL context with SAME OPTIONS as engines
+        const contextOptions = {
           alpha: true,
           depth: true,
+          stencil: false,
           antialias: false,
-          powerPreference: 'low-power'
-        });
+          premultipliedAlpha: true,
+          preserveDrawingBuffer: false,
+          powerPreference: 'high-performance',
+          failIfMajorPerformanceCaveat: false
+        };
+        
+        const gl = canvas.getContext('webgl2', contextOptions) || 
+                   canvas.getContext('webgl', contextOptions) ||
+                   canvas.getContext('experimental-webgl', contextOptions);
         
         if (gl) {
           console.log(`✨ Created context: ${config.id} (${canvas.width}x${canvas.height})`);
