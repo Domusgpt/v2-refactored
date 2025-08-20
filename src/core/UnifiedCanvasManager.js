@@ -1,11 +1,18 @@
-// src/core/UnifiedCanvasManager.js
-class UnifiedCanvasManager {
+/**
+ * UnifiedCanvasManager - Single master canvas with viewport management
+ * Replaces 20+ WebGL contexts with 1 master context + framebuffers
+ * Based on compass artifact specifications
+ */
+
+export class UnifiedCanvasManager {
   constructor() {
     this.masterCanvas = document.createElement('canvas');
     this.masterCanvas.style.position = 'fixed';
     this.masterCanvas.style.width = '100%';
     this.masterCanvas.style.height = '100%';
     this.masterCanvas.style.zIndex = '-1';
+    this.masterCanvas.style.top = '0';
+    this.masterCanvas.style.left = '0';
     document.body.appendChild(this.masterCanvas);
     
     this.gl = this.masterCanvas.getContext('webgl2', {
@@ -15,14 +22,33 @@ class UnifiedCanvasManager {
       preserveDrawingBuffer: false
     });
     
+    if (!this.gl) {
+      // Fallback to WebGL1
+      this.gl = this.masterCanvas.getContext('webgl', {
+        antialias: false,
+        alpha: true,
+        powerPreference: 'low-power',
+        preserveDrawingBuffer: false
+      });
+    }
+    
     this.viewports = new Map();
     this.activeSystem = null;
     this.frameBuffers = new Map();
-    this.isRendering = false;
+    
+    console.log('🎯 UnifiedCanvasManager: Single WebGL context created');
+    this.resizeCanvas();
+    window.addEventListener('resize', () => this.resizeCanvas());
   }
 
   registerVisualizationSystem(systemId, element, renderCallback) {
     const canvas2d = document.createElement('canvas');
+    canvas2d.style.position = 'absolute';
+    canvas2d.style.top = '0';
+    canvas2d.style.left = '0';
+    canvas2d.style.width = '100%';
+    canvas2d.style.height = '100%';
+    canvas2d.style.pointerEvents = 'none';
     element.appendChild(canvas2d);
     
     // Create framebuffer for this system
@@ -36,6 +62,7 @@ class UnifiedCanvasManager {
       dirty: true
     });
     
+    console.log(`📦 Registered system: ${systemId}`);
     return systemId;
   }
 
@@ -47,18 +74,22 @@ class UnifiedCanvasManager {
     this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 
                        width, height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
     
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, fbo);
     this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, 
                                   this.gl.TEXTURE_2D, texture, 0);
     
+    // Check framebuffer status
+    if (this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER) !== this.gl.FRAMEBUFFER_COMPLETE) {
+      console.error('Framebuffer not complete');
+    }
+    
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
     return { fbo, texture, width, height };
   }
 
   render() {
-    if (this.isRendering) return;
-    this.isRendering = true;
-    
     this.resizeIfNeeded();
     
     for (const [systemId, viewport] of this.viewports) {
@@ -83,14 +114,21 @@ class UnifiedCanvasManager {
     }
     
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-    this.isRendering = false;
-    
     requestAnimationFrame(() => this.render());
   }
 
   copyToCanvas2D(viewport) {
     const { canvas2d, framebuffer } = viewport;
     const ctx = canvas2d.getContext('2d');
+    
+    if (!ctx) return;
+    
+    // Resize 2D canvas to match container
+    const rect = viewport.element.getBoundingClientRect();
+    canvas2d.width = rect.width;
+    canvas2d.height = rect.height;
+    
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, framebuffer.fbo);
     
     // Read pixels from framebuffer
     const pixels = new Uint8Array(framebuffer.width * framebuffer.height * 4);
@@ -100,38 +138,54 @@ class UnifiedCanvasManager {
     // Flip vertically and draw to 2D canvas
     const imageData = new ImageData(new Uint8ClampedArray(pixels), 
                                      framebuffer.width, framebuffer.height);
-    ctx.putImageData(imageData, 0, 0);
+    
+    // Create temporary canvas for vertical flip
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = framebuffer.width;
+    tempCanvas.height = framebuffer.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.putImageData(imageData, 0, 0);
+    
+    // Draw flipped to final canvas
+    ctx.save();
+    ctx.scale(1, -1);
+    ctx.translate(0, -canvas2d.height);
+    ctx.drawImage(tempCanvas, 0, 0, canvas2d.width, canvas2d.height);
+    ctx.restore();
   }
 
-  resizeIfNeeded() {
-    const needsResize = this.masterCanvas.width !== window.innerWidth ||
-                       this.masterCanvas.height !== window.innerHeight;
+  resizeCanvas() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     
-    if (needsResize) {
-      this.masterCanvas.width = window.innerWidth;
-      this.masterCanvas.height = window.innerHeight;
-      
-      // Mark all viewports as dirty for resize
-      for (const viewport of this.viewports.values()) {
-        viewport.dirty = true;
-      }
+    this.masterCanvas.width = width * dpr;
+    this.masterCanvas.height = height * dpr;
+    this.masterCanvas.style.width = width + 'px';
+    this.masterCanvas.style.height = height + 'px';
+    
+    if (this.gl) {
+      this.gl.viewport(0, 0, this.masterCanvas.width, this.masterCanvas.height);
     }
   }
 
-  markSystemDirty(systemId) {
+  resizeIfNeeded() {
+    const rect = this.masterCanvas.getBoundingClientRect();
+    if (rect.width !== this.masterCanvas.width || rect.height !== this.masterCanvas.height) {
+      this.resizeCanvas();
+    }
+  }
+
+  markDirty(systemId) {
     const viewport = this.viewports.get(systemId);
     if (viewport) {
       viewport.dirty = true;
     }
   }
 
-  getMasterGL() {
-    return this.gl;
-  }
-
   dispose() {
     // Clean up framebuffers
-    for (const viewport of this.viewports.values()) {
+    for (const [_, viewport] of this.viewports) {
       this.gl.deleteFramebuffer(viewport.framebuffer.fbo);
       this.gl.deleteTexture(viewport.framebuffer.texture);
     }
@@ -141,8 +195,6 @@ class UnifiedCanvasManager {
       this.masterCanvas.parentNode.removeChild(this.masterCanvas);
     }
     
-    this.viewports.clear();
+    console.log('🧹 UnifiedCanvasManager disposed');
   }
 }
-
-export default UnifiedCanvasManager;
