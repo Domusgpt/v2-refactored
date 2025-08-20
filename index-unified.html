@@ -274,6 +274,10 @@
                 transform: translateX(50%);
             }
             
+            .nav-links {
+                display: none;
+            }
+            
             .performance-monitor {
                 display: none;
             }
@@ -388,6 +392,11 @@
             <button class="system-btn" data-system="polychora" onclick="switchSystem('polychora')">
                 Polychora
             </button>
+        </div>
+        
+        <div class="nav-links">
+            <a href="gallery-unified.html" style="color: #00ffff; text-decoration: none; margin-right: 15px; font-size: 0.8rem;">🖼️ Gallery</a>
+            <a href="viewer-unified.html" style="color: #00ffff; text-decoration: none; margin-right: 15px; font-size: 0.8rem;">👁️ Viewer</a>
         </div>
         
         <div class="performance-monitor">
@@ -509,9 +518,11 @@
     <script type="module">
         // Import the unified engine architecture
         import { VIB34DUnifiedEngine } from './src/core/UnifiedEngine.js';
+        import { UnifiedSaveManager } from './src/core/UnifiedSaveManager.js';
         
         // Global state
         let unifiedEngine = null;
+        let unifiedSaveManager = null;
         let currentSystem = 'faceted';
         let controlsVisible = false;
         
@@ -547,9 +558,22 @@
                 // Initialize UI
                 setupGeometryGrid();
                 setupParameterUpdates();
+                syncParametersToUI(); // Initialize parameter state
+                
+                // Initialize the UnifiedSaveManager
+                updateLoadingText('Setting up save system...');
+                unifiedSaveManager = new UnifiedSaveManager(unifiedEngine);
+                
+                // Add parameter capture helper for save system
+                unifiedEngine.getCurrentParameters = () => {
+                    return window.currentParameters || {};
+                };
                 
                 // Make engine globally accessible for compatibility
                 window.unifiedEngine = unifiedEngine;
+                window.unifiedSaveManager = unifiedSaveManager;
+                window.currentSystem = currentSystem;
+                window.currentParameters = {};
                 window.switchSystem = switchSystem;
                 window.updateParameter = updateParameter;
                 
@@ -619,7 +643,12 @@
             const success = unifiedEngine.switchSystem(systemName);
             if (success) {
                 currentSystem = systemName;
+                window.currentSystem = systemName; // Keep global reference
                 setupGeometryGrid();
+                
+                // Reset and sync current parameters
+                syncParametersToUI();
+                
                 showNotification(`Switched to ${systemName} system`, 'info');
             } else {
                 showNotification(`Failed to switch to ${systemName} system`, 'error');
@@ -630,16 +659,26 @@
         function updateParameter(name, value) {
             if (!unifiedEngine) return;
             
-            // Update the active system
-            const activeSystem = unifiedEngine.systems.get(currentSystem);
-            if (activeSystem && activeSystem.renderer && activeSystem.renderer.updateParameter) {
-                activeSystem.renderer.updateParameter(name, value);
-            }
+            console.log(`🎹 Updating parameter ${name} = ${value} for system ${currentSystem}`);
             
-            // Also update the polychora system if it has the parameter
-            const polychoraSystem = unifiedEngine.systems.get('polychora');
-            if (polychoraSystem && polychoraSystem.renderer && polychoraSystem.renderer.updateParameter) {
-                polychoraSystem.renderer.updateParameter(name, value);
+            // Update the active system through unified architecture
+            try {
+                // Call the unified engine's parameter update method
+                if (unifiedEngine.updateParameter) {
+                    unifiedEngine.updateParameter(name, value);
+                } else {
+                    // Fallback to direct system update
+                    const activeSystem = unifiedEngine.systems.get(currentSystem);
+                    if (activeSystem && activeSystem.renderer && activeSystem.renderer.updateParameter) {
+                        activeSystem.renderer.updateParameter(name, value);
+                    }
+                }
+                
+                // Make parameter globally available for save system
+                window.currentParameters = window.currentParameters || {};
+                window.currentParameters[name] = value;
+            } catch (error) {
+                console.error('Parameter update error:', error);
             }
             
             // Update UI display
@@ -689,6 +728,28 @@
                         : slider.value;
                     updateParameter(name, value);
                 });
+            });
+        }
+        
+        function syncParametersToUI() {
+            // Sync current slider values to parameters
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                const name = slider.id;
+                const value = slider.type === 'range' ? 
+                    (slider.step && slider.step.includes('.') ? parseFloat(slider.value) : parseInt(slider.value)) 
+                    : slider.value;
+                
+                // Update parameter without triggering events
+                if (window.currentParameters) {
+                    window.currentParameters[name] = value;
+                }
+                
+                // Update display
+                const valueDisplay = document.getElementById(`${name}-value`);
+                if (valueDisplay) {
+                    valueDisplay.textContent = typeof value === 'number' ? 
+                        (value % 1 === 0 ? value.toString() : value.toFixed(2)) : value;
+                }
             });
         }
         
@@ -779,16 +840,51 @@
             showNotification('Parameters reset to defaults', 'info');
         }
         
-        function saveToGallery() {
-            showNotification('Gallery save not implemented yet', 'info');
+        async function saveToGallery() {
+            if (!unifiedSaveManager) {
+                showNotification('Save system not ready yet', 'error');
+                return;
+            }
+            
+            try {
+                console.log('💾 Saving current state to gallery...');
+                const result = await unifiedSaveManager.save({ target: 'gallery' });
+                
+                if (result.success) {
+                    showNotification(`Saved to gallery: ${result.collection}`, 'success');
+                } else {
+                    showNotification('Failed to save: ' + result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showNotification('Save failed: ' + error.message, 'error');
+            }
         }
         
         function openGallery() {
-            showNotification('Gallery not implemented yet', 'info');
+            console.log('🖼️ Opening gallery...');
+            window.location.href = 'gallery-unified.html';
         }
         
-        function exportTradingCard() {
-            showNotification('Trading card export not implemented yet', 'info');
+        async function exportTradingCard() {
+            if (!unifiedSaveManager) {
+                showNotification('Export system not ready yet', 'error');
+                return;
+            }
+            
+            try {
+                console.log('🎴 Exporting trading card...');
+                const result = await unifiedSaveManager.save({ target: 'download', format: 'json' });
+                
+                if (result.success) {
+                    showNotification(`Exported: ${result.filename}`, 'success');
+                } else {
+                    showNotification('Export failed', 'error');
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                showNotification('Export failed: ' + error.message, 'error');
+            }
         }
         
         function showNotification(message, type = 'info') {
