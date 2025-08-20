@@ -780,17 +780,23 @@
             console.log(`🎯 switchSystem called with: ${system}`);
             console.log(`🔍 Current state: moduleReady=${!!window.moduleReady}, currentSystem=${window.currentSystem}`);
             
-            // CANVAS EXPLOSION FIX: Use SmartCanvasPool for context management
+            // CANVAS EXPLOSION FIX: Use SmartCanvasPool for lazy loading
             if (window.canvasPool) {
-                const engines = {
-                    faceted: window.engine,
-                    quantum: window.quantumEngine, 
-                    holographic: window.holographicSystem,
-                    polychora: null // TODO: Implement polychora engine
-                };
-                
-                window.canvasPool.switchToSystem(system, engines[system]);
-                console.log(`📊 Canvas stats: ${JSON.stringify(window.canvasPool.getStats())}`);
+                try {
+                    console.log(`🎯 Lazy loading ${system} system...`);
+                    const newEngine = await window.canvasPool.switchToSystem(system, null);
+                    
+                    if (newEngine) {
+                        console.log(`✅ ${system} system ready with engine`);
+                        console.log(`📊 Canvas stats: ${JSON.stringify(window.canvasPool.getStats())}`);
+                    } else {
+                        console.log(`⚠️ ${system} system loaded but no engine available`);
+                    }
+                } catch (error) {
+                    console.error(`❌ Failed to switch to ${system}:`, error);
+                    // Fallback to original layer management
+                    CanvasLayerManager.switchSystem(system);
+                }
             } else {
                 // Fallback to original layer management
                 CanvasLayerManager.switchSystem(system);
@@ -1240,18 +1246,17 @@
                     }
                 }
                 
-                // Create all engines for both mobile and desktop
-                // Mobile WebGL proven to work - let users choose their system
-                engine = new VIB34DIntegratedEngine();
-                quantumEngine = new QuantumEngine();
-                holographicSystem = new RealHolographicSystem();
-                
-                // CANVAS EXPLOSION FIX: SmartCanvasPool - 5 contexts at a time instead of 20
-                console.log('🎯 Initializing SmartCanvasPool - 75% context reduction');
+                // CANVAS EXPLOSION FIX: SmartCanvasPool - Lazy load engines
+                console.log('🎯 Initializing SmartCanvasPool - Lazy loading engines on demand');
                 window.canvasPool = new SmartCanvasPool();
                 
-                // Start with faceted system (only 5 contexts active)
-                window.canvasPool.switchToSystem('faceted', engine);
+                // Don't create engines yet - they'll be created when system is activated
+                engine = null;
+                quantumEngine = null;
+                holographicSystem = null;
+                
+                // Start with faceted system (this will create the engine)
+                await window.canvasPool.switchToSystem('faceted', null);
                 
                 if (isMobile) {
                     window.mobileOptimization.log(`📱 Mobile: All engines created (faceted, quantum, holographic)`);

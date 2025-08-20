@@ -41,34 +41,97 @@ export class SmartCanvasPool {
     console.log('🎯 SmartCanvasPool initialized - Only 5 contexts at a time');
   }
 
-  switchToSystem(systemName, engine) {
+  async switchToSystem(systemName, engine) {
     console.log(`🔄 Switching to ${systemName} - destroying old contexts, creating new ones`);
     
-    // Destroy current system contexts
+    // Destroy current system contexts and engine
     if (this.activeSystem) {
       this.destroySystemContexts(this.activeSystem);
+      this.destroyCurrentEngine();
     }
     
     // Create new system contexts
     this.createSystemContexts(systemName);
     this.activeSystem = systemName;
     
-    // Re-initialize the engine for the new contexts
-    if (engine && engine.visualizers) {
-      console.log(`🔧 Re-initializing ${engine.visualizers.length} visualizers for ${systemName}`);
-      
-      // Destroy old visualizers
-      engine.visualizers.forEach(visualizer => {
+    // Lazy load and create the engine for this system
+    const newEngine = await this.createEngineForSystem(systemName);
+    
+    console.log(`✅ ${systemName} system active with 5 WebGL contexts`);
+    return newEngine;
+  }
+
+  destroyCurrentEngine() {
+    // Destroy the current engine and its visualizers
+    const currentEngine = this.getCurrentEngine();
+    if (currentEngine && currentEngine.visualizers) {
+      console.log(`🧹 Destroying ${currentEngine.visualizers.length} visualizers`);
+      currentEngine.visualizers.forEach(visualizer => {
         if (visualizer.destroy) {
           visualizer.destroy();
         }
       });
+    }
+  }
+
+  getCurrentEngine() {
+    switch(this.activeSystem) {
+      case 'faceted': return window.engine;
+      case 'quantum': return window.quantumEngine;
+      case 'holographic': return window.holographicSystem;
+      case 'polychora': return window.polychoraSystem;
+      default: return null;
+    }
+  }
+
+  async createEngineForSystem(systemName) {
+    console.log(`🚀 Lazy loading ${systemName} engine...`);
+    
+    // Wait a bit for contexts to be ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    let newEngine = null;
+    
+    try {
+      switch(systemName) {
+        case 'faceted':
+          // Import and create VIB34D engine
+          const { VIB34DIntegratedEngine } = await import('./Engine.js');
+          newEngine = new VIB34DIntegratedEngine();
+          window.engine = newEngine;
+          break;
+          
+        case 'quantum':
+          // Import and create Quantum engine
+          const { QuantumEngine } = await import('../quantum/QuantumEngine.js');
+          newEngine = new QuantumEngine();
+          window.quantumEngine = newEngine;
+          break;
+          
+        case 'holographic':
+          // Import and create Holographic system
+          const { RealHolographicSystem } = await import('../holograms/RealHolographicSystem.js');
+          newEngine = new RealHolographicSystem();
+          window.holographicSystem = newEngine;
+          break;
+          
+        case 'polychora':
+          console.log('🔮 Polychora system not implemented yet');
+          break;
+          
+        default:
+          console.error(`❌ Unknown system: ${systemName}`);
+      }
       
-      // Create new visualizers with new contexts
-      engine.createVisualizers();
+      if (newEngine) {
+        console.log(`✅ ${systemName} engine created and ready`);
+      }
+      
+    } catch (error) {
+      console.error(`❌ Failed to create ${systemName} engine:`, error);
     }
     
-    console.log(`✅ ${systemName} system active with 5 WebGL contexts`);
+    return newEngine;
   }
 
   destroySystemContexts(systemName) {
