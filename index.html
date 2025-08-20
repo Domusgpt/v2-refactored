@@ -717,70 +717,13 @@
         parseURLParameters();
         
         // SURGICAL FIX: Smart Canvas Management
-        class CanvasLayerManager {
-            static switchSystem(targetSystem) {
-                const systems = ['faceted', 'quantum', 'holographic', 'polychora'];
-                let activeCanvases = 0;
-                
-                systems.forEach(sys => {
-                    const layerId = sys === 'faceted' ? 'vib34dLayers' : `${sys}Layers`;
-                    const layers = document.getElementById(layerId);
-                    if (layers) {
-                        const shouldShow = sys === targetSystem;
-                        
-                        // Optimize display changes
-                        if (shouldShow) {
-                            layers.style.display = 'block';
-                            layers.style.visibility = 'visible';
-                            layers.style.opacity = '1';
-                            activeCanvases += layers.children.length;
-                            
-                            // CRITICAL ANDROID FIX: Force canvas dimensions after display change
-                            setTimeout(() => {
-                                const canvases = layers.querySelectorAll('canvas');
-                                canvases.forEach(canvas => {
-                                    const rect = canvas.getBoundingClientRect();
-                                    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-                                    
-                                    // If still 0x0 after display:block, use viewport dimensions
-                                    if (rect.width === 0 || rect.height === 0) {
-                                        const viewWidth = window.innerWidth;
-                                        const viewHeight = window.innerHeight;
-                                        canvas.width = viewWidth * dpr;
-                                        canvas.height = viewHeight * dpr;
-                                        
-                                        if (window.mobileOptimization) {
-                                            window.mobileOptimization.log(`🔧 Fixed ${canvas.id}: ${canvas.width}x${canvas.height} (viewport fallback)`);
-                                        }
-                                    } else {
-                                        canvas.width = rect.width * dpr;
-                                        canvas.height = rect.height * dpr;
-                                        
-                                        if (window.mobileOptimization) {
-                                            window.mobileOptimization.log(`✅ Updated ${canvas.id}: ${canvas.width}x${canvas.height} (from rect)`);
-                                        }
-                                    }
-                                });
-                            }, 50); // Small delay to let display:block take effect
-                            
-                        } else {
-                            layers.style.display = 'none';
-                            layers.style.visibility = 'hidden';
-                            layers.style.opacity = '0';
-                        }
-                    }
-                });
-                
-                console.log(`🎯 Canvas Manager: ${targetSystem} active (${activeCanvases} contexts)`);
-            }
-        }
+        // CanvasLayerManager removed - SmartCanvasPool handles all layer management
         
         // Global system switching function - accessible to HTML onclick handlers
         window.switchSystem = async function(system) {
             console.log(`🎯 switchSystem called with: ${system}`);
-            console.log(`🔍 Current state: moduleReady=${!!window.moduleReady}, currentSystem=${window.currentSystem}`);
             
-            // CANVAS EXPLOSION FIX: Use SmartCanvasPool for lazy loading
+            // CANVAS EXPLOSION FIX: Use SmartCanvasPool ONLY
             if (window.canvasPool) {
                 try {
                     console.log(`🎯 Lazy loading ${system} system...`);
@@ -789,172 +732,40 @@
                     if (newEngine) {
                         console.log(`✅ ${system} system ready with engine`);
                         console.log(`📊 Canvas stats: ${JSON.stringify(window.canvasPool.getStats())}`);
+                        
+                        // Update global state and UI
+                        window.currentSystem = system;
+                        
+                        // Update UI buttons
+                        document.querySelectorAll('.system-btn').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.system === system);
+                        });
+                        
+                        // Update panel header
+                        const headers = {
+                            faceted: 'FACETED SYSTEM',
+                            quantum: 'QUANTUM SYSTEM', 
+                            holographic: 'HOLOGRAPHIC SYSTEM',
+                            polychora: 'POLYCHORA SYSTEM'
+                        };
+                        const panelHeader = document.getElementById('panelHeader');
+                        if (panelHeader) panelHeader.textContent = headers[system] || 'VIB34D SYSTEM';
+                        
+                        console.log(`✅ Switched to ${system} system successfully`);
+                        return; // Success - exit early
+                    } else if (system === 'polychora') {
+                        console.log(`🔮 Polychora system not implemented yet`);
+                        return; // Expected for polychora
                     } else {
-                        console.log(`⚠️ ${system} system loaded but no engine available`);
+                        console.error(`❌ ${system} engine failed to create`);
                     }
                 } catch (error) {
                     console.error(`❌ Failed to switch to ${system}:`, error);
-                    // Fallback to original layer management
-                    CanvasLayerManager.switchSystem(system);
-                }
-            } else {
-                // Fallback to original layer management
-                CanvasLayerManager.switchSystem(system);
-            }
-            
-            // CRITICAL FIX: Wait for ES6 module OR timeout quickly for better performance
-            if (!window.moduleReady) {
-                console.log('⏳ Waiting for module initialization...');
-                
-                // For gallery preview iframes, don't wait forever - try direct switch after short timeout
-                let waitCount = 0;
-                const maxWait = 10; // 500ms max (10 × 50ms)
-                
-                while (!window.moduleReady && waitCount < maxWait) {
-                    await new Promise(resolve => setTimeout(resolve, 50));
-                    waitCount++;
-                }
-                
-                if (!window.moduleReady) {
-                    console.warn('⚠️ Module not ready after 500ms, proceeding with direct system switch');
-                    // Force module ready state to prevent further waiting
-                    window.moduleReady = true;
                 }
             }
             
-            window.currentSystem = system;
-            
-            console.log(`🔄 System switched to: ${system}`);
-            console.log(`✅ Verification: window.currentSystem is now: ${window.currentSystem}`);
-            console.log(`🔍 Engine availability at switch time:`, {
-                engine: !!window.engine,
-                quantumEngine: !!window.quantumEngine,
-                holographicSystem: !!window.holographicSystem,
-                polychoraSystem: !!window.polychoraSystem
-            });
-            
-            // Update UI
-            document.querySelectorAll('.system-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.system === system);
-            });
-            
-            // Update panel header
-            const headers = {
-                faceted: 'FACETED SYSTEM',
-                quantum: 'QUANTUM SYSTEM', 
-                holographic: 'HOLOGRAPHIC SYSTEM',
-                polychora: 'POLYCHORA SYSTEM'
-            };
-            const panelHeader = document.getElementById('panelHeader');
-            if (panelHeader) panelHeader.textContent = headers[system] || 'VIB34D SYSTEM';
-            
-            // Show/hide sections based on system
-            const geometrySection = document.getElementById('geometrySection');
-            const holographicSection = document.getElementById('holographicSection');
-            if (geometrySection) geometrySection.style.display = 'block';
-            if (holographicSection) holographicSection.style.display = system === 'holographic' ? 'block' : 'none';
-            
-            // Setup geometry for current system
-            if (window.setupGeometry) window.setupGeometry(system);
-            
-            // Switch visualization systems
-            if (system === 'faceted') {
-                // Show VIB34D canvases, hide others
-                const vib34dLayers = document.getElementById('vib34dLayers');
-                const quantumLayers = document.getElementById('quantumLayers');
-                const holographicLayers = document.getElementById('holographicLayers');
-                const polychoraLayers = document.getElementById('polychoraLayers');
-                
-                if (vib34dLayers) vib34dLayers.style.display = 'block';
-                if (quantumLayers) quantumLayers.style.display = 'none';
-                if (holographicLayers) holographicLayers.style.display = 'none';
-                if (polychoraLayers) polychoraLayers.style.display = 'none';
-                
-                if (window.quantumEngine) window.quantumEngine.setActive(false);
-                if (window.holographicSystem) window.holographicSystem.setActive(false);
-                if (window.polychoraSystem) window.polychoraSystem.stop();
-                
-            } else if (system === 'quantum') {
-                // Show Quantum canvases, hide others
-                const vib34dLayers = document.getElementById('vib34dLayers');
-                const quantumLayers = document.getElementById('quantumLayers');
-                const holographicLayers = document.getElementById('holographicLayers');
-                const polychoraLayers = document.getElementById('polychoraLayers');
-                
-                if (vib34dLayers) vib34dLayers.style.display = 'none';
-                if (quantumLayers) quantumLayers.style.display = 'block';
-                if (holographicLayers) holographicLayers.style.display = 'none';
-                if (polychoraLayers) polychoraLayers.style.display = 'none';
-                
-                if (window.holographicSystem) {
-                    window.holographicSystem.setActive(false);
-                } else {
-                    console.warn('⚠️ holographicSystem not available for system switch');
-                }
-                
-                if (window.polychoraSystem) {
-                    window.polychoraSystem.stop();
-                } else {
-                    console.warn('⚠️ polychoraSystem not available for system switch');
-                }
-                
-                if (window.quantumEngine) {
-                    window.quantumEngine.setActive(true);
-                } else {
-                    console.warn('⚠️ quantumEngine not available for system switch - this will cause parameter routing to faceted system');
-                }
-                
-            } else if (system === 'holographic') {
-                // Show Holographic canvases, hide others
-                const vib34dLayers = document.getElementById('vib34dLayers');
-                const quantumLayers = document.getElementById('quantumLayers');
-                const holographicLayers = document.getElementById('holographicLayers');
-                const polychoraLayers = document.getElementById('polychoraLayers');
-                
-                if (vib34dLayers) vib34dLayers.style.display = 'none';
-                if (quantumLayers) quantumLayers.style.display = 'none';
-                if (holographicLayers) holographicLayers.style.display = 'block';
-                if (polychoraLayers) polychoraLayers.style.display = 'none';
-                
-                if (window.quantumEngine) {
-                    window.quantumEngine.setActive(false);
-                } else {
-                    console.warn('⚠️ quantumEngine not available for system switch');
-                }
-                
-                if (window.polychoraSystem) {
-                    window.polychoraSystem.stop();
-                } else {
-                    console.warn('⚠️ polychoraSystem not available for system switch');
-                }
-                
-                if (window.holographicSystem) {
-                    window.holographicSystem.setActive(true);
-                } else {
-                    console.warn('⚠️ holographicSystem not available for system switch - this will cause parameter routing to faceted system');
-                }
-                
-            } else if (system === 'polychora') {
-                // Show Polychora canvases, hide others
-                const vib34dLayers = document.getElementById('vib34dLayers');
-                const quantumLayers = document.getElementById('quantumLayers');
-                const holographicLayers = document.getElementById('holographicLayers');
-                const polychoraLayers = document.getElementById('polychoraLayers');
-                
-                if (vib34dLayers) vib34dLayers.style.display = 'none';
-                if (quantumLayers) quantumLayers.style.display = 'none';
-                if (holographicLayers) holographicLayers.style.display = 'none';
-                if (polychoraLayers) polychoraLayers.style.display = 'block';
-                
-                if (window.quantumEngine) window.quantumEngine.setActive(false);
-                if (window.holographicSystem) window.holographicSystem.setActive(false);
-                
-                // Initialize Polychora if needed
-                if (window.initializePolychora) await window.initializePolychora();
-                if (window.polychoraSystem) window.polychoraSystem.start();
-            }
-            
-            console.log(`✅ Switched to ${system} system successfully`);
+            // If we get here, SmartCanvasPool failed - this is an error
+            console.error(`💥 SmartCanvasPool failed for ${system} - system may not work properly`);
         }
         
         // Make other essential functions globally accessible
@@ -1248,7 +1059,11 @@
                 
                 // CANVAS EXPLOSION FIX: SmartCanvasPool - Lazy load engines
                 console.log('🎯 Initializing SmartCanvasPool - Lazy loading engines on demand');
-                window.canvasPool = new SmartCanvasPool();
+                window.canvasPool = new SmartCanvasPool({
+                    VIB34DIntegratedEngine,
+                    QuantumEngine,
+                    RealHolographicSystem
+                });
                 
                 // Don't create engines yet - they'll be created when system is activated
                 engine = null;
