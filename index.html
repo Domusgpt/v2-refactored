@@ -780,8 +780,21 @@
             console.log(`🎯 switchSystem called with: ${system}`);
             console.log(`🔍 Current state: moduleReady=${!!window.moduleReady}, currentSystem=${window.currentSystem}`);
             
-            // SURGICAL FIX: Use smart canvas management immediately
-            CanvasLayerManager.switchSystem(system);
+            // CANVAS EXPLOSION FIX: Use SmartCanvasPool for context management
+            if (window.canvasPool) {
+                const engines = {
+                    faceted: window.engine,
+                    quantum: window.quantumEngine, 
+                    holographic: window.holographicSystem,
+                    polychora: null // TODO: Implement polychora engine
+                };
+                
+                window.canvasPool.switchToSystem(system, engines[system]);
+                console.log(`📊 Canvas stats: ${JSON.stringify(window.canvasPool.getStats())}`);
+            } else {
+                // Fallback to original layer management
+                CanvasLayerManager.switchSystem(system);
+            }
             
             // CRITICAL FIX: Wait for ES6 module OR timeout quickly for better performance
             if (!window.moduleReady) {
@@ -1053,14 +1066,14 @@
     </script>
     
     <script type="module">
-        // Import VIB34D modules + UnifiedCanvasManager for canvas explosion fix
+        // Import VIB34D modules + SmartCanvasPool for canvas explosion fix
         import { VIB34DIntegratedEngine } from './src/core/Engine.js';
         import { QuantumEngine } from './src/quantum/QuantumEngine.js';
         import { RealHolographicSystem } from './src/holograms/RealHolographicSystem.js';
         import { CollectionManager } from './src/features/CollectionManager.js';
         import { UnifiedSaveManager } from './src/core/UnifiedSaveManager.js';
         import { ParameterMapper } from './src/core/ParameterMapper.js';
-        import { UnifiedCanvasManager } from './src/core/UnifiedCanvasManager.js';
+        import { SmartCanvasPool } from './src/core/SmartCanvasPool.js';
         import { TradingCardGenerator } from './src/export/TradingCardGenerator.js';
         import universalReactivity from './src/interactions/UniversalReactivitySystem.js';
         
@@ -1233,10 +1246,12 @@
                 quantumEngine = new QuantumEngine();
                 holographicSystem = new RealHolographicSystem();
                 
-                // CANVAS EXPLOSION FIX: UnifiedCanvasManager (temporarily disabled)
-                // TODO: Implement proper framebuffer-based rendering to actually reduce WebGL contexts
-                // For now, restoring original system functionality
-                console.log('🎯 Canvas explosion fix implementation pending - using original system');
+                // CANVAS EXPLOSION FIX: SmartCanvasPool - 5 contexts at a time instead of 20
+                console.log('🎯 Initializing SmartCanvasPool - 75% context reduction');
+                window.canvasPool = new SmartCanvasPool();
+                
+                // Start with faceted system (only 5 contexts active)
+                window.canvasPool.switchToSystem('faceted', engine);
                 
                 if (isMobile) {
                     window.mobileOptimization.log(`📱 Mobile: All engines created (faceted, quantum, holographic)`);
