@@ -397,7 +397,12 @@
     <div class="canvas-container" id="canvasContainer">
         <!-- VIB34D Faceted System - UNIFIED ARCHITECTURE -->
         <div class="holographic-layers" id="vib34dLayers" style="display: block;">
-            <!-- Canvases will be created by UnifiedCanvasManager -->
+            <!-- Hidden canvases for engines to find, then redirect to unified rendering -->
+            <canvas id="background-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="shadow-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="content-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="highlight-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="accent-canvas" class="visualization-canvas" style="display: none;"></canvas>
         </div>
         
         <!-- VIB34D Quantum System - UNIFIED ARCHITECTURE -->
@@ -407,12 +412,22 @@
         
         <!-- Holographic System - UNIFIED ARCHITECTURE -->
         <div class="holographic-layers" id="holographicLayers" style="display: none;">
-            <!-- Canvases will be created by UnifiedCanvasManager -->
+            <!-- Hidden canvases for engines to find, then redirect to unified rendering -->
+            <canvas id="holo-background-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="holo-shadow-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="holo-content-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="holo-highlight-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="holo-accent-canvas" class="visualization-canvas" style="display: none;"></canvas>
         </div>
         
         <!-- Polychora System - UNIFIED ARCHITECTURE -->
         <div class="holographic-layers" id="polychoraLayers" style="display: none;">
-            <!-- Canvases will be created by UnifiedCanvasManager -->
+            <!-- Hidden canvases for engines to find, then redirect to unified rendering -->
+            <canvas id="polychora-background-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="polychora-shadow-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="polychora-content-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="polychora-highlight-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <canvas id="polychora-accent-canvas" class="visualization-canvas" style="display: none;"></canvas>
         </div>
     </div>
     

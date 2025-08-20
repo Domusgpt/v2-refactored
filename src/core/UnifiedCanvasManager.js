@@ -51,8 +51,18 @@ export class UnifiedCanvasManager {
     canvas2d.style.pointerEvents = 'none';
     element.appendChild(canvas2d);
     
+    // Get proper dimensions - fallback to window size if element has no size
+    let width = element.clientWidth;
+    let height = element.clientHeight;
+    
+    if (width === 0 || height === 0) {
+      width = window.innerWidth - 300; // Account for control panel
+      height = window.innerHeight - 50; // Account for top bar
+      console.log(`📐 Using fallback dimensions for ${systemId}: ${width}x${height}`);
+    }
+    
     // Create framebuffer for this system
-    const fbo = this.createFramebuffer(element.clientWidth, element.clientHeight);
+    const fbo = this.createFramebuffer(width, height);
     
     this.viewports.set(systemId, {
       element,
