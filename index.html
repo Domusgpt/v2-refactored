@@ -395,39 +395,44 @@
     
     <!-- Canvas Container -->
     <div class="canvas-container" id="canvasContainer">
-        <!-- VIB34D Faceted System - UNIFIED ARCHITECTURE -->
+        <!-- VIB34D Faceted System -->
         <div class="holographic-layers" id="vib34dLayers" style="display: block;">
-            <!-- Hidden canvases for engines to find, then redirect to unified rendering -->
-            <canvas id="background-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="shadow-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="content-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="highlight-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="accent-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <!-- VISIBLE canvases - engines render here normally -->
+            <canvas id="background-canvas" class="visualization-canvas"></canvas>
+            <canvas id="shadow-canvas" class="visualization-canvas"></canvas>
+            <canvas id="content-canvas" class="visualization-canvas"></canvas>
+            <canvas id="highlight-canvas" class="visualization-canvas"></canvas>
+            <canvas id="accent-canvas" class="visualization-canvas"></canvas>
         </div>
         
-        <!-- VIB34D Quantum System - UNIFIED ARCHITECTURE -->
+        <!-- VIB34D Quantum System -->
         <div class="holographic-layers" id="quantumLayers" style="display: none;">
-            <!-- Canvases will be created by UnifiedCanvasManager -->
+            <!-- VISIBLE canvases - engines render here normally -->
+            <canvas id="quantum-background-canvas" class="visualization-canvas"></canvas>
+            <canvas id="quantum-shadow-canvas" class="visualization-canvas"></canvas>
+            <canvas id="quantum-content-canvas" class="visualization-canvas"></canvas>
+            <canvas id="quantum-highlight-canvas" class="visualization-canvas"></canvas>
+            <canvas id="quantum-accent-canvas" class="visualization-canvas"></canvas>
         </div>
         
-        <!-- Holographic System - UNIFIED ARCHITECTURE -->
+        <!-- Holographic System -->
         <div class="holographic-layers" id="holographicLayers" style="display: none;">
-            <!-- Hidden canvases for engines to find, then redirect to unified rendering -->
-            <canvas id="holo-background-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="holo-shadow-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="holo-content-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="holo-highlight-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="holo-accent-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <!-- VISIBLE canvases - engines render here normally -->
+            <canvas id="holo-background-canvas" class="visualization-canvas"></canvas>
+            <canvas id="holo-shadow-canvas" class="visualization-canvas"></canvas>
+            <canvas id="holo-content-canvas" class="visualization-canvas"></canvas>
+            <canvas id="holo-highlight-canvas" class="visualization-canvas"></canvas>
+            <canvas id="holo-accent-canvas" class="visualization-canvas"></canvas>
         </div>
         
-        <!-- Polychora System - UNIFIED ARCHITECTURE -->
+        <!-- Polychora System -->
         <div class="holographic-layers" id="polychoraLayers" style="display: none;">
-            <!-- Hidden canvases for engines to find, then redirect to unified rendering -->
-            <canvas id="polychora-background-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="polychora-shadow-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="polychora-content-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="polychora-highlight-canvas" class="visualization-canvas" style="display: none;"></canvas>
-            <canvas id="polychora-accent-canvas" class="visualization-canvas" style="display: none;"></canvas>
+            <!-- VISIBLE canvases - engines render here normally -->
+            <canvas id="polychora-background-canvas" class="visualization-canvas"></canvas>
+            <canvas id="polychora-shadow-canvas" class="visualization-canvas"></canvas>
+            <canvas id="polychora-content-canvas" class="visualization-canvas"></canvas>
+            <canvas id="polychora-highlight-canvas" class="visualization-canvas"></canvas>
+            <canvas id="polychora-accent-canvas" class="visualization-canvas"></canvas>
         </div>
     </div>
     
@@ -1228,47 +1233,10 @@
                 quantumEngine = new QuantumEngine();
                 holographicSystem = new RealHolographicSystem();
                 
-                // CANVAS EXPLOSION FIX: Initialize UnifiedCanvasManager
-                console.log('🎯 Initializing UnifiedCanvasManager - Single WebGL context solution');
-                window.canvasManager = new UnifiedCanvasManager();
-                
-                // Register all systems with unified canvas manager
-                window.canvasManager.registerVisualizationSystem('faceted', 
-                    document.getElementById('vib34dLayers'), 
-                    (gl, systemId) => {
-                        // Faceted system render callback
-                        if (engine && engine.visualizers) {
-                            engine.visualizers.forEach(visualizer => visualizer.render());
-                        }
-                    });
-                
-                window.canvasManager.registerVisualizationSystem('quantum', 
-                    document.getElementById('quantumLayers'), 
-                    (gl, systemId) => {
-                        // Quantum system render callback
-                        if (quantumEngine && quantumEngine.visualizers) {
-                            quantumEngine.visualizers.forEach(visualizer => visualizer.render());
-                        }
-                    });
-                
-                window.canvasManager.registerVisualizationSystem('holographic', 
-                    document.getElementById('holographicLayers'), 
-                    (gl, systemId) => {
-                        // Holographic system render callback
-                        if (holographicSystem && holographicSystem.render) {
-                            holographicSystem.render();
-                        }
-                    });
-                
-                window.canvasManager.registerVisualizationSystem('polychora', 
-                    document.getElementById('polychoraLayers'), 
-                    (gl, systemId) => {
-                        // Polychora system render callback - TODO: Implement
-                        console.log('Polychora rendering through unified context');
-                    });
-                
-                // Start unified rendering loop
-                window.canvasManager.render();
+                // CANVAS EXPLOSION FIX: UnifiedCanvasManager (temporarily disabled)
+                // TODO: Implement proper framebuffer-based rendering to actually reduce WebGL contexts
+                // For now, restoring original system functionality
+                console.log('🎯 Canvas explosion fix implementation pending - using original system');
                 
                 if (isMobile) {
                     window.mobileOptimization.log(`📱 Mobile: All engines created (faceted, quantum, holographic)`);
