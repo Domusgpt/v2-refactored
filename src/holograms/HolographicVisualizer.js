@@ -251,15 +251,15 @@ export class HolographicVisualizer {
                 
                 float vertices = 1.0 - smoothstep(0.0, 0.03, min(min(min(d1, d2), min(d3, d4)), min(min(d5, d6), d7)));
                 
-                // Enhanced edge network with interference patterns
+                // Enhanced edge network with interference patterns (slowed 10x)
                 float edges = 0.0;
-                float shimmer = sin(u_time * 0.002) * 0.02;
+                float shimmer = sin(u_time * 0.0002) * 0.02;
                 edges = max(edges, 1.0 - smoothstep(0.0, 0.015, abs(length(q.xy) - (0.18 + shimmer))));
                 edges = max(edges, 1.0 - smoothstep(0.0, 0.015, abs(length(q.yz) - (0.18 + shimmer * 0.8))));
                 edges = max(edges, 1.0 - smoothstep(0.0, 0.015, abs(length(q.xz) - (0.18 + shimmer * 1.2))));
                 
-                // Add interference patterns between vertices
-                float interference = sin(d1 * 25.0 + u_time * 0.003) * sin(d2 * 22.0 + u_time * 0.0025) * 0.1;
+                // Add interference patterns between vertices (slowed 10x)
+                float interference = sin(d1 * 25.0 + u_time * 0.0003) * sin(d2 * 22.0 + u_time * 0.00025) * 0.1;
                 
                 // Volumetric density based on distance field
                 float volume = exp(-length(q) * 3.0) * 0.15;
@@ -289,8 +289,8 @@ export class HolographicVisualizer {
                     vertices = max(vertices, 1.0 - smoothstep(0.0, 0.04, dist));
                 }
                 
-                // Holographic interference patterns
-                float interference = sin(length(q) * 20.0 + u_time * 0.002) * 0.08;
+                // Holographic interference patterns (slowed 10x)
+                float interference = sin(length(q) * 20.0 + u_time * 0.0002) * 0.08;
                 
                 // Cross-dimensional glow
                 float glow = exp(-length(q) * 2.5) * 0.12;
@@ -370,9 +370,9 @@ export class HolographicVisualizer {
             
             vec3 rgbGlitch(vec3 color, vec2 uv, float intensity) {
                 vec2 offset = vec2(intensity * 0.005, 0.0);
-                float r = color.r + sin(uv.y * 30.0 + u_time * 0.001) * intensity * 0.06;
-                float g = color.g + sin(uv.y * 28.0 + u_time * 0.0012) * intensity * 0.06;
-                float b = color.b + sin(uv.y * 32.0 + u_time * 0.0008) * intensity * 0.06;
+                float r = color.r + sin(uv.y * 30.0 + u_time * 0.0001) * intensity * 0.06;
+                float g = color.g + sin(uv.y * 28.0 + u_time * 0.00012) * intensity * 0.06;
+                float b = color.b + sin(uv.y * 32.0 + u_time * 0.00008) * intensity * 0.06;
                 return vec3(r, g, b);
             }
             
@@ -398,7 +398,7 @@ export class HolographicVisualizer {
                 uv.x *= aspectRatio;
                 uv -= 0.5;
                 
-                float time = u_time * 0.0004 * u_speed * u_roleSpeed;
+                float time = u_time * 0.00004 * u_speed * u_roleSpeed;
                 
                 float mouseInfluence = u_mouseIntensity * 0.5;
                 vec2 mouseOffset = (u_mouse - 0.5) * mouseInfluence;
@@ -415,10 +415,10 @@ export class HolographicVisualizer {
                 float scrollRotation = u_scrollParallax * 0.1;
                 float touchRotation = u_touchMorph * 0.2;
                 
-                // Combine manual rotation with automatic/interactive rotation
-                p4d = rotateXW(u_rot4dXW + time * 0.2 + mouseOffset.y * 0.5 + scrollRotation) * p4d;
-                p4d = rotateYW(u_rot4dYW + time * 0.15 + mouseOffset.x * 0.5 + touchRotation) * p4d;
-                p4d = rotateZW(u_rot4dZW + time * 0.25 + u_clickIntensity * 0.3 + u_touchChaos * 0.4) * p4d;
+                // Combine manual rotation with automatic/interactive rotation (slowed 10x)
+                p4d = rotateXW(u_rot4dXW + time * 0.02 + mouseOffset.y * 0.5 + scrollRotation) * p4d;
+                p4d = rotateYW(u_rot4dYW + time * 0.015 + mouseOffset.x * 0.5 + touchRotation) * p4d;
+                p4d = rotateZW(u_rot4dZW + time * 0.025 + u_clickIntensity * 0.3 + u_touchChaos * 0.4) * p4d;
                 
                 vec3 p = project4Dto3D(p4d);
                 
@@ -438,8 +438,8 @@ export class HolographicVisualizer {
                 
                 // Holographic shimmer layers
                 vec3 shimmer1 = baseColor * lattice * 0.5;
-                vec3 shimmer2 = baseColor * sin(lattice * 8.0 + u_time * 0.001) * 0.2;
-                vec3 shimmer3 = baseColor * cos(lattice * 12.0 + u_time * 0.0008) * 0.15;
+                vec3 shimmer2 = baseColor * sin(lattice * 8.0 + u_time * 0.0001) * 0.2;
+                vec3 shimmer3 = baseColor * cos(lattice * 12.0 + u_time * 0.00008) * 0.15;
                 
                 color += shimmer1 + shimmer2 + shimmer3;
                 
@@ -456,17 +456,17 @@ export class HolographicVisualizer {
                 color += vec3(gridOverlay(uv, u_mouseIntensity + u_scrollParallax * 0.1));
                 color = rgbGlitch(color, uv, enhancedChaos);
                 
-                // Apply morph distortion to position
-                vec2 morphDistortion = vec2(sin(uv.y * 10.0 + u_time * 0.001) * u_morph * 0.1, 
-                                           cos(uv.x * 10.0 + u_time * 0.001) * u_morph * 0.1);
+                // Apply morph distortion to position (slowed 10x)
+                vec2 morphDistortion = vec2(sin(uv.y * 10.0 + u_time * 0.0001) * u_morph * 0.1, 
+                                           cos(uv.x * 10.0 + u_time * 0.0001) * u_morph * 0.1);
                 color = mix(color, color * (1.0 + length(morphDistortion)), u_morph * 0.5);
                 
                 // Enhanced holographic interaction effects
                 float mouseDist = length(uv - (u_mouse - 0.5) * vec2(aspectRatio, 1.0));
                 
-                // Multi-layer mouse glow with holographic ripples
+                // Multi-layer mouse glow with holographic ripples (slowed 10x)
                 float mouseGlow = exp(-mouseDist * 1.2) * u_mouseIntensity * 0.25;
-                float mouseRipple = sin(mouseDist * 15.0 - u_time * 0.003) * exp(-mouseDist * 2.0) * u_mouseIntensity * 0.1;
+                float mouseRipple = sin(mouseDist * 15.0 - u_time * 0.0003) * exp(-mouseDist * 2.0) * u_mouseIntensity * 0.1;
                 color += vec3(mouseGlow + mouseRipple) * baseColor * 0.8;
                 
                 // Enhanced click pulse with interference
@@ -474,8 +474,8 @@ export class HolographicVisualizer {
                 float clickRing = sin(mouseDist * 20.0 - u_clickIntensity * 5.0) * u_clickIntensity * 0.15;
                 color += vec3(clickPulse + clickRing, (clickPulse + clickRing) * 0.6, (clickPulse + clickRing) * 1.2);
                 
-                // Holographic interference from interactions
-                float interference = sin(mouseDist * 25.0 + u_time * 0.002) * u_mouseIntensity * 0.05;
+                // Holographic interference from interactions (slowed 10x)
+                float interference = sin(mouseDist * 25.0 + u_time * 0.0002) * u_mouseIntensity * 0.05;
                 color += vec3(interference) * baseColor;
                 
                 gl_FragColor = vec4(color, 0.95);
