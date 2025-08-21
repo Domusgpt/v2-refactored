@@ -165,10 +165,10 @@
             --bend-intensity: 0;
         }
         
-        /* Default desktop tilt intensity */
+        /* Smooth desktop tilt intensity - MUCH less dramatic */
         .variation-card {
-            --tilt-intensity-y: 1.2deg;
-            --tilt-intensity-x: 0.6deg;
+            --tilt-intensity-y: 0.3deg;
+            --tilt-intensity-x: 0.15deg;
             --accel-x: 0;
             --accel-y: 0;
         }
@@ -181,8 +181,8 @@
                 0 0 40px rgba(255, 0, 255, 0.4);
             transform: 
                 perspective(1200px)
-                rotateY(calc((var(--mouse-x) - 50) * var(--tilt-intensity-y) * var(--bend-intensity) + var(--accel-y) * 8deg))
-                rotateX(calc((var(--mouse-y) - 50) * var(--tilt-intensity-x) * var(--bend-intensity) + var(--accel-x) * 8deg))
+                rotateY(calc((var(--mouse-x) - 50) * var(--tilt-intensity-y) * var(--bend-intensity) + var(--accel-y) * 2deg))
+                rotateX(calc((var(--mouse-y) - 50) * var(--tilt-intensity-x) * var(--bend-intensity) + var(--accel-x) * 2deg))
                 translateZ(calc(var(--bend-intensity) * 40px))
                 translateY(-15px)
                 scale(1.02);
@@ -191,11 +191,11 @@
             transition: transform 0.08s cubic-bezier(0.23, 0.4, 0.42, 0.96);
         }
 
-        /* Mobile optimization: Reduced tilt intensity by 50% */
+        /* Mobile optimization: Ultra-smooth tilt for better visibility */
         @media (max-width: 768px), (pointer: coarse) {
             .variation-card {
-                --tilt-intensity-y: 0.6deg;
-                --tilt-intensity-x: 0.3deg;
+                --tilt-intensity-y: 0.15deg;
+                --tilt-intensity-x: 0.08deg;
             }
         }
         
@@ -235,8 +235,8 @@
                 perspective(1000px)
                 translateZ(30px)
                 scale(2.0)  /* 2x scale from center */
-                rotateY(calc((var(--mouse-x) - 50) * var(--tilt-intensity-y) * 0.75 + var(--accel-y) * 6deg))
-                rotateX(calc((50 - var(--mouse-y)) * var(--tilt-intensity-x) + var(--accel-x) * 6deg));
+                rotateY(calc((var(--mouse-x) - 50) * var(--tilt-intensity-y) * 0.75 + var(--accel-y) * 1.5deg))
+                rotateX(calc((50 - var(--mouse-y)) * var(--tilt-intensity-x) + var(--accel-x) * 1.5deg));
             transform-origin: center center;
             z-index: 100;
             box-shadow: 
@@ -1369,7 +1369,7 @@
                 // Mouse enter - start holographic effect
                 card.addEventListener('mouseenter', (e) => {
                     isHovering = true;
-                    card.style.setProperty('--bend-intensity', '0.8');
+                    card.style.setProperty('--bend-intensity', '0.3');
                     console.log('🌌 Holographic card activated');
                 });
                 
@@ -1502,7 +1502,7 @@
                     
                     card.style.setProperty('--mouse-x', cardX);
                     card.style.setProperty('--mouse-y', cardY);
-                    card.style.setProperty('--bend-intensity', '1.5');
+                    card.style.setProperty('--bend-intensity', '0.6');
                     
                     card.classList.add('holographic-explosion');
                     
@@ -1542,7 +1542,9 @@
                 this.isActive = false;
                 this.smoothedX = 0;
                 this.smoothedY = 0;
-                this.smoothingFactor = 0.1;
+                this.smoothingFactor = 0.15; // Increased smoothing for elegance
+                this.sensitivity = 0.4; // Much reduced sensitivity
+                this.deadzone = 8; // Larger deadzone for stability
                 this.cards = [];
                 
                 this.init();
@@ -1589,9 +1591,13 @@
                 
                 if (beta === null || gamma === null) return;
                 
-                // Normalize values to -1 to 1 range
-                const normalizedX = Math.max(-1, Math.min(1, beta / 45));   // Tilt forward/back
-                const normalizedY = Math.max(-1, Math.min(1, gamma / 45));  // Tilt left/right
+                // Apply deadzone to prevent micro-movements
+                const deadzonedBeta = Math.abs(beta) < this.deadzone ? 0 : beta;
+                const deadzonedGamma = Math.abs(gamma) < this.deadzone ? 0 : gamma;
+                
+                // Normalize values to -1 to 1 range with reduced sensitivity
+                const normalizedX = Math.max(-1, Math.min(1, (deadzonedBeta / 60) * this.sensitivity));   // Tilt forward/back
+                const normalizedY = Math.max(-1, Math.min(1, (deadzonedGamma / 45) * this.sensitivity));  // Tilt left/right
                 
                 // Apply smoothing to prevent jittery motion
                 this.smoothedX = this.smoothedX + (normalizedX - this.smoothedX) * this.smoothingFactor;
