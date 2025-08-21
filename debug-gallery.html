@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Gallery Storage</title>
+    <style>
+        body { font-family: monospace; background: #000; color: #0f0; padding: 20px; }
+        .variation { margin: 10px 0; padding: 10px; border: 1px solid #0f0; }
+        .error { color: #f00; }
+        .system { color: #ff0; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>VIB34D Gallery Storage Debug</h1>
+    <button onclick="analyzeStorage()">Analyze Storage</button>
+    <button onclick="clearStorage()">Clear All Storage</button>
+    <div id="output"></div>
+    
+    <script>
+        function analyzeStorage() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<h2>Storage Analysis:</h2>';
+            
+            // Check localStorage keys
+            output.innerHTML += '<h3>LocalStorage Keys:</h3>';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.includes('vib34d') || key.includes('collection')) {
+                    const value = localStorage.getItem(key);
+                    try {
+                        const parsed = JSON.parse(value);
+                        output.innerHTML += `<div class="variation">
+                            <strong>${key}:</strong><br>
+                            <pre>${JSON.stringify(parsed, null, 2)}</pre>
+                        </div>`;
+                    } catch (e) {
+                        output.innerHTML += `<div class="error">
+                            <strong>${key}:</strong> ${value.substring(0, 200)}...
+                        </div>`;
+                    }
+                }
+            }
+            
+            // Specifically check unified variations
+            const unifiedKey = 'vib34d-unified-variations';
+            const unifiedVariations = localStorage.getItem(unifiedKey);
+            if (unifiedVariations) {
+                try {
+                    const variations = JSON.parse(unifiedVariations);
+                    output.innerHTML += '<h3>Unified Variations Analysis:</h3>';
+                    variations.forEach((v, i) => {
+                        output.innerHTML += `<div class="variation">
+                            <strong>Variation ${i + 1}:</strong><br>
+                            <span class="system">System: ${v.system || 'MISSING'}</span><br>
+                            Name: ${v.name || 'UNNAMED'}<br>
+                            Parameters: ${Object.keys(v.parameters || {}).length} params<br>
+                            <details>
+                                <summary>Full Data:</summary>
+                                <pre>${JSON.stringify(v, null, 2)}</pre>
+                            </details>
+                        </div>`;
+                    });
+                } catch (e) {
+                    output.innerHTML += `<div class="error">Failed to parse unified variations: ${e.message}</div>`;
+                }
+            }
+            
+            // Check collection files
+            const collectionKey = 'vib34d-collection-variations';
+            const collectionData = localStorage.getItem(collectionKey);
+            if (collectionData) {
+                try {
+                    const collections = JSON.parse(collectionData);
+                    output.innerHTML += '<h3>Collection Variations:</h3>';
+                    collections.forEach((v, i) => {
+                        output.innerHTML += `<div class="variation">
+                            <strong>Collection ${i + 1}:</strong><br>
+                            <span class="system">System: ${v.system || 'MISSING'}</span><br>
+                            Name: ${v.name || 'UNNAMED'}<br>
+                            Parameters: ${Object.keys(v.parameters || {}).length} params<br>
+                        </div>`;
+                    });
+                } catch (e) {
+                    output.innerHTML += `<div class="error">Failed to parse collection variations: ${e.message}</div>`;
+                }
+            }
+        }
+        
+        function clearStorage() {
+            if (confirm('Clear ALL VIB34D storage? This cannot be undone!')) {
+                const keys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.includes('vib34d') || key.includes('collection')) {
+                        keys.push(key);
+                    }
+                }
+                keys.forEach(key => localStorage.removeItem(key));
+                alert(`Cleared ${keys.length} storage keys`);
+                analyzeStorage();
+            }
+        }
+        
+        // Auto-analyze on load
+        analyzeStorage();
+    </script>
+</body>
+</html>

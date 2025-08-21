@@ -1,0 +1,95 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]: VIB34D ENGINE
+    - generic [ref=e4]:
+      - button "🔷 Faceted" [ref=e5] [cursor=pointer]
+      - button "🌌 Quantum" [ref=e6] [cursor=pointer]
+      - button "✨ Holographic" [ref=e7] [cursor=pointer]
+      - button "🔮 Polychora" [ref=e8] [cursor=pointer]
+    - generic [ref=e9]:
+      - button "🖼️" [ref=e10] [cursor=pointer]
+      - button "🎵" [ref=e11] [cursor=pointer]
+      - button "🤖" [ref=e12] [cursor=pointer]
+      - button "I" [ref=e13] [cursor=pointer]
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]: FACETED SYSTEM
+      - button "▲" [ref=e23] [cursor=pointer]
+    - generic [ref=e24]:
+      - generic [ref=e25]: GEOMETRY
+      - generic [ref=e26]:
+        - button "TETRAHEDRON" [ref=e27] [cursor=pointer]
+        - button "HYPERCUBE" [ref=e28] [cursor=pointer]
+        - button "SPHERE" [ref=e29] [cursor=pointer]
+        - button "TORUS" [ref=e30] [cursor=pointer]
+        - button "KLEIN BOTTLE" [ref=e31] [cursor=pointer]
+        - button "FRACTAL" [ref=e32] [cursor=pointer]
+        - button "WAVE" [ref=e33] [cursor=pointer]
+        - button "CRYSTAL" [ref=e34] [cursor=pointer]
+    - generic [ref=e35]:
+      - generic [ref=e36]: 4D ROTATION
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - generic [ref=e39]: XW Plane
+          - generic [ref=e40]: "0.00"
+        - slider [ref=e41]: "0"
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: YW Plane
+          - generic [ref=e45]: "0.00"
+        - slider [ref=e46]: "0"
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - generic [ref=e49]: ZW Plane
+          - generic [ref=e50]: "0.00"
+        - slider [ref=e51]: "0"
+    - generic [ref=e52]:
+      - generic [ref=e53]: VISUAL
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]: Density
+          - generic [ref=e57]: "15"
+        - slider [ref=e58]: "15"
+      - generic [ref=e59]:
+        - generic [ref=e60]:
+          - generic [ref=e61]: Morph
+          - generic [ref=e62]: "1.0"
+        - slider [ref=e63]: "1"
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - generic [ref=e66]: Chaos
+          - generic [ref=e67]: "0.2"
+        - slider [ref=e68]: "0.2"
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]: Speed
+          - generic [ref=e72]: "1.0"
+        - slider [ref=e73]: "1"
+      - generic [ref=e74]:
+        - generic [ref=e75]:
+          - generic [ref=e76]: Hue
+          - generic [ref=e77]: 200°
+        - slider [ref=e78]: "200"
+      - generic [ref=e79]:
+        - generic [ref=e80]:
+          - generic [ref=e81]: Intensity
+          - generic [ref=e82]: "0.5"
+        - slider [ref=e83]: "0.5"
+      - generic [ref=e84]:
+        - generic [ref=e85]:
+          - generic [ref=e86]: Saturation
+          - generic [ref=e87]: "0.8"
+        - slider [ref=e88]: "0.8"
+    - generic [ref=e89]:
+      - button "🎲 Random" [ref=e90] [cursor=pointer]
+      - button "🌀 Full" [ref=e91] [cursor=pointer]
+    - generic [ref=e92]:
+      - button "🔄 Reset" [ref=e93] [cursor=pointer]
+      - button "💾 Save to Gallery" [ref=e94] [cursor=pointer]
+    - generic [ref=e95]:
+      - button "🎴 Trading Card" [ref=e96] [cursor=pointer]
+      - button "📱 Social Card" [ref=e97] [cursor=pointer]
+```

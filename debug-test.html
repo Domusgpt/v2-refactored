@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug WebGL Test</title>
+    <style>
+        body { font-family: monospace; background: #000; color: #0f0; padding: 20px; }
+        .log { margin: 5px 0; }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+        .warn { color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>Debug WebGL Context Test</h1>
+    <div id="log"></div>
+    
+    <script>
+        function log(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = new Date().toISOString() + ': ' + message;
+            document.getElementById('log').appendChild(div);
+            console.log(message);
+        }
+        
+        // Test basic WebGL
+        log('Starting WebGL test...');
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 600;
+        document.body.appendChild(canvas);
+        
+        const contextOptions = {
+            alpha: true,
+            depth: true,
+            stencil: false,
+            antialias: false,
+            premultipliedAlpha: true,
+            preserveDrawingBuffer: false,
+            powerPreference: 'high-performance',
+            failIfMajorPerformanceCaveat: false
+        };
+        
+        const gl = canvas.getContext('webgl2', contextOptions) || 
+                   canvas.getContext('webgl', contextOptions) ||
+                   canvas.getContext('experimental-webgl', contextOptions);
+        
+        if (!gl) {
+            log('WebGL context creation FAILED', 'error');
+        } else {
+            log('WebGL context created successfully', 'success');
+            log('Version: ' + gl.getParameter(gl.VERSION));
+            log('Renderer: ' + gl.getParameter(gl.RENDERER));
+            log('Context lost: ' + gl.isContextLost());
+            
+            // Test shader compilation
+            const vertexSource = `attribute vec2 a_position;
+void main() {
+    gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+            
+            const fragmentSource = `precision highp float;
+void main() {
+    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+}`;
+            
+            try {
+                const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+                if (!vertexShader) {
+                    log('Failed to create vertex shader object', 'error');
+                } else {
+                    gl.shaderSource(vertexShader, vertexSource);
+                    gl.compileShader(vertexShader);
+                    
+                    if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+                        const error = gl.getShaderInfoLog(vertexShader);
+                        log('Vertex shader compilation failed: ' + (error || 'null'), 'error');
+                    } else {
+                        log('Vertex shader compiled successfully', 'success');
+                        
+                        const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+                        if (!fragmentShader) {
+                            log('Failed to create fragment shader object', 'error');
+                        } else {
+                            gl.shaderSource(fragmentShader, fragmentSource);
+                            gl.compileShader(fragmentShader);
+                            
+                            if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+                                const error = gl.getShaderInfoLog(fragmentShader);
+                                log('Fragment shader compilation failed: ' + (error || 'null'), 'error');
+                            } else {
+                                log('Fragment shader compiled successfully', 'success');
+                                
+                                // Test program linking
+                                const program = gl.createProgram();
+                                gl.attachShader(program, vertexShader);
+                                gl.attachShader(program, fragmentShader);
+                                gl.linkProgram(program);
+                                
+                                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                                    const error = gl.getProgramInfoLog(program);
+                                    log('Program linking failed: ' + (error || 'null'), 'error');
+                                } else {
+                                    log('Program linked successfully', 'success');
+                                    log('ALL WEBGL TESTS PASSED', 'success');
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                log('Exception during shader test: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

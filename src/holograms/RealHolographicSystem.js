@@ -4,6 +4,7 @@
  * Audio reactive only - no mouse/touch/scroll interference
  */
 import { HolographicVisualizer } from './HolographicVisualizer.js';
+import { HolographicTiltController } from '../interactions/HolographicTiltController.js';
 
 export class RealHolographicSystem {
     constructor() {
@@ -12,6 +13,7 @@ export class RealHolographicSystem {
         this.baseVariants = 30; // Original 30 variations
         this.totalVariants = 30;
         this.isActive = false;
+        this.tiltController = null;
         
         // Audio reactivity system
         this.audioEnabled = false;
@@ -107,13 +109,26 @@ export class RealHolographicSystem {
             if (!this.audioEnabled) {
                 this.initAudio();
             }
-            console.log('🌌 REAL Active Holograms ACTIVATED with audio reactivity');
+            
+            // CRITICAL: Initialize tilt controller for mobile devices
+            if (!this.tiltController) {
+                this.tiltController = new HolographicTiltController();
+            }
+            this.tiltController.init();
+            
+            console.log('🌌 REAL Active Holograms ACTIVATED with audio reactivity + tilt control');
         } else {
             // Hide holographic layers
             const holoLayers = document.getElementById('holographicLayers');
             if (holoLayers) {
                 holoLayers.style.display = 'none';
             }
+            
+            // Deactivate tilt controller
+            if (this.tiltController) {
+                this.tiltController.deactivate();
+            }
+            
             console.log('🌌 REAL Active Holograms DEACTIVATED');
         }
     }
@@ -147,6 +162,12 @@ export class RealHolographicSystem {
     }
     
     updateParameter(param, value) {
+        // CRITICAL: Update tilt controller base rotations when user changes 4D rotation sliders
+        if (this.tiltController && (param === 'rot4dXW' || param === 'rot4dYW' || param === 'rot4dZW')) {
+            const axis = param.replace('rot4d', '').toLowerCase(); // 'rot4dXW' -> 'xw'
+            this.tiltController.updateBaseRotation(axis, value);
+        }
+        
         // Store custom parameter overrides
         if (!this.customParams) {
             this.customParams = {};
