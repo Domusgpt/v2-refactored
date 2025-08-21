@@ -840,13 +840,22 @@
                         }
                     });
                     
-                    // Hide inactive system canvases to prevent WebGL context creation
+                    // CRITICAL FIX: Don't hide inactive system canvases - SmartCanvasPool needs them for switching!
+                    // Just ensure they're properly sized but keep them accessible
                     Object.keys(systemCanvases).forEach(system => {
                         if (system !== activeSystem) {
                             systemCanvases[system].forEach(canvasId => {
                                 const canvas = document.getElementById(canvasId);
                                 if (canvas) {
-                                    canvas.style.display = 'none';
+                                    // Size the canvas but keep it accessible for system switching
+                                    canvas.style.position = 'absolute';
+                                    canvas.style.top = '0';
+                                    canvas.style.left = '0';
+                                    canvas.style.width = '100%';
+                                    canvas.style.height = '100%';
+                                    canvas.width = viewWidth * dpr;
+                                    canvas.height = viewHeight * dpr;
+                                    window.mobileOptimization.log(`📱 Pre-sized inactive canvas ${canvasId}: ${canvas.width}x${canvas.height}`);
                                 }
                             });
                         }
@@ -1081,21 +1090,16 @@
                     console.log('✅ All engines initialized for desktop');
                 }
                 
-                // Ensure all engines exist with stubs if needed for compatibility
+                // CRITICAL FIX: Don't create stub engines - they break system switching!
+                // SmartCanvasPool will create real engines on demand when switching systems
                 if (!engine) {
-                    engine = { visualizers: [], updateParameter: () => {}, startRenderLoop: () => {}, updateVisualizers: () => {} };
+                    console.log('⚠️ Faceted engine will be created by SmartCanvasPool');
                 }
                 if (!quantumEngine) {
-                    quantumEngine = { visualizers: [], setActive: () => {}, updateParameter: () => {}, isActive: false };
+                    console.log('⚠️ Quantum engine will be created by SmartCanvasPool on demand');
                 }
                 if (!holographicSystem) {
-                    if (isMobile && activeSystem !== 'holographic') {
-                        // Stub holographic system for mobile when not active
-                        holographicSystem = { setActive: () => {}, updateParameter: () => {}, ensureRunning: () => {}, isActive: false };
-                    } else {
-                        holographicSystem = new RealHolographicSystem();
-                        console.log('✅ Holographic System ready');
-                    }
+                    console.log('⚠️ Holographic system will be created by SmartCanvasPool on demand');
                 }
                 
                 // CRITICAL PERFORMANCE FIX: Set moduleReady flag immediately after core engines

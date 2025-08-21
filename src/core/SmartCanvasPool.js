@@ -250,6 +250,16 @@ export class SmartCanvasPool {
     
     console.log(`🎨 Creating ${configs.length} WebGL contexts for ${systemName}`);
     
+    // CRITICAL MOBILE FIX: Ensure canvas container is visible first
+    const layerId = systemName === 'faceted' ? 'vib34dLayers' : `${systemName}Layers`;
+    const layerContainer = document.getElementById(layerId);
+    if (layerContainer && layerContainer.style.display === 'none') {
+      console.log(`📱 MOBILE FIX: Making ${layerId} visible for context creation`);
+      layerContainer.style.display = 'block';
+      layerContainer.style.visibility = 'visible';
+      layerContainer.style.opacity = '1';
+    }
+    
     configs.forEach(config => {
       const canvas = document.getElementById(config.id);
       if (canvas) {
