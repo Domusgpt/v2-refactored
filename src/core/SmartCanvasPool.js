@@ -43,27 +43,83 @@ export class SmartCanvasPool {
   }
 
   async switchToSystem(systemName, engine) {
-    console.log(`🔄 Switching to ${systemName} - destroying old contexts, creating new ones`);
+    console.log(`🔄 Switching to ${systemName} - managing contexts and engines`);
     
     // Hide all layer containers first
     this.hideAllLayers();
     
-    // Destroy current system contexts and engine
-    if (this.activeSystem) {
-      this.destroySystemContexts(this.activeSystem);
-      this.destroyCurrentEngine();
+    // Store previous system
+    const previousSystem = this.activeSystem;
+    
+    // Deactivate previous engine BEFORE destroying contexts
+    if (previousSystem && previousSystem !== systemName) {
+      const prevEngine = this.getEngineForSystem(previousSystem);
+      if (prevEngine && prevEngine.setActive) {
+        console.log(`🔴 Deactivating ${previousSystem} engine`);
+        prevEngine.setActive(false);
+      }
     }
     
-    // Show and create contexts for target system only
+    // Destroy previous system contexts
+    if (this.activeSystem) {
+      this.destroySystemContexts(this.activeSystem);
+    }
+    
+    // Show target system layers BEFORE creating engine (critical for mobile)
     this.showSystemLayers(systemName);
-    this.createSystemContexts(systemName);
+    
+    // Update active system
     this.activeSystem = systemName;
     
-    // Lazy load and create the engine for this system
-    const newEngine = await this.createEngineForSystem(systemName);
+    // Create NEW contexts for target system
+    this.createSystemContexts(systemName);
+    
+    // Get or create engine for target system
+    let targetEngine = this.getEngineForSystem(systemName);
+    
+    if (!targetEngine) {
+      console.log(`🚀 Creating new ${systemName} engine...`);
+      targetEngine = await this.createEngineForSystem(systemName);
+      
+      // New engine will have freshly created visualizers
+      console.log(`✨ New ${systemName} engine has ${targetEngine?.visualizers?.length || 0} visualizers`);
+    } else {
+      console.log(`♻️ Reusing existing ${systemName} engine with ${targetEngine?.visualizers?.length || 0} visualizers`);
+      
+      // CRITICAL: Reinitialize visualizers for reused engine
+      if (targetEngine.visualizers && targetEngine.visualizers.length > 0) {
+        console.log(`🔄 Reinitializing ${targetEngine.visualizers.length} visualizers for ${systemName}`);
+        
+        // Wait a bit for contexts to stabilize
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        targetEngine.visualizers.forEach((visualizer, index) => {
+          try {
+            if (visualizer.reinitializeContext) {
+              const success = visualizer.reinitializeContext();
+              if (success) {
+                console.log(`✅ Visualizer ${index} reinitialized`);
+              } else {
+                console.warn(`⚠️ Visualizer ${index} reinit failed`);
+              }
+            } else {
+              console.warn(`⚠️ Visualizer ${index} missing reinitializeContext`);
+            }
+          } catch (error) {
+            console.error(`❌ Failed to reinitialize visualizer ${index}:`, error);
+          }
+        });
+      }
+    }
+    
+    // Activate the target engine
+    if (targetEngine && targetEngine.setActive) {
+      console.log(`🟢 Activating ${systemName} engine`);
+      targetEngine.setActive(true);
+    }
     
     console.log(`✅ ${systemName} system active with 5 WebGL contexts`);
-    return newEngine;
+    return targetEngine;
   }
 
   destroyCurrentEngine() {
@@ -81,6 +137,16 @@ export class SmartCanvasPool {
 
   getCurrentEngine() {
     switch(this.activeSystem) {
+      case 'faceted': return window.engine;
+      case 'quantum': return window.quantumEngine;
+      case 'holographic': return window.holographicSystem;
+      case 'polychora': return window.polychoraSystem;
+      default: return null;
+    }
+  }
+
+  getEngineForSystem(systemName) {
+    switch(systemName) {
       case 'faceted': return window.engine;
       case 'quantum': return window.quantumEngine;
       case 'holographic': return window.holographicSystem;

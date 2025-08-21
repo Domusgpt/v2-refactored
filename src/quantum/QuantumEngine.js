@@ -47,30 +47,19 @@ export class QuantumEngine {
         
         layers.forEach(layer => {
             try {
-                // Create canvas element if it doesn't exist
-                let canvas = document.getElementById(layer.id);
+                // Canvas elements should already exist in HTML
+                const canvas = document.getElementById(layer.id);
                 if (!canvas) {
-                    canvas = document.createElement('canvas');
-                    canvas.id = layer.id;
-                    canvas.className = 'visualizer-canvas';
-                    canvas.style.position = 'absolute';
-                    canvas.style.top = '0';
-                    canvas.style.left = '0';
-                    canvas.style.width = '100%';
-                    canvas.style.height = '100%';
-                    canvas.style.pointerEvents = 'none';
-                    
-                    // Add to quantum layers container
-                    const quantumLayers = document.getElementById('quantumLayers');
-                    if (quantumLayers) {
-                        quantumLayers.appendChild(canvas);
-                    }
+                    console.warn(`⚠️ Canvas ${layer.id} not found in DOM - skipping`);
+                    return;
                 }
                 
                 const visualizer = new QuantumHolographicVisualizer(layer.id, layer.role, layer.reactivity, 0);
                 if (visualizer.gl) {
                     this.visualizers.push(visualizer);
                     console.log(`🌌 Created quantum layer: ${layer.role}`);
+                } else {
+                    console.warn(`⚠️ No WebGL context for quantum layer ${layer.id}`);
                 }
             } catch (error) {
                 console.warn(`Failed to create quantum layer ${layer.id}:`, error);

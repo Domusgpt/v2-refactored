@@ -576,6 +576,32 @@ void main() {
     }
     
     /**
+     * CRITICAL FIX: Reinitialize WebGL program after context recreation
+     */
+    reinitializeContext() {
+        console.log(`🔄 Reinitializing WebGL context for ${this.canvas?.id}`);
+        
+        // Clear ALL old WebGL references
+        this.program = null;
+        this.buffer = null;
+        this.uniforms = null;
+        this.gl = null;
+        
+        // Get fresh WebGL context
+        this.createWebGLContext();
+        
+        // Reinitialize shaders and buffers if context is valid
+        if (this.gl) {
+            this.init();
+            console.log(`✅ ${this.canvas?.id}: Context reinitialized successfully`);
+            return true;
+        } else {
+            console.error(`❌ ${this.canvas?.id}: Failed to reinitialize WebGL context`);
+            return false;
+        }
+    }
+
+    /**
      * Clean up WebGL resources
      */
     destroy() {
