@@ -415,10 +415,10 @@ export class HolographicVisualizer {
                 float scrollRotation = u_scrollParallax * 0.1;
                 float touchRotation = u_touchMorph * 0.2;
                 
-                // Combine manual rotation with automatic/interactive rotation
-                p4d = rotateXW(u_rot4dXW + time * 0.2 + mouseOffset.y * 0.5 + scrollRotation) * p4d;
-                p4d = rotateYW(u_rot4dYW + time * 0.15 + mouseOffset.x * 0.5 + touchRotation) * p4d;
-                p4d = rotateZW(u_rot4dZW + time * 0.25 + u_clickIntensity * 0.3 + u_touchChaos * 0.4) * p4d;
+                // Combine manual rotation with automatic/interactive rotation (automatic rotation reduced 10x)
+                p4d = rotateXW(u_rot4dXW + time * 0.02 + mouseOffset.y * 0.5 + scrollRotation) * p4d;
+                p4d = rotateYW(u_rot4dYW + time * 0.015 + mouseOffset.x * 0.5 + touchRotation) * p4d;
+                p4d = rotateZW(u_rot4dZW + time * 0.025 + u_clickIntensity * 0.3 + u_touchChaos * 0.4) * p4d;
                 
                 vec3 p = project4Dto3D(p4d);
                 
@@ -756,7 +756,7 @@ export class HolographicVisualizer {
         this.gl.uniform2f(this.uniforms.mouse, this.mouseX, this.mouseY);
         this.gl.uniform1f(this.uniforms.geometryType, this.variantParams.geometryType || 0);
         this.gl.uniform1f(this.uniforms.density, this.variantParams.density || 1.0);
-        this.gl.uniform1f(this.uniforms.speed, (this.variantParams.speed || 0.5) + (this.audioSpeedBoost || 0.0));
+        this.gl.uniform1f(this.uniforms.speed, ((this.variantParams.speed || 0.5) + (this.audioSpeedBoost || 0.0)) * 0.1);
         this.gl.uniform3fv(this.uniforms.color, new Float32Array(rgbColor));
         this.gl.uniform1f(this.uniforms.intensity, (this.variantParams.intensity || 0.5) * this.roleParams.intensity);
         this.gl.uniform1f(this.uniforms.roleDensity, this.roleParams.densityMult);
