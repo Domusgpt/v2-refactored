@@ -920,7 +920,9 @@
         }
         
         function createVariationCard(variation, collectionIndex, variationIndex) {
-            const parametersQuery = buildParametersQuery(variation.parameters);
+            // CRITICAL FIX: Ensure parameters exist and are valid before building query
+            const safeParameters = variation.parameters || {};
+            const parametersQuery = buildParametersQuery(safeParameters);
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             
             // Use the variation's globalId directly for proper sequential numbering
@@ -936,9 +938,9 @@
             const system = variation.system || 'faceted';
             const sysInfo = systemInfo[system] || systemInfo.faceted;
             
-            // Parameter display
-            const hue = variation.parameters.hue || 0;
-            const saturation = (variation.parameters.saturation || 0.8) * 100;
+            // Parameter display - handle safely
+            const hue = safeParameters.hue || 0;
+            const saturation = (safeParameters.saturation || 0.8) * 100;
             
             return `
                 <div class="variation-card" 
@@ -961,7 +963,7 @@
                                 ${sysInfo.name}
                             </div>
                             <div class="preview-geometry" style="color: hsl(${hue}, ${saturation}%, 70%);">
-                                ${getGeometryName(variation.parameters)}
+                                ${getGeometryName(safeParameters)}
                             </div>
                             <div class="preview-bar" style="background: hsl(${hue}, ${saturation}%, 60%);"></div>
                             <div class="preview-hint">
@@ -974,7 +976,7 @@
                         <h3>${escapeHtml(variation.name)} <span style="color: rgba(255,255,255,0.4); font-size: 0.8em;">#${globalId}</span></h3>
                         <div class="card-params">
                             System: ${sysInfo.name}<br>
-                            Geometry: ${getGeometryName(variation.parameters)}<br>
+                            Geometry: ${getGeometryName(safeParameters)}<br>
                             Hue: ${Math.round(hue)}° | Global ID: ${globalId}
                         </div>
                     </div>
@@ -985,9 +987,14 @@
         }
         
         function buildParametersQuery(params) {
+            // CRITICAL FIX: Handle null/undefined params safely
+            if (!params || typeof params !== 'object') {
+                return '';
+            }
+            
             const urlParams = new URLSearchParams();
             Object.entries(params).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
+                if (value !== undefined && value !== null && key !== 'undefined') {
                     urlParams.set(key, value);
                 }
             });

@@ -290,8 +290,8 @@ export class CollectionManager {
                             id: index + 100, // Start user variations at ID 100+
                             name: variation.name || `User Variation ${index + 1}`,
                             isCustom: true,
-                            globalId: variation.id,
-                            system: variation.system || 'faceted',
+                            globalId: variation.id || `USER-${Date.now()}-${index}`,
+                            system: this.detectSystemFromParameters(variation.system, variation.parameters),
                             parameters: this.normalizeParameters(variation.parameters || {})
                         }))
                     };
@@ -340,26 +340,123 @@ export class CollectionManager {
     
     /**
      * Normalize parameters to match expected gallery format
+     * ENHANCED: Handle legacy parameter formats and null/undefined values
      */
     normalizeParameters(params) {
-        // Convert between different parameter formats
+        // CRITICAL FIX: Handle null/undefined/non-object params
+        if (!params || typeof params !== 'object') {
+            console.warn('⚠️ Invalid parameters, using defaults:', params);
+            return this.getDefaultParameters();
+        }
+        
+        // Convert between different parameter formats with safe fallbacks
         const normalized = {
-            geometryType: params.geometry || params.geometryType || 0,
-            density: params.gridDensity || params.density || 10,
-            speed: params.speed || 1.0,
-            chaos: params.chaos || 0,
-            morph: params.morphFactor || params.morph || 0,
-            hue: params.hue || 200,
-            saturation: params.saturation || 0.8,
-            intensity: params.intensity || 0.5,
+            // Geometry - handle multiple legacy names
+            geometry: this.safeNumber(params.geometry || params.geometryType || params.geom, 0),
+            geometryType: this.safeNumber(params.geometry || params.geometryType || params.geom, 0),
+            
+            // Grid/Density - handle legacy names  
+            gridDensity: this.safeNumber(params.gridDensity || params.density || params.grid, 10),
+            density: this.safeNumber(params.gridDensity || params.density || params.grid, 10),
+            
+            // Animation speed
+            speed: this.safeNumber(params.speed || params.animSpeed, 1.0),
+            
+            // Chaos/randomization
+            chaos: this.safeNumber(params.chaos || params.randomness, 0),
+            
+            // Morphing
+            morphFactor: this.safeNumber(params.morphFactor || params.morph, 0),
+            morph: this.safeNumber(params.morphFactor || params.morph, 0),
+            
+            // Colors - handle multiple formats
+            hue: this.safeNumber(params.hue || params.color || params.colorHue, 200),
+            saturation: this.safeNumber(params.saturation || params.sat, 0.8),
+            intensity: this.safeNumber(params.intensity || params.brightness, 0.5),
+            
             // 4D rotation parameters
-            rot4dXW: params.rot4dXW || 0,
-            rot4dYW: params.rot4dYW || 0,
-            rot4dZW: params.rot4dZW || 0,
-            dimension: params.dimension || 3.8
+            rot4dXW: this.safeNumber(params.rot4dXW || params.rotXW, 0),
+            rot4dYW: this.safeNumber(params.rot4dYW || params.rotYW, 0), 
+            rot4dZW: this.safeNumber(params.rot4dZW || params.rotZW, 0),
+            
+            // Dimension
+            dimension: this.safeNumber(params.dimension || params.dim, 3.8)
         };
         
+        console.log('🔧 Parameter normalization:', { original: params, normalized });
         return normalized;
+    }
+    
+    /**
+     * Safely convert value to number with fallback
+     */
+    safeNumber(value, fallback) {
+        if (value === null || value === undefined || value === '') {
+            return fallback;
+        }
+        
+        const num = parseFloat(value);
+        return isNaN(num) ? fallback : num;
+    }
+    
+    /**
+     * Get default parameters for invalid variations
+     */
+    getDefaultParameters() {
+        return {
+            geometry: 0,
+            geometryType: 0,
+            gridDensity: 10,
+            density: 10,
+            speed: 1.0,
+            chaos: 0,
+            morphFactor: 0,
+            morph: 0,
+            hue: 200,
+            saturation: 0.8,
+            intensity: 0.5,
+            rot4dXW: 0,
+            rot4dYW: 0,
+            rot4dZW: 0,
+            dimension: 3.8
+        };
+    }
+    
+    /**
+     * Detect system type from parameters when system property is missing
+     */
+    detectSystemFromParameters(explicitSystem, parameters) {
+        // If system is explicitly set, use it
+        if (explicitSystem && ['faceted', 'quantum', 'holographic', 'polychora'].includes(explicitSystem)) {
+            return explicitSystem;
+        }
+        
+        // Try to detect from parameters
+        if (!parameters || typeof parameters !== 'object') {
+            return 'faceted'; // Default fallback
+        }
+        
+        // Polychora detection: Has polytope parameter
+        if (parameters.polytope !== undefined || parameters.polytopeType !== undefined) {
+            return 'polychora';
+        }
+        
+        // Holographic detection: Has high-end effects or audio parameters
+        if (parameters.audioReactive || parameters.microphone || 
+            (parameters.intensity !== undefined && parameters.intensity > 0.7) ||
+            (parameters.saturation !== undefined && parameters.saturation > 0.9)) {
+            return 'holographic';
+        }
+        
+        // Quantum detection: Has complex parameters or high values
+        if ((parameters.chaos !== undefined && parameters.chaos > 0.3) ||
+            (parameters.morphFactor !== undefined && parameters.morphFactor > 0.5) ||
+            (parameters.dimension !== undefined && parameters.dimension > 3.5)) {
+            return 'quantum';
+        }
+        
+        // Default to faceted for simple configurations
+        return 'faceted';
     }
 
     /**
