@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIB34D Engine - Canvas Explosion FIXED</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/styles/universal-controls.css">
     <style>
         * {
             margin: 0;
@@ -902,6 +903,7 @@
         import { SmartCanvasPool } from './src/core/SmartCanvasPool.js';
         import { TradingCardGenerator } from './src/export/TradingCardGenerator.js';
         import universalReactivity from './src/interactions/UniversalReactivitySystem.js';
+        import { initializeUniversalSystems } from './src/init/UniversalSystemInitializer.js';
         
         // Global state - CRITICAL FIX: Check for gallery preview data FIRST
         let currentSystem = window.galleryPreviewData ? window.galleryPreviewData.system : 'faceted';
@@ -965,6 +967,27 @@
             // Module ready flag already set earlier for performance
             
             console.log('🚀 VIB34D Clean Interface Ready - All systems initialized');
+            
+            // Initialize Universal Audio and Interaction Systems
+            try {
+                const universalInitializer = await initializeUniversalSystems();
+                console.log('🎵🖱️ Universal Systems integrated successfully');
+                
+                // Make universalInitializer globally accessible
+                window.universalInitializer = universalInitializer;
+                
+                // Start audio processing for universal systems
+                if (window.universalAudio) {
+                    console.log('🎵 Universal Audio Engine started');
+                }
+                
+                if (window.universalInteractions) {
+                    console.log('🖱️ Universal Interaction Engine started');
+                }
+                
+            } catch (error) {
+                console.warn('⚠️ Failed to initialize Universal Systems:', error);
+            }
             
             // Mobile debug system auto-hide on successful initialization
             if (window.mobileOptimization) {

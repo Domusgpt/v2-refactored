@@ -1,0 +1,282 @@
+/**
+ * Universal System Controls CSS
+ * Styles for Universal Audio Engine and Interaction Engine controls
+ */
+
+.universal-controls {
+    background: rgba(20, 20, 40, 0.95);
+    border: 1px solid rgba(100, 255, 150, 0.3);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-family: 'Orbitron', monospace;
+    color: #64ff96;
+}
+
+.universal-controls-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64ff96;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.control-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #a8e6a3;
+    cursor: pointer;
+}
+
+.control-row input[type="checkbox"] {
+    accent-color: #64ff96;
+    transform: scale(1.1);
+}
+
+.btn-primary {
+    background: linear-gradient(145deg, #64ff96, #4a9960);
+    border: none;
+    color: #001a0a;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(145deg, #7cffae, #5eab74);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(100, 255, 150, 0.3);
+}
+
+.btn-primary:disabled {
+    background: #4a4a4a;
+    color: #888;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Audio Visualization */
+.audio-visualizer {
+    background: rgba(0, 20, 10, 0.6);
+    border: 1px solid rgba(100, 255, 150, 0.2);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 16px;
+}
+
+.frequency-bars {
+    display: flex;
+    gap: 8px;
+    height: 40px;
+    align-items: flex-end;
+}
+
+.freq-bar {
+    flex: 1;
+    background: linear-gradient(
+        to top,
+        rgba(100, 255, 150, 0.8) 0%,
+        rgba(100, 255, 150, 0.6) 50%,
+        rgba(100, 255, 150, 0.3) 100%
+    );
+    border-radius: 2px 2px 0 0;
+    position: relative;
+    height: calc(var(--intensity, 0) * 35px + 5px);
+    transition: height 0.1s ease-out;
+    min-height: 5px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.freq-bar span {
+    font-size: 8px;
+    color: #001a0a;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1px 2px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 2px;
+    margin-bottom: 1px;
+}
+
+/* Interaction Status */
+.interaction-status {
+    font-size: 11px;
+    color: #a8e6a3;
+    font-style: italic;
+}
+
+/* System Status */
+.system-status {
+    margin-top: 16px;
+}
+
+.system-status h4 {
+    margin: 0 0 8px 0;
+    font-size: 12px;
+    color: #64ff96;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+}
+
+.system-card {
+    background: rgba(0, 20, 10, 0.4);
+    border: 1px solid rgba(100, 255, 150, 0.2);
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    transition: all 0.2s ease;
+}
+
+.system-card:hover {
+    background: rgba(0, 20, 10, 0.6);
+    border-color: rgba(100, 255, 150, 0.4);
+}
+
+.system-name {
+    color: #a8e6a3;
+    font-weight: 500;
+}
+
+.status-indicator {
+    font-size: 12px;
+    cursor: help;
+}
+
+/* System-specific colors */
+.system-card.faceted {
+    border-left: 3px solid #64a4ff;
+}
+
+.system-card.quantum {
+    border-left: 3px solid #9c64ff;
+}
+
+.system-card.holographic {
+    border-left: 3px solid #ff64c8;
+}
+
+.system-card.polychora {
+    border-left: 3px solid #64ffff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .universal-controls {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .control-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .frequency-bars {
+        height: 30px;
+    }
+    
+    .freq-bar {
+        height: calc(var(--intensity, 0) * 25px + 3px);
+        min-height: 3px;
+    }
+    
+    .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    
+    .system-card {
+        padding: 6px;
+        font-size: 9px;
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .universal-controls {
+        background: rgba(10, 10, 25, 0.98);
+        border-color: rgba(100, 255, 150, 0.4);
+    }
+    
+    .audio-visualizer {
+        background: rgba(0, 10, 5, 0.8);
+    }
+    
+    .system-card {
+        background: rgba(0, 10, 5, 0.6);
+    }
+    
+    .system-card:hover {
+        background: rgba(0, 10, 5, 0.8);
+    }
+}
+
+/* Animation for status indicators */
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.status-indicator:not([title*="Connected"]) {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Audio bar animation */
+@keyframes audioReactive {
+    0% { box-shadow: 0 0 0 rgba(100, 255, 150, 0.3); }
+    50% { box-shadow: 0 0 10px rgba(100, 255, 150, 0.6); }
+    100% { box-shadow: 0 0 0 rgba(100, 255, 150, 0.3); }
+}
+
+.freq-bar[style*="--intensity"] {
+    animation: audioReactive 0.5s ease-in-out infinite;
+}
+
+/* Success states */
+.status-indicator[title*="Connected"] {
+    color: #64ff96;
+    text-shadow: 0 0 4px rgba(100, 255, 150, 0.6);
+}
+
+/* Partially connected */
+.status-indicator[title*="Partially"] {
+    color: #ffb464;
+    text-shadow: 0 0 4px rgba(255, 180, 100, 0.6);
+}
+
+/* Loading state */
+.status-indicator[title*="Connecting"] {
+    color: #64a4ff;
+    text-shadow: 0 0 4px rgba(100, 164, 255, 0.6);
+}

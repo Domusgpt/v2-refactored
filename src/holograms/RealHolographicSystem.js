@@ -43,6 +43,9 @@ export class RealHolographicSystem {
         ];
         
         this.initialize();
+        
+        // Connect to universal systems (holographic already has sophisticated audio built-in)
+        this.connectToUniversalSystems();
     }
     
     initialize() {
@@ -560,7 +563,88 @@ export class RealHolographicSystem {
         return this.variantNames[variant] || 'UNKNOWN';
     }
     
+    /**
+     * Connect to universal systems (mainly for enhanced interactions)
+     */
+    connectToUniversalSystems() {
+        // Holographic system already has sophisticated audio - connect for interaction enhancements
+        if (window.universalInteractions) {
+            window.universalInteractions.connectSystem('holographic', this);
+            console.log('🖱️ Holographic system connected to Universal Interaction Engine');
+        } else {
+            // Retry after a short delay if not available yet
+            setTimeout(() => {
+                if (window.universalInteractions) {
+                    window.universalInteractions.connectSystem('holographic', this);
+                    console.log('🖱️ Holographic system connected to Universal Interaction Engine');
+                }
+            }, 100);
+        }
+        
+        // Optional: Also connect to audio for enhancement features
+        if (window.universalAudio) {
+            window.universalAudio.connectSystem('holographic', this);
+            console.log('🎵 Holographic system connected to Universal Audio Engine for enhancements');
+        }
+    }
+    
+    /**
+     * Update audio enhancement (called by Universal Audio Engine)
+     */
+    updateAudioEnhancement(enhancements) {
+        if (enhancements.rhythmMorph && this.audioEnabled) {
+            // Enhance rhythm detection with universal audio analysis
+            this.audioData.rhythm = enhancements.rhythmMorph;
+        }
+        
+        if (enhancements.enhancedTransients && this.audioEnabled) {
+            // Boost transient response
+            this.audioData.transients = enhancements.enhancedTransients;
+        }
+    }
+    
+    /**
+     * Update single parameter (for universal system compatibility)
+     */
+    updateParameter(param, value) {
+        // Route to appropriate system
+        if (param === 'variant') {
+            this.setVariant(Math.floor(value));
+        } else if (param === 'intensity' && this.audioEnabled) {
+            // Enhance existing audio system
+            this.audioData.intensity = value;
+        } else if (param === 'speed' || param === 'dimension') {
+            // Apply to visualizers
+            this.visualizers.forEach(visualizer => {
+                if (visualizer.updateParameters) {
+                    const params = {};
+                    params[param] = value;
+                    visualizer.updateParameters(params);
+                }
+            });
+        }
+    }
+    
+    /**
+     * Get single parameter (for universal system compatibility)
+     */
+    getParameter(param) {
+        if (param === 'variant') {
+            return this.currentVariant;
+        }
+        // Return reasonable defaults for other params
+        return 0.5;
+    }
+    
     destroy() {
+        // Disconnect from universal systems
+        if (window.universalInteractions) {
+            window.universalInteractions.disconnectSystem('holographic');
+        }
+        if (window.universalAudio) {
+            window.universalAudio.disconnectSystem('holographic');
+        }
+        
         this.visualizers.forEach(visualizer => {
             if (visualizer.destroy) {
                 visualizer.destroy();

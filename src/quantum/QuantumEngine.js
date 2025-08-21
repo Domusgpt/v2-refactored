@@ -22,6 +22,9 @@ export class QuantumEngine {
         this.parameters.setParameter('gridDensity', 20); // Denser patterns
         
         this.init();
+        
+        // Connect to universal audio and interaction systems when available
+        this.connectToUniversalSystems();
     }
     
     /**
@@ -231,12 +234,50 @@ export class QuantumEngine {
     }
     
     /**
+     * Connect to universal audio and interaction systems
+     */
+    connectToUniversalSystems() {
+        // Connect to Universal Audio Engine when available
+        if (window.universalAudio) {
+            window.universalAudio.connectSystem('quantum', this);
+            console.log('🎵 Quantum system connected to Universal Audio Engine');
+        } else {
+            // Retry after a short delay if not available yet
+            setTimeout(() => this.connectToUniversalSystems(), 100);
+        }
+        
+        // Connect to Universal Interaction Engine when available
+        if (window.universalInteractions) {
+            window.universalInteractions.connectSystem('quantum', this);
+            console.log('🖱️ Quantum system connected to Universal Interaction Engine');
+        } else {
+            // Retry after a short delay if not available yet
+            setTimeout(() => {
+                if (window.universalInteractions) {
+                    window.universalInteractions.connectSystem('quantum', this);
+                    console.log('🖱️ Quantum system connected to Universal Interaction Engine');
+                }
+            }, 100);
+        }
+    }
+    
+    /**
+     * Get single parameter (required by Universal Interaction Engine)
+     */
+    getParameter(param) {
+        return this.parameters.getParameter ? this.parameters.getParameter(param) : this.parameters.getAllParameters()[param];
+    }
+    
+    /**
      * Clean up resources
      */
     destroy() {
-        // Disconnect from universal reactivity
-        if (window.universalReactivity) {
-            window.universalReactivity.disconnectSystem('quantum');
+        // Disconnect from universal systems
+        if (window.universalAudio) {
+            window.universalAudio.disconnectSystem('quantum');
+        }
+        if (window.universalInteractions) {
+            window.universalInteractions.disconnectSystem('quantum');
         }
         
         this.visualizers.forEach(visualizer => {

@@ -558,6 +558,9 @@ export class PolychoraSystem {
                 blur: 3.0
             }
         };
+        
+        // Connect to universal audio and interaction systems when available
+        this.connectToUniversalSystems();
     }
     
     /**
@@ -894,10 +897,64 @@ export class PolychoraSystem {
     }
     
     /**
+     * Connect to universal audio and interaction systems
+     */
+    connectToUniversalSystems() {
+        // Connect to Universal Audio Engine when available
+        if (window.universalAudio) {
+            window.universalAudio.connectSystem('polychora', this);
+            console.log('🎵 Polychora system connected to Universal Audio Engine');
+        } else {
+            // Retry after a short delay if not available yet
+            setTimeout(() => this.connectToUniversalSystems(), 100);
+        }
+        
+        // Connect to Universal Interaction Engine when available
+        if (window.universalInteractions) {
+            window.universalInteractions.connectSystem('polychora', this);
+            console.log('🖱️ Polychora system connected to Universal Interaction Engine');
+        } else {
+            // Retry after a short delay if not available yet
+            setTimeout(() => {
+                if (window.universalInteractions) {
+                    window.universalInteractions.connectSystem('polychora', this);
+                    console.log('🖱️ Polychora system connected to Universal Interaction Engine');
+                }
+            }, 100);
+        }
+    }
+    
+    /**
+     * Update single parameter (required by Universal Audio Engine)
+     */
+    updateParameter(param, value) {
+        if (this.parameters[param] !== undefined) {
+            this.parameters[param] = value;
+            console.log(`🔮 Polychora parameter updated: ${param} = ${value}`);
+        }
+    }
+    
+    /**
+     * Get single parameter (required by Universal Interaction Engine)
+     */
+    getParameter(param) {
+        return this.parameters[param];
+    }
+    
+    /**
      * Destroy system and clean up resources
      */
     destroy() {
         this.stop();
+        
+        // Disconnect from universal systems
+        if (window.universalAudio) {
+            window.universalAudio.disconnectSystem('polychora');
+        }
+        if (window.universalInteractions) {
+            window.universalInteractions.disconnectSystem('polychora');
+        }
+        
         this.visualizers.forEach(visualizer => {
             if (visualizer.destroy) {
                 visualizer.destroy();
