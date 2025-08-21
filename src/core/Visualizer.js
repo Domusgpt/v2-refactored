@@ -119,6 +119,17 @@ export class IntegratedHolographicVisualizer {
      * Create WebGL context after canvas is properly sized
      */
     createWebGLContext() {
+        // CRITICAL FIX: Check if context already exists from SmartCanvasPool
+        let existingContext = this.canvas.getContext('webgl2') || 
+                             this.canvas.getContext('webgl') || 
+                             this.canvas.getContext('experimental-webgl');
+        
+        if (existingContext && !existingContext.isContextLost()) {
+            console.log(`🔄 Reusing existing WebGL context for ${this.canvas.id}`);
+            this.gl = existingContext;
+            return;
+        }
+        
         // Try WebGL2 first (better mobile support), then WebGL1
         this.gl = this.canvas.getContext('webgl2', this.contextOptions) || 
                   this.canvas.getContext('webgl', this.contextOptions) ||
@@ -369,17 +380,49 @@ void main() {
      * Create individual shader
      */
     createShader(type, source) {
-        const shader = this.gl.createShader(type);
-        this.gl.shaderSource(shader, source);
-        this.gl.compileShader(shader);
-        
-        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-            console.error('Shader compilation failed:', this.gl.getShaderInfoLog(shader));
-            console.error('Shader source:', source);
+        // CRITICAL FIX: Check WebGL context state before shader operations
+        if (!this.gl) {
+            console.error('❌ Cannot create shader: WebGL context is null');
             return null;
         }
         
-        return shader;
+        if (this.gl.isContextLost()) {
+            console.error('❌ Cannot create shader: WebGL context is lost');
+            return null;
+        }
+        
+        try {
+            const shader = this.gl.createShader(type);
+            
+            if (!shader) {
+                console.error('❌ Failed to create shader object - WebGL context may be invalid');
+                return null;
+            }
+            
+            this.gl.shaderSource(shader, source);
+            this.gl.compileShader(shader);
+            
+            if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                const error = this.gl.getShaderInfoLog(shader);
+                const shaderType = type === this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
+                
+                // CRITICAL FIX: Show actual error instead of null
+                if (error) {
+                    console.error(`❌ ${shaderType} shader compilation failed:`, error);
+                } else {
+                    console.error(`❌ ${shaderType} shader compilation failed: WebGL returned no error info (context may be invalid)`);
+                }
+                
+                console.error('Shader source:', source);
+                this.gl.deleteShader(shader);
+                return null;
+            }
+            
+            return shader;
+        } catch (error) {
+            console.error('❌ Exception during shader creation:', error);
+            return null;
+        }
     }
     
     /**
@@ -587,16 +630,29 @@ void main() {
         this.uniforms = null;
         this.gl = null;
         
-        // Get fresh WebGL context
-        this.createWebGLContext();
+        // CRITICAL FIX: Don't create new context - SmartCanvasPool already did this
+        // Just get the existing context that SmartCanvasPool created
+        this.gl = this.canvas.getContext('webgl2') || 
+                  this.canvas.getContext('webgl') ||
+                  this.canvas.getContext('experimental-webgl');
+        
+        if (!this.gl) {
+            console.error(`❌ No WebGL context available for ${this.canvas?.id} - SmartCanvasPool should have created one`);
+            return false;
+        }
+        
+        if (this.gl.isContextLost()) {
+            console.error(`❌ WebGL context is lost for ${this.canvas?.id}`);
+            return false;
+        }
         
         // Reinitialize shaders and buffers if context is valid
-        if (this.gl) {
+        try {
             this.init();
             console.log(`✅ ${this.canvas?.id}: Context reinitialized successfully`);
             return true;
-        } else {
-            console.error(`❌ ${this.canvas?.id}: Failed to reinitialize WebGL context`);
+        } catch (error) {
+            console.error(`❌ Failed to reinitialize WebGL resources for ${this.canvas?.id}:`, error);
             return false;
         }
     }

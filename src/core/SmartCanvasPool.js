@@ -260,16 +260,16 @@ export class SmartCanvasPool {
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         
-        // Force creation of new WebGL context with SAME OPTIONS as engines
+        // CRITICAL FIX: Use UNIFIED context options that match ALL visualizers
         const contextOptions = {
           alpha: true,
           depth: true,
           stencil: false,
-          antialias: false,
+          antialias: false,  // Disable antialiasing on mobile for performance
           premultipliedAlpha: true,
           preserveDrawingBuffer: false,
           powerPreference: 'high-performance',
-          failIfMajorPerformanceCaveat: false
+          failIfMajorPerformanceCaveat: false  // Don't fail on mobile
         };
         
         const gl = canvas.getContext('webgl2', contextOptions) || 
@@ -277,9 +277,30 @@ export class SmartCanvasPool {
                    canvas.getContext('experimental-webgl', contextOptions);
         
         if (gl) {
-          console.log(`✨ Created context: ${config.id} (${canvas.width}x${canvas.height})`);
+          // CRITICAL FIX: Add proper WebGL context validation
+          if (gl.isContextLost()) {
+            console.error(`❌ Context lost immediately: ${config.id}`);
+            return;
+          }
+          
+          // Test basic WebGL functionality
+          try {
+            const version = gl.getParameter(gl.VERSION);
+            const renderer = gl.getParameter(gl.RENDERER);
+            console.log(`✨ Created context: ${config.id} (${canvas.width}x${canvas.height}) - ${version}`);
+            
+            // Test shader creation capability
+            const testShader = gl.createShader(gl.VERTEX_SHADER);
+            if (!testShader) {
+              console.warn(`⚠️ Context may be invalid: ${config.id} - cannot create shaders`);
+            } else {
+              gl.deleteShader(testShader);
+            }
+          } catch (error) {
+            console.error(`❌ Context validation failed: ${config.id} -`, error);
+          }
         } else {
-          console.error(`❌ Failed to create context: ${config.id}`);
+          console.error(`❌ Failed to create context: ${config.id} - WebGL not supported`);
         }
       }
     });

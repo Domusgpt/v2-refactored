@@ -9,8 +9,8 @@ export class HolographicVisualizer {
         this.reactivity = reactivity;
         this.variant = variant;
         
-        // Mobile-friendly WebGL context creation with fallbacks
-        const contextOptions = {
+        // CRITICAL FIX: Define contextOptions as instance property to match SmartCanvasPool
+        this.contextOptions = {
             alpha: true,
             depth: true,
             stencil: false,
@@ -21,10 +21,20 @@ export class HolographicVisualizer {
             failIfMajorPerformanceCaveat: false  // Don't fail on mobile
         };
         
-        // Try WebGL2 first (better mobile support), then WebGL1
-        this.gl = this.canvas.getContext('webgl2', contextOptions) || 
-                  this.canvas.getContext('webgl', contextOptions) ||
-                  this.canvas.getContext('experimental-webgl', contextOptions);
+        // CRITICAL FIX: Check if context already exists from SmartCanvasPool
+        let existingContext = this.canvas.getContext('webgl2') || 
+                             this.canvas.getContext('webgl') || 
+                             this.canvas.getContext('experimental-webgl');
+        
+        if (existingContext && !existingContext.isContextLost()) {
+            console.log(`🔄 Reusing existing WebGL context for ${canvasId}`);
+            this.gl = existingContext;
+        } else {
+            // Try WebGL2 first (better mobile support), then WebGL1
+            this.gl = this.canvas.getContext('webgl2', this.contextOptions) || 
+                      this.canvas.getContext('webgl', this.contextOptions) ||
+                      this.canvas.getContext('experimental-webgl', this.contextOptions);
+        }
         
         if (!this.gl) {
             console.error(`WebGL not supported for ${canvasId}`);
@@ -525,15 +535,47 @@ export class HolographicVisualizer {
     }
     
     createShader(type, source) {
-        const shader = this.gl.createShader(type);
-        this.gl.shaderSource(shader, source);
-        this.gl.compileShader(shader);
-        
-        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-            throw new Error('Shader compilation failed: ' + this.gl.getShaderInfoLog(shader));
+        // CRITICAL FIX: Check WebGL context state before shader operations
+        if (!this.gl) {
+            console.error('❌ Cannot create shader: WebGL context is null');
+            throw new Error('WebGL context is null');
         }
         
-        return shader;
+        if (this.gl.isContextLost()) {
+            console.error('❌ Cannot create shader: WebGL context is lost');
+            throw new Error('WebGL context is lost');
+        }
+        
+        try {
+            const shader = this.gl.createShader(type);
+            
+            if (!shader) {
+                console.error('❌ Failed to create shader object - WebGL context may be invalid');
+                throw new Error('Failed to create shader object - WebGL context may be invalid');
+            }
+            
+            this.gl.shaderSource(shader, source);
+            this.gl.compileShader(shader);
+            
+            if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                const error = this.gl.getShaderInfoLog(shader);
+                const shaderType = type === this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
+                
+                // CRITICAL FIX: Show actual error instead of null
+                if (error) {
+                    console.error(`❌ ${shaderType} shader compilation failed:`, error);
+                    throw new Error(`${shaderType} shader compilation failed: ${error}`);
+                } else {
+                    console.error(`❌ ${shaderType} shader compilation failed: WebGL returned no error info (context may be invalid)`);
+                    throw new Error(`${shaderType} shader compilation failed: WebGL returned no error info (context may be invalid)`);
+                }
+            }
+            
+            return shader;
+        } catch (error) {
+            console.error('❌ Exception during shader creation:', error);
+            throw error;
+        }
     }
     
     initBuffers() {
@@ -750,6 +792,48 @@ export class HolographicVisualizer {
         this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
     }
     
+    /**
+     * CRITICAL FIX: Reinitialize WebGL context and resources after SmartCanvasPool context recreation
+     */
+    reinitializeContext() {
+        console.log(`🔄 Reinitializing WebGL context for ${this.canvas?.id}`);
+        
+        // Clear ALL old WebGL references
+        this.program = null;
+        this.buffer = null;
+        this.uniforms = null;
+        this.gl = null;
+        
+        // CRITICAL FIX: Don't create new context - SmartCanvasPool already did this
+        // Just get the existing context that SmartCanvasPool created
+        this.gl = this.canvas.getContext('webgl2') || 
+                  this.canvas.getContext('webgl') ||
+                  this.canvas.getContext('experimental-webgl');
+        
+        if (!this.gl) {
+            console.error(`❌ No WebGL context available for ${this.canvas?.id} - SmartCanvasPool should have created one`);
+            return false;
+        }
+        
+        if (this.gl.isContextLost()) {
+            console.error(`❌ WebGL context is lost for ${this.canvas?.id}`);
+            return false;
+        }
+        
+        // Reinitialize shaders and buffers if context is valid
+        try {
+            this.initShaders();
+            this.initBuffers();
+            this.resize();
+            
+            console.log(`✅ ${this.canvas?.id}: Holographic context reinitialized successfully`);
+            return true;
+        } catch (error) {
+            console.error(`❌ Failed to reinitialize holographic WebGL resources for ${this.canvas?.id}:`, error);
+            return false;
+        }
+    }
+
     /**
      * CRITICAL FIX: Update visualization parameters with immediate re-render
      * This method was missing and causing parameter sliders to not work in holographic system

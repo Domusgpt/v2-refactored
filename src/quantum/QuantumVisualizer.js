@@ -13,8 +13,8 @@ export class QuantumHolographicVisualizer {
         this.reactivity = reactivity;
         this.variant = variant;
         
-        // Mobile-friendly WebGL context creation with fallbacks
-        const contextOptions = {
+        // CRITICAL FIX: Define contextOptions as instance property to match SmartCanvasPool
+        this.contextOptions = {
             alpha: true,
             depth: true,
             stencil: false,
@@ -25,10 +25,11 @@ export class QuantumHolographicVisualizer {
             failIfMajorPerformanceCaveat: false  // Don't fail on mobile
         };
         
+        // CRITICAL FIX: Don't create context here - let SmartCanvasPool handle it
         // Try WebGL2 first (better mobile support), then WebGL1
-        this.gl = this.canvas.getContext('webgl2', contextOptions) || 
-                  this.canvas.getContext('webgl', contextOptions) ||
-                  this.canvas.getContext('experimental-webgl', contextOptions);
+        this.gl = this.canvas.getContext('webgl2', this.contextOptions) || 
+                  this.canvas.getContext('webgl', this.contextOptions) ||
+                  this.canvas.getContext('experimental-webgl', this.contextOptions);
         
         if (!this.gl) {
             console.error(`WebGL not supported for ${canvasId}`);
@@ -127,6 +128,17 @@ export class QuantumHolographicVisualizer {
      * Create WebGL context after canvas is properly sized
      */
     createWebGLContext() {
+        // CRITICAL FIX: Check if context already exists from SmartCanvasPool
+        let existingContext = this.canvas.getContext('webgl2') || 
+                             this.canvas.getContext('webgl') || 
+                             this.canvas.getContext('experimental-webgl');
+        
+        if (existingContext && !existingContext.isContextLost()) {
+            console.log(`🔄 Reusing existing WebGL context for ${this.canvas.id}`);
+            this.gl = existingContext;
+            return;
+        }
+        
         // Try WebGL2 first (better mobile support), then WebGL1
         this.gl = this.canvas.getContext('webgl2', this.contextOptions) || 
                   this.canvas.getContext('webgl', this.contextOptions) ||
@@ -163,34 +175,40 @@ export class QuantumHolographicVisualizer {
     reinitializeContext() {
         console.log(`🔄 Reinitializing WebGL context for ${this.canvas.id}`);
         
-        // Get new WebGL context from recreated canvas
-        const contextOptions = {
-            alpha: true,
-            depth: true,
-            stencil: false,
-            antialias: false,
-            premultipliedAlpha: true,
-            preserveDrawingBuffer: false,
-            powerPreference: 'high-performance',
-            failIfMajorPerformanceCaveat: false
-        };
+        // CRITICAL FIX: Clear old WebGL references first
+        this.program = null;
+        this.buffer = null;
+        this.uniforms = null;
+        this.gl = null;
         
-        this.gl = this.canvas.getContext('webgl2', contextOptions) || 
-                  this.canvas.getContext('webgl', contextOptions) ||
-                  this.canvas.getContext('experimental-webgl', contextOptions);
+        // CRITICAL FIX: Don't create new context - SmartCanvasPool already did this
+        // Just get the existing context that SmartCanvasPool created
+        this.gl = this.canvas.getContext('webgl2') || 
+                  this.canvas.getContext('webgl') ||
+                  this.canvas.getContext('experimental-webgl');
         
         if (!this.gl) {
-            console.error(`❌ Failed to reinitialize WebGL context for ${this.canvas.id}`);
+            console.error(`❌ No WebGL context available for ${this.canvas.id} - SmartCanvasPool should have created one`);
             return false;
         }
         
-        // Reinitialize all WebGL resources
-        this.initShaders();
-        this.initBuffers();
-        this.resize();
+        if (this.gl.isContextLost()) {
+            console.error(`❌ WebGL context is lost for ${this.canvas.id}`);
+            return false;
+        }
         
-        console.log(`✅ WebGL context reinitialized for ${this.canvas.id}`);
-        return true;
+        // Reinitialize all WebGL resources with the existing context
+        try {
+            this.initShaders();
+            this.initBuffers();
+            this.resize();
+            
+            console.log(`✅ WebGL context reinitialized for ${this.canvas.id}`);
+            return true;
+        } catch (error) {
+            console.error(`❌ Failed to reinitialize WebGL resources for ${this.canvas.id}:`, error);
+            return false;
+        }
     }
     
     /**
@@ -547,31 +565,75 @@ void main() {
      * Create individual shader
      */
     createShader(type, source) {
-        const shader = this.gl.createShader(type);
-        this.gl.shaderSource(shader, source);
-        this.gl.compileShader(shader);
-        
-        if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-            const error = this.gl.getShaderInfoLog(shader);
-            const shaderType = type === this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
-            console.error(`${shaderType} shader compilation failed:`, error);
-            console.error('Shader source:', source);
-            
+        // CRITICAL FIX: Check WebGL context state before shader operations
+        if (!this.gl) {
+            console.error('❌ Cannot create shader: WebGL context is null');
             if (window.mobileDebug) {
-                window.mobileDebug.log(`❌ ${this.canvas?.id}: ${shaderType} shader compile failed - ${error}`);
-                // Log first few lines of problematic shader for mobile debugging
-                const sourceLines = source.split('\n').slice(0, 5).join('\\n');
-                window.mobileDebug.log(`🔍 ${shaderType} shader source start: ${sourceLines}...`);
+                window.mobileDebug.log(`❌ ${this.canvas?.id}: Cannot create shader - WebGL context is null`);
             }
             return null;
-        } else {
-            if (window.mobileDebug) {
-                const shaderType = type === this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
-                window.mobileDebug.log(`✅ ${this.canvas?.id}: ${shaderType} shader compiled successfully`);
-            }
         }
         
-        return shader;
+        if (this.gl.isContextLost()) {
+            console.error('❌ Cannot create shader: WebGL context is lost');
+            if (window.mobileDebug) {
+                window.mobileDebug.log(`❌ ${this.canvas?.id}: Cannot create shader - WebGL context is lost`);
+            }
+            return null;
+        }
+        
+        try {
+            const shader = this.gl.createShader(type);
+            
+            if (!shader) {
+                console.error('❌ Failed to create shader object - WebGL context may be invalid');
+                if (window.mobileDebug) {
+                    window.mobileDebug.log(`❌ ${this.canvas?.id}: Failed to create shader object`);
+                }
+                return null;
+            }
+            
+            this.gl.shaderSource(shader, source);
+            this.gl.compileShader(shader);
+            
+            if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                const error = this.gl.getShaderInfoLog(shader);
+                const shaderType = type === this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
+                
+                // CRITICAL FIX: Show actual error instead of null
+                if (error) {
+                    console.error(`❌ ${shaderType} shader compilation failed:`, error);
+                } else {
+                    console.error(`❌ ${shaderType} shader compilation failed: WebGL returned no error info (context may be invalid)`);
+                }
+                
+                console.error('Shader source:', source);
+                
+                if (window.mobileDebug) {
+                    const errorMsg = error || 'No error info (context may be invalid)';
+                    window.mobileDebug.log(`❌ ${this.canvas?.id}: ${shaderType} shader compile failed - ${errorMsg}`);
+                    // Log first few lines of problematic shader for mobile debugging
+                    const sourceLines = source.split('\n').slice(0, 5).join('\\n');
+                    window.mobileDebug.log(`🔍 ${shaderType} shader source start: ${sourceLines}...`);
+                }
+                
+                this.gl.deleteShader(shader);
+                return null;
+            } else {
+                if (window.mobileDebug) {
+                    const shaderType = type === this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
+                    window.mobileDebug.log(`✅ ${this.canvas?.id}: ${shaderType} shader compiled successfully`);
+                }
+            }
+            
+            return shader;
+        } catch (error) {
+            console.error('❌ Exception during shader creation:', error);
+            if (window.mobileDebug) {
+                window.mobileDebug.log(`❌ ${this.canvas?.id}: Exception during shader creation - ${error.message}`);
+            }
+            return null;
+        }
     }
     
     /**
