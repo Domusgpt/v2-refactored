@@ -1082,12 +1082,17 @@
                 // Start with faceted system (this will create the engine)
                 await window.canvasPool.switchToSystem('faceted', null);
                 
+                // CRITICAL FIX: Update local variables after SmartCanvasPool creates engines
+                engine = window.engine;
+                quantumEngine = window.quantumEngine;
+                holographicSystem = window.holographicSystem;
+                
                 if (isMobile) {
-                    window.mobileOptimization.log(`📱 Mobile: All engines created (faceted, quantum, holographic)`);
-                    window.mobileOptimization.log(`📱 Faceted: ${engine.visualizers ? engine.visualizers.length : 0} visualizers`);
-                    window.mobileOptimization.log(`📱 Quantum: ${quantumEngine.visualizers ? quantumEngine.visualizers.length : 0} visualizers`);
+                    window.mobileOptimization.log(`📱 Mobile: Faceted engine created`);
+                    window.mobileOptimization.log(`📱 Faceted: ${engine ? engine.visualizers?.length || 0 : 0} visualizers`);
+                    window.mobileOptimization.log(`📱 Other engines will be created on demand when switching systems`);
                 } else {
-                    console.log('✅ All engines initialized for desktop');
+                    console.log('✅ Faceted engine initialized, others will be created on demand');
                 }
                 
                 // CRITICAL FIX: Don't create stub engines - they break system switching!

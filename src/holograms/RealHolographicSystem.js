@@ -425,34 +425,62 @@ export class RealHolographicSystem {
         document.addEventListener('touchstart', (e) => {
             if (!this.isActive) return;
             
+            // CRITICAL FIX: Only capture touches on canvas area, not UI controls
+            const target = e.target;
+            const isUIElement = target.matches('button, input, .control-panel, .control-panel *, .top-bar, .top-bar *');
+            if (isUIElement) return; // Let UI handle its own touches
+            
             if (e.touches.length > 0) {
-                e.preventDefault();
-                currentTouch = e.touches[0];
-                touchStartTime = Date.now();
-                const touchX = currentTouch.clientX / window.innerWidth;
-                const touchY = 1.0 - (currentTouch.clientY / window.innerHeight);
+                const canvasContainer = document.getElementById('canvasContainer');
+                const touch = e.touches[0];
+                const containerRect = canvasContainer?.getBoundingClientRect();
                 
-                this.visualizers.forEach(visualizer => {
-                    visualizer.triggerClick(touchX, touchY);
-                    visualizer.updateTouch(touchX, touchY, true);
-                });
+                // Only preventDefault if touch is within canvas area
+                if (containerRect && 
+                    touch.clientX >= containerRect.left && 
+                    touch.clientX <= containerRect.right &&
+                    touch.clientY >= containerRect.top && 
+                    touch.clientY <= containerRect.bottom) {
+                    e.preventDefault();
+                    currentTouch = touch;
+                    touchStartTime = Date.now();
+                    const touchX = currentTouch.clientX / window.innerWidth;
+                    const touchY = 1.0 - (currentTouch.clientY / window.innerHeight);
+                    
+                    this.visualizers.forEach(visualizer => {
+                        visualizer.triggerClick(touchX, touchY);
+                        visualizer.updateTouch(touchX, touchY, true);
+                    });
+                }
             }
         }, { passive: false });
         
         document.addEventListener('touchmove', (e) => {
             if (!this.isActive || !currentTouch) return;
             
+            // CRITICAL FIX: Only preventDefault if we're actively tracking a touch in canvas area
             if (e.touches.length > 0) {
-                e.preventDefault();
                 const touch = e.touches[0];
-                const touchX = touch.clientX / window.innerWidth;
-                const touchY = 1.0 - (touch.clientY / window.innerHeight);
+                const canvasContainer = document.getElementById('canvasContainer');
+                const containerRect = canvasContainer?.getBoundingClientRect();
                 
-                this.visualizers.forEach(visualizer => {
-                    visualizer.updateTouch(touchX, touchY, true);
-                });
-                
-                currentTouch = touch;
+                // Only preventDefault and update if touch is in canvas area
+                if (containerRect && 
+                    touch.clientX >= containerRect.left && 
+                    touch.clientX <= containerRect.right &&
+                    touch.clientY >= containerRect.top && 
+                    touch.clientY <= containerRect.bottom) {
+                    e.preventDefault();
+                    
+                    const touchX = touch.clientX / window.innerWidth;
+                    const touchY = 1.0 - (touch.clientY / window.innerHeight);
+                    
+                    this.visualizers.forEach(visualizer => {
+                        visualizer.updateTouch(touchX, touchY, true);
+                    });
+                    
+                    currentTouch = touch;
+                }
             }
         }, { passive: false });
         
