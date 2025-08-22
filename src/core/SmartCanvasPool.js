@@ -244,9 +244,21 @@ export class SmartCanvasPool {
     });
   }
 
-  createSystemContexts(systemName) {
+  async createSystemContexts(systemName) {
     const configs = this.canvasConfigs[systemName];
     if (!configs) return;
+    
+    // INVESTIGATION 4: Check total WebGL context count across all systems
+    const totalContextCount = this.getTotalWebGLContextCount();
+    console.log(`📊 Total WebGL contexts across all systems: ${totalContextCount}`);
+    console.log(`📊 Browser WebGL context limit: ~16-32 typical`);
+    
+    if (totalContextCount > 15) {
+      console.warn(`⚠️ High WebGL context count (${totalContextCount}) - may cause context loss`);
+    }
+    
+    // INVESTIGATION 5: Add GPU memory monitoring
+    this.checkGPUMemory();
     
     console.log(`🎨 Creating ${configs.length} WebGL contexts for ${systemName}`);
     
@@ -260,15 +272,37 @@ export class SmartCanvasPool {
       layerContainer.style.opacity = '1';
     }
     
-    configs.forEach(config => {
+    // INVESTIGATION 2: Stagger context creation to prevent GPU overload
+    for (let i = 0; i < configs.length; i++) {
+      const config = configs[i];
+      
+      // Add delay between context creation (20ms * index)
+      await new Promise(resolve => setTimeout(resolve, i * 20));
+      console.log(`🕒 Creating context ${i + 1}/${configs.length} for ${config.id}`);
       const canvas = document.getElementById(config.id);
       if (canvas) {
-        // Set proper canvas dimensions
+        // INVESTIGATION 1: Check canvas visibility/size
         const rect = canvas.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(canvas);
+        const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+        const hasSize = rect.width > 0 && rect.height > 0;
+        
+        console.log(`🔍 Canvas ${config.id}: visible=${isVisible}, size=${rect.width}x${rect.height}, display=${computedStyle.display}`);
+        
+        // CRITICAL: Don't create contexts for invisible/zero-sized canvases
+        if (!isVisible || !hasSize) {
+          console.warn(`⚠️ Skipping context creation for ${config.id} - invisible or zero size`);
+          return;
+        }
+        
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
+        // Ensure minimum canvas size
+        const minWidth = Math.max(rect.width, 100);
+        const minHeight = Math.max(rect.height, 100);
+        
+        canvas.width = minWidth * dpr;
+        canvas.height = minHeight * dpr;
         
         // CRITICAL FIX: Use UNIFIED context options that match ALL visualizers
         const contextOptions = {
@@ -293,6 +327,9 @@ export class SmartCanvasPool {
             return;
           }
           
+          // INVESTIGATION 3: Setup context loss recovery for this canvas
+          this.setupContextLossRecovery(canvas, config);
+          
           // Test basic WebGL functionality
           try {
             const version = gl.getParameter(gl.VERSION);
@@ -313,7 +350,7 @@ export class SmartCanvasPool {
           console.error(`❌ Failed to create context: ${config.id} - WebGL not supported`);
         }
       }
-    });
+    }
   }
 
   getActiveContextCount() {
@@ -386,5 +423,108 @@ export class SmartCanvasPool {
       maxContexts: 5,
       reduction: '75% (20 → 5 contexts)'
     };
+  }
+  
+  /**
+   * INVESTIGATION 4: Count total WebGL contexts across all systems
+   */
+  getTotalWebGLContextCount() {
+    let totalCount = 0;
+    
+    // Count contexts in all system canvas configs
+    Object.keys(this.canvasConfigs).forEach(systemName => {
+      const configs = this.canvasConfigs[systemName];
+      configs.forEach(config => {
+        const canvas = document.getElementById(config.id);
+        if (canvas) {
+          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+          if (gl && !gl.isContextLost()) {
+            totalCount++;
+          }
+        }
+      });
+    });
+    
+    return totalCount;
+  }
+  
+  /**
+   * INVESTIGATION 5: GPU memory monitoring
+   */
+  checkGPUMemory() {
+    try {
+      // Create a temporary canvas to check GPU memory
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = 1;
+      tempCanvas.height = 1;
+      const gl = tempCanvas.getContext('webgl') || tempCanvas.getContext('experimental-webgl');
+      
+      if (gl) {
+        // Check for WebGL memory extensions
+        const memoryInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        if (memoryInfo) {
+          const renderer = gl.getParameter(memoryInfo.UNMASKED_RENDERER_WEBGL);
+          console.log(`🎮 GPU Renderer: ${renderer}`);
+        }
+        
+        // Check for memory pressure indicators
+        const contextAttributes = gl.getContextAttributes();
+        console.log(`💾 WebGL Context Attributes:`, contextAttributes);
+        
+        // Test texture creation to check memory availability
+        const testTexture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, testTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 256, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        
+        const error = gl.getError();
+        if (error !== gl.NO_ERROR) {
+          console.warn(`⚠️ GPU Memory pressure detected - texture creation error: ${error}`);
+        } else {
+          console.log(`✅ GPU Memory available - test texture created successfully`);
+        }
+        
+        gl.deleteTexture(testTexture);
+      }
+    } catch (error) {
+      console.warn(`⚠️ GPU memory check failed:`, error);
+    }
+  }
+  
+  /**
+   * INVESTIGATION 3: Context loss recovery instead of recreation
+   */
+  setupContextLossRecovery(canvas, config) {
+    canvas.addEventListener('webglcontextlost', (event) => {
+      console.warn(`🔥 WebGL context lost for ${config.id}`);
+      event.preventDefault(); // Prevent default context loss behavior
+      
+      // Mark for recovery instead of immediate recreation
+      setTimeout(() => {
+        console.log(`🔄 Attempting context recovery for ${config.id}`);
+        this.recoverLostContext(canvas, config);
+      }, 1000); // Wait 1 second before recovery attempt
+    });
+    
+    canvas.addEventListener('webglcontextrestored', () => {
+      console.log(`✅ WebGL context restored for ${config.id}`);
+    });
+  }
+  
+  recoverLostContext(canvas, config) {
+    try {
+      // Force browser to recreate context
+      const gl = canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      
+      if (gl && !gl.isContextLost()) {
+        console.log(`✅ Context recovery successful for ${config.id}`);
+        return true;
+      } else {
+        console.warn(`❌ Context recovery failed for ${config.id}`);
+        return false;
+      }
+    } catch (error) {
+      console.error(`❌ Context recovery error for ${config.id}:`, error);
+      return false;
+    }
   }
 }
