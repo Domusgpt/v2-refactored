@@ -26,8 +26,8 @@ export class CanvasManager {
     // STEP 2: DESTROY old WebGL contexts 
     this.destroyOldWebGLContexts();
     
-    // STEP 3: Show new container
-    this.switchContainerVisibility(systemName);
+    // STEP 3: DESTROY all canvases + CREATE 5 fresh ones
+    this.destroyAllCanvasesAndCreateFresh(systemName);
     
     // STEP 4: CREATE fresh engine
     const engine = await this.createFreshEngine(systemName, engineClasses);
@@ -84,26 +84,80 @@ export class CanvasManager {
     console.log(`💥 DESTRUCTION COMPLETE: ${destroyedCount} WebGL contexts destroyed, all engine refs cleared`);
   }
 
-  switchContainerVisibility(systemName) {
-    // Hide all containers
+  destroyAllCanvasesAndCreateFresh(systemName) {
+    console.log('💥 DESTROYING ALL CANVASES + CREATING 5 FRESH ONES');
+    
+    // STEP 1: DESTROY all existing canvases completely
+    const allCanvases = document.querySelectorAll('canvas');
+    allCanvases.forEach(canvas => canvas.remove());
+    console.log(`💥 Destroyed ${allCanvases.length} old canvases`);
+    
+    // STEP 2: Clear all containers
     const containers = ['vib34dLayers', 'quantumLayers', 'holographicLayers', 'polychoraLayers'];
     containers.forEach(containerId => {
       const container = document.getElementById(containerId);
       if (container) {
+        container.innerHTML = '';
         container.style.display = 'none';
       }
     });
     
-    // Show target container
+    // STEP 3: CREATE 5 fresh canvases for the new system
     const targetId = systemName === 'faceted' ? 'vib34dLayers' : `${systemName}Layers`;
     const targetContainer = document.getElementById(targetId);
-    if (targetContainer) {
-      targetContainer.style.display = 'block';
-      targetContainer.style.visibility = 'visible';
-      targetContainer.style.opacity = '1';
-      console.log(`👁️ Showing ${systemName} container with ${targetContainer.querySelectorAll('canvas').length} canvases`);
-    } else {
+    
+    if (!targetContainer) {
       console.error(`❌ Container ${targetId} not found`);
+      return;
+    }
+    
+    // Create canvas IDs for this system
+    const canvasIds = this.getCanvasIdsForSystem(systemName);
+    
+    // Create 5 fresh canvases
+    canvasIds.forEach((canvasId, index) => {
+      const canvas = document.createElement('canvas');
+      canvas.id = canvasId;
+      canvas.className = 'visualization-canvas';
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.zIndex = index + 1;
+      
+      // Set canvas dimensions
+      const viewWidth = window.innerWidth;
+      const viewHeight = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = viewWidth * dpr;
+      canvas.height = viewHeight * dpr;
+      
+      targetContainer.appendChild(canvas);
+    });
+    
+    // Show the target container
+    targetContainer.style.display = 'block';
+    targetContainer.style.visibility = 'visible';
+    targetContainer.style.opacity = '1';
+    
+    console.log(`✅ Created 5 fresh canvases for ${systemName}: ${canvasIds.join(', ')}`);
+  }
+  
+  getCanvasIdsForSystem(systemName) {
+    const baseIds = ['background-canvas', 'shadow-canvas', 'content-canvas', 'highlight-canvas', 'accent-canvas'];
+    
+    switch (systemName) {
+      case 'faceted':
+        return baseIds;
+      case 'quantum':
+        return baseIds.map(id => `quantum-${id}`);
+      case 'holographic':
+        return baseIds.map(id => `holo-${id}`);
+      case 'polychora':
+        return baseIds.map(id => `polychora-${id}`);
+      default:
+        return baseIds;
     }
   }
   
