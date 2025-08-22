@@ -366,6 +366,11 @@ export class VIB34DIntegratedEngine {
      * Update audio reactivity (for universal reactivity system)
      */
     updateAudioReactivity(audioData) {
+        // Check if audio is enabled globally
+        if (window.audioEnabled === false) {
+            return; // Skip audio processing when disabled
+        }
+        
         this.visualizers.forEach(visualizer => {
             if (visualizer.updateAudio) {
                 visualizer.updateAudio(audioData);

@@ -535,6 +535,15 @@ void main() {
      * Update mouse interaction state
      */
     updateInteraction(x, y, intensity) {
+        // Check if interactions are enabled globally
+        if (window.interactivityEnabled === false) {
+            // Reset to default when disabled
+            this.mouseX = 0.5;
+            this.mouseY = 0.5;
+            this.mouseIntensity = 0.0;
+            return;
+        }
+        
         this.mouseX = x;
         this.mouseY = y;
         this.mouseIntensity = intensity;

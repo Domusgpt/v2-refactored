@@ -902,6 +902,7 @@
         import { VIB34DIntegratedEngine } from './src/core/Engine.js';
         import { QuantumEngine } from './src/quantum/QuantumEngine.js';
         import { RealHolographicSystem } from './src/holograms/RealHolographicSystem.js';
+        import { PolychoraSystem } from './src/core/PolychoraSystem.js';
         import { CollectionManager } from './src/features/CollectionManager.js';
         import { UnifiedSaveManager } from './src/core/UnifiedSaveManager.js';
         import { ParameterMapper } from './src/core/ParameterMapper.js';
@@ -1046,7 +1047,8 @@
                 window.engineClasses = {
                     VIB34DIntegratedEngine,
                     QuantumEngine,
-                    RealHolographicSystem
+                    RealHolographicSystem,
+                    PolychoraSystem
                 };
                 
                 // Don't create engines yet - they'll be created when system is activated
@@ -1623,6 +1625,7 @@
         
         window.toggleAudio = async function() {
             audioEnabled = !audioEnabled;
+            window.audioEnabled = audioEnabled; // Update global flag
             
             // Update button visual state
             const audioBtn = document.querySelector('[onclick="toggleAudio()"]');
@@ -1897,9 +1900,12 @@
         }
         
         let interactivityEnabled = true; // Default enabled
+        window.interactivityEnabled = interactivityEnabled; // Global flag
+        window.audioEnabled = false; // Global audio flag
         
         window.toggleInteractivity = function() {
             interactivityEnabled = !interactivityEnabled;
+            window.interactivityEnabled = interactivityEnabled; // Update global flag
             
             // Update button visual state
             const interactBtn = document.querySelector('[onclick="toggleInteractivity()"]');
@@ -1909,20 +1915,6 @@
                 interactBtn.style.borderColor = interactivityEnabled ? '#00ff00' : 'rgba(255, 0, 255, 0.3)';
                 interactBtn.title = `Mouse/Touch Interactions: ${interactivityEnabled ? 'ON' : 'OFF'}`;
                 interactBtn.textContent = interactivityEnabled ? 'I' : 'I';
-            }
-            
-            // Enable/disable interactions for all systems
-            if (window.engine && window.engine.updateInteraction) {
-                window.engine.interactionEnabled = interactivityEnabled;
-            }
-            if (window.quantumEngine && window.quantumEngine.updateInteraction) {
-                window.quantumEngine.interactionEnabled = interactivityEnabled;
-            }
-            if (window.holographicSystem && window.holographicSystem.updateInteraction) {
-                window.holographicSystem.interactionEnabled = interactivityEnabled;
-            }
-            if (window.polychoraSystem && window.polychoraSystem.updateInteraction) {
-                window.polychoraSystem.interactionEnabled = interactivityEnabled;
             }
             
             console.log(`🎛️ Mouse/Touch Interactions: ${interactivityEnabled ? 'ENABLED' : 'DISABLED'}`);
