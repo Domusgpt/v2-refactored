@@ -905,6 +905,7 @@
         import { VIB34DIntegratedEngine } from './src/core/Engine.js';
         import { QuantumEngine } from './src/quantum/QuantumEngine.js';
         import { RealHolographicSystem } from './src/holograms/RealHolographicSystem.js';
+        import { PolychoraSystem } from './src/core/PolychoraSystem.js';
         import { CollectionManager } from './src/features/CollectionManager.js';
         import { UnifiedSaveManager } from './src/core/UnifiedSaveManager.js';
         import { ParameterMapper } from './src/core/ParameterMapper.js';
@@ -1104,7 +1105,8 @@
                 window.canvasPool = new SmartCanvasPool({
                     VIB34DIntegratedEngine,
                     QuantumEngine,
-                    RealHolographicSystem
+                    RealHolographicSystem,
+                    PolychoraSystem
                 });
                 
                 // Don't create engines yet - they'll be created when system is activated
