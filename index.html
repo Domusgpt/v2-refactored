@@ -8,6 +8,15 @@
     <link rel="stylesheet" href="./src/styles/universal-controls.css">
     
     <!-- CRITICAL: Load mobile fix BEFORE any other scripts -->
+    <script>
+    // IMMEDIATE FIX: Add window.mobileDebug before any modules load
+    window.mobileDebug = {
+        log: function(message) {
+            console.log(`[Debug] ${message}`);
+        }
+    };
+    console.log('🔧 IMMEDIATE: window.mobileDebug created');
+    </script>
     <script src="./MOBILE_FIX.js"></script>
     <style>
         * {
