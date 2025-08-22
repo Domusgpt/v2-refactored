@@ -1345,9 +1345,14 @@
                 if (holographicSystem) {
                     await holographicSystem.initAudio();
                 }
-                // Add audio to other systems if they support it
-                if (window.quantumEngine && window.quantumEngine.initAudio) {
-                    await window.quantumEngine.initAudio();
+                // Enable Quantum audio frequency reactivity
+                if (window.quantumEngine && window.quantumEngine.toggleAudio) {
+                    window.quantumEngine.toggleAudio(true);
+                }
+            } else {
+                // Disable audio for all systems
+                if (window.quantumEngine && window.quantumEngine.toggleAudio) {
+                    window.quantumEngine.toggleAudio(false);
                 }
             }
             
