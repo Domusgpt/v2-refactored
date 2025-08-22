@@ -446,6 +446,64 @@ class PolychoraVisualizer {
             this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
         }
     }
+    
+    /**
+     * Update 4D mouse interaction - maps to 4D space
+     */
+    update4DMouse(x, y, intensity) {
+        // Store mouse state for shader uniforms
+        this.mouseState = {
+            x: x,
+            y: y, 
+            intensity: intensity,
+            time: Date.now()
+        };
+        console.log(`🔮 ${this.canvasId}: 4D mouse update ${x.toFixed(2)}, ${y.toFixed(2)}, intensity: ${intensity.toFixed(2)}`);
+    }
+    
+    /**
+     * Trigger 4D click interaction
+     */
+    trigger4DClick(intensity) {
+        this.clickState = {
+            intensity: intensity,
+            time: Date.now()
+        };
+        console.log(`🔮 ${this.canvasId}: 4D click intensity: ${intensity.toFixed(2)}`);
+    }
+    
+    /**
+     * Update audio reactivity for 4D visualization
+     */
+    updateAudio(audioData) {
+        this.audioState = {
+            bass: audioData.bass || 0,
+            mid: audioData.mid || 0,
+            high: audioData.high || 0,
+            energy: audioData.energy || 0
+        };
+        console.log(`🔮 ${this.canvasId}: Audio update energy: ${audioData.energy || 0}`);
+    }
+    
+    /**
+     * Update cross-section navigation (4D scroll)
+     */
+    updateCrossSection(velocity) {
+        this.crossSectionState = {
+            velocity: velocity,
+            position: (this.crossSectionState?.position || 0) + velocity * 0.01,
+            time: Date.now()
+        };
+        console.log(`🔮 ${this.canvasId}: Cross-section velocity: ${velocity}, position: ${this.crossSectionState.position.toFixed(3)}`);
+    }
+    
+    /**
+     * Update parameters from system
+     */
+    updateParameters(newParams) {
+        this.cachedParameters = { ...newParams };
+        console.log(`🔮 ${this.canvasId}: Parameters updated`);
+    }
 }
 
 // Import 4D physics engine
@@ -877,6 +935,46 @@ export class PolychoraSystem {
         
         console.log(`🔮 Set polytope to ${polytope.name}: ${polytope.description}`);
         return polytope;
+    }
+    
+    /**
+     * Update parameters from UI - CRITICAL MISSING METHOD
+     */
+    updateParameters(newParams) {
+        // Map standard VIB34D parameters to Polychora parameters
+        if (newParams.rot4dXW !== undefined) this.parameters.rot4dXW = newParams.rot4dXW;
+        if (newParams.rot4dYW !== undefined) this.parameters.rot4dYW = newParams.rot4dYW;
+        if (newParams.rot4dZW !== undefined) this.parameters.rot4dZW = newParams.rot4dZW;
+        if (newParams.hue !== undefined) this.parameters.hue = newParams.hue;
+        
+        // Map grid density to Polychora line thickness (missing connection!)
+        if (newParams.gridDensity !== undefined) {
+            this.parameters.lineThickness = newParams.gridDensity * 0.01; // Scale 5-100 to 0.05-1.0
+        }
+        
+        // Map geometry to polytope selection
+        if (newParams.geometry !== undefined) {
+            this.parameters.polytope = Math.min(newParams.geometry, this.polytopes.length - 1);
+        }
+        
+        // Map speed to flow direction intensity
+        if (newParams.speed !== undefined) {
+            this.parameters.flowDirection = newParams.speed;
+        }
+        
+        // Map intensity to projection distance
+        if (newParams.intensity !== undefined) {
+            this.parameters.projectionDistance = 1.0 + (newParams.intensity * 4.0); // Scale 0-1 to 1-5
+        }
+        
+        // Update all visualizers with new parameters
+        this.visualizers.forEach(visualizer => {
+            if (visualizer.updateParameters) {
+                visualizer.updateParameters(this.parameters);
+            }
+        });
+        
+        console.log('🔮 Polychora parameters updated:', this.parameters);
     }
     
     /**
