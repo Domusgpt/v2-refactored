@@ -998,11 +998,12 @@
             
             // Initialize Universal Audio and Interaction Systems
             try {
-                const universalInitializer = await initializeUniversalSystems();
-                console.log('🎵🖱️ Universal Systems integrated successfully');
+                // TEMPORARILY DISABLED: UniversalInteractionEngine causing UI click conflicts
+                // const universalInitializer = await initializeUniversalSystems();
+                console.log('🎵🖱️ Universal Systems DISABLED (fixing UI conflicts)');
                 
                 // Make universalInitializer globally accessible
-                window.universalInitializer = universalInitializer;
+                // window.universalInitializer = universalInitializer;
                 
                 // Start audio processing for universal systems
                 if (window.universalAudio) {
