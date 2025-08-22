@@ -789,111 +789,44 @@
         window.moduleReady = false;
         window.currentSystem = 'faceted';
         
-        // Mobile optimization system (no debug overlay)
-        window.mobileOptimization = {
+        // Simple Canvas Management - Universal (works on all devices)
+        window.smartCanvasManager = {
             log: function(message) {
-                // Silent logging for production - only to console
-                console.log(`[Mobile] ${message}`);
+                console.log(`[Canvas] ${message}`);
+            },
+            
+            // Simple canvas sizing for all devices
+            setupAllCanvases: function() {
+                const allCanvases = document.querySelectorAll('canvas');
+                const viewWidth = window.innerWidth;
+                const viewHeight = window.innerHeight;
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                
+                allCanvases.forEach(canvas => {
+                    // Set CSS dimensions first
+                    canvas.style.position = 'absolute';
+                    canvas.style.top = '0';
+                    canvas.style.left = '0';
+                    canvas.style.width = '100%';
+                    canvas.style.height = '100%';
+                    
+                    // Set canvas buffer dimensions
+                    canvas.width = viewWidth * dpr;
+                    canvas.height = viewHeight * dpr;
+                });
+                
+                this.log(`Setup ${allCanvases.length} canvases: ${viewWidth}x${viewHeight} (DPR: ${dpr})`);
             }
         };
         
-        // MOBILE OPTIMIZATION: Initial canvas setup (CanvasManager handles sizing during switches)
+        // Setup canvases when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (isMobile) {
-                window.mobileOptimization.log('📱 MOBILE: Optimized single-system initialization');
-                
-                // Define canvas groups per system
-                const systemCanvases = {
-                    faceted: ['background-canvas', 'shadow-canvas', 'content-canvas', 'highlight-canvas', 'accent-canvas'],
-                    quantum: ['quantum-background-canvas', 'quantum-shadow-canvas', 'quantum-content-canvas', 'quantum-highlight-canvas', 'quantum-accent-canvas'],
-                    holographic: ['holo-background-canvas', 'holo-shadow-canvas', 'holo-content-canvas', 'holo-highlight-canvas', 'holo-accent-canvas'],
-                    polychora: ['polychora-background-canvas', 'polychora-shadow-canvas', 'polychora-content-canvas', 'polychora-highlight-canvas', 'polychora-accent-canvas']
-                };
-                
-                // Determine active system (gallery preview or default)
-                const activeSystem = window.galleryPreviewData ? window.galleryPreviewData.system : 'faceted';
-                window.mobileOptimization.log(`📱 Active system: ${activeSystem}`);
-                
-                // Only fix canvases for the active system
-                const fixActiveCanvases = () => {
-                    const activeCanvases = systemCanvases[activeSystem];
-                    const viewWidth = window.innerWidth || screen.width;
-                    const viewHeight = window.innerHeight || screen.height;
-                    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-                    let fixedCount = 0;
-                    
-                    activeCanvases.forEach(canvasId => {
-                        const canvas = document.getElementById(canvasId);
-                        if (canvas) {
-                            // Force immediate style
-                            canvas.style.cssText = `
-                                position: absolute !important;
-                                top: 0 !important;
-                                left: 0 !important;
-                                width: 100% !important;
-                                height: 100% !important;
-                                min-width: ${viewWidth}px !important;
-                                min-height: ${viewHeight}px !important;
-                            `;
-                            
-                            // Force canvas buffer size
-                            canvas.width = viewWidth * dpr;
-                            canvas.height = viewHeight * dpr;
-                            fixedCount++;
-                            
-                            window.mobileOptimization.log(`📱 Fixed ${canvasId}: ${canvas.width}x${canvas.height}`);
-                        }
-                    });
-                    
-                    // CRITICAL FIX: Don't hide inactive system canvases - CanvasManager needs them for switching!
-                    // Just ensure they're properly sized but keep them accessible
-                    Object.keys(systemCanvases).forEach(system => {
-                        if (system !== activeSystem) {
-                            systemCanvases[system].forEach(canvasId => {
-                                const canvas = document.getElementById(canvasId);
-                                if (canvas) {
-                                    // Size the canvas but keep it accessible for system switching
-                                    canvas.style.position = 'absolute';
-                                    canvas.style.top = '0';
-                                    canvas.style.left = '0';
-                                    canvas.style.width = '100%';
-                                    canvas.style.height = '100%';
-                                    canvas.width = viewWidth * dpr;
-                                    canvas.height = viewHeight * dpr;
-                                    window.mobileOptimization.log(`📱 Pre-sized inactive canvas ${canvasId}: ${canvas.width}x${canvas.height}`);
-                                }
-                            });
-                        }
-                    });
-                    
-                    return fixedCount;
-                };
-                
-                // Run mobile optimization passes
-                const count1 = fixActiveCanvases();
-                window.mobileOptimization.log(`📱 Pass 1: Fixed ${count1}/${systemCanvases[activeSystem].length} canvases for ${activeSystem} system`);
-                
-                setTimeout(() => {
-                    const count2 = fixActiveCanvases();
-                    window.mobileOptimization.log(`📱 Pass 2: Fixed ${count2} canvases`);
-                }, 250);
-                
-                setTimeout(() => {
-                    const count3 = fixActiveCanvases();
-                    window.mobileOptimization.log(`📱 Pass 3: Fixed ${count3} canvases - optimization complete`);
-                    
-                    // Test canvas existence (WITHOUT creating 2D context that would block WebGL)
-                    const testCanvasId = systemCanvases[activeSystem][0];
-                    const testCanvas = document.getElementById(testCanvasId);
-                    if (testCanvas) {
-                        const canvasRect = testCanvas.getBoundingClientRect();
-                        window.mobileOptimization.log(`✅ Mobile optimization successful - ${activeSystem} system ready, canvas ${testCanvasId}: ${canvasRect.width}x${canvasRect.height}`);
-                    } else {
-                        window.mobileOptimization.log(`❌ Test canvas ${testCanvasId} not found after optimization`);
-                    }
-                }, 500);
-            }
+            window.smartCanvasManager.setupAllCanvases();
+        });
+        
+        // Resize all canvases when window resizes
+        window.addEventListener('resize', function() {
+            window.smartCanvasManager.setupAllCanvases();
         });
     </script>
     
@@ -945,20 +878,10 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-            // CRITICAL TIMING FIX: Run mobile canvas fix FIRST before engine initialization
-            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (isMobile) {
-                // Wait for any other mobile fixes to complete first
-                await new Promise(resolve => setTimeout(resolve, 100));
-                window.mobileOptimization.log(`⚡ Engine initialization starting after mobile canvas fix`);
-            }
-            
-            // URL parameters already parsed outside the module
-            
             setupGeometry('faceted');
             const success = await initializeEngine();
             
-            // CRITICAL: Make engines globally accessible for switchSystem function
+            // Make engines globally accessible for switchSystem function
             window.engine = engine;
             window.quantumEngine = quantumEngine;
             window.holographicSystem = holographicSystem;
@@ -969,80 +892,49 @@
             window.initializePolychora = initializePolychora;
             window.updateParameter = updateParameter;
             
-            // Module ready flag already set earlier for performance
-            
             console.log('🚀 VIB34D Clean Interface Ready - All systems initialized');
-            
-            // Mobile debug system auto-hide on successful initialization
-            if (window.mobileOptimization) {
-                window.mobileOptimization.log('🚀 VIB34D Clean Interface Ready - All systems initialized');
-            }
         });
         
         // URL parameters already parsed outside the ES6 module
         
-        // Mobile WebGL diagnostic function
-        function checkMobileWebGL() {
-            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            window.mobileOptimization.log(`📱 Device check: Mobile=${isMobile}, UserAgent=${navigator.userAgent}`);
+        // Simple WebGL availability check (works on all devices)
+        function checkWebGLAvailable() {
+            const testCanvas = document.createElement('canvas');
+            const contextOptions = {
+                alpha: true,
+                depth: false,
+                stencil: false,
+                antialias: false,
+                premultipliedAlpha: false,
+                preserveDrawingBuffer: false,
+                powerPreference: 'default',
+                failIfMajorPerformanceCaveat: false
+            };
             
-            if (isMobile) {
-                // Test WebGL availability on mobile
-                const testCanvas = document.createElement('canvas');
-                const contextOptions = {
-                    alpha: true,
-                    depth: false,
-                    stencil: false,
-                    antialias: false,
-                    premultipliedAlpha: false,
-                    preserveDrawingBuffer: false,
-                    powerPreference: 'default',
-                    failIfMajorPerformanceCaveat: false
-                };
-                
-                const testGL = testCanvas.getContext('webgl2', contextOptions) ||
-                              testCanvas.getContext('webgl', contextOptions) ||
-                              testCanvas.getContext('experimental-webgl', contextOptions);
-                
-                if (!testGL) {
-                    window.mobileOptimization.log('❌ CRITICAL: WebGL not available on mobile device');
-                    return false;
-                } else {
-                    const renderer = testGL.getParameter(testGL.RENDERER);
-                    const vendor = testGL.getParameter(testGL.VENDOR);
-                    const version = testGL.getParameter(testGL.VERSION);
-                    
-                    window.mobileOptimization.log(`✅ Mobile WebGL OK: ${version}`);
-                    window.mobileOptimization.log(`🎮 GPU: ${renderer} (${vendor})`);
-                    
-                    // Check for common mobile WebGL issues
-                    const maxTextureSize = testGL.getParameter(testGL.MAX_TEXTURE_SIZE);
-                    const maxViewport = testGL.getParameter(testGL.MAX_VIEWPORT_DIMS);
-                    
-                    window.mobileOptimization.log(`📊 Max texture: ${maxTextureSize}, Max viewport: ${maxViewport[0]}x${maxViewport[1]}`);
-                    
-                    return true;
-                }
+            const testGL = testCanvas.getContext('webgl2', contextOptions) ||
+                          testCanvas.getContext('webgl', contextOptions) ||
+                          testCanvas.getContext('experimental-webgl', contextOptions);
+            
+            if (!testGL) {
+                console.error('❌ WebGL not available');
+                return false;
             }
+            
+            const version = testGL.getParameter(testGL.VERSION);
+            console.log(`✅ WebGL available: ${version}`);
             return true;
         }
         
         // Initialize VIB34D Engine
         async function initializeEngine() {
             try {
-                // Check mobile WebGL before initializing engines
-                if (!checkMobileWebGL()) {
-                    throw new Error('Mobile WebGL not available');
+                // Check WebGL availability
+                if (!checkWebGLAvailable()) {
+                    throw new Error('WebGL not available');
                 }
                 
-                // CanvasManager handles all layer showing/hiding and canvas setup
-                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                if (isMobile) {
-                    window.mobileOptimization.log(`📱 Mobile device detected - CanvasManager will handle optimization`);
-                }
-                
-                // SIMPLE CANVAS MANAGER: Destroy old, create new
-                console.log('🎯 Initializing CanvasManager - Simple tab switching');
+                // Initialize smart canvas manager
+                console.log('🎯 Initializing Smart Canvas Manager');
                 window.canvasManager = new CanvasManager();
                 window.engineClasses = {
                     VIB34DIntegratedEngine,
@@ -1050,11 +942,6 @@
                     RealHolographicSystem,
                     PolychoraSystem
                 };
-                
-                // Don't create engines yet - they'll be created when system is activated
-                engine = null;
-                quantumEngine = null;
-                holographicSystem = null;
                 
                 // Start with faceted system (this will create the engine)
                 await window.canvasManager.switchToSystem('faceted', window.engineClasses);
@@ -1064,29 +951,10 @@
                 quantumEngine = window.quantumEngine;
                 holographicSystem = window.holographicSystem;
                 
-                if (isMobile) {
-                    window.mobileOptimization.log(`📱 Mobile: Faceted engine created`);
-                    window.mobileOptimization.log(`📱 Faceted: ${engine ? engine.visualizers?.length || 0 : 0} visualizers`);
-                    window.mobileOptimization.log(`📱 Other engines will be created on demand when switching systems`);
-                } else {
-                    console.log('✅ Faceted engine initialized, others will be created on demand');
-                }
+                console.log('✅ Engines ready - system switching enabled');
                 
-                // Engines are created on demand when switching systems
-                if (!engine) {
-                    console.log('⚠️ Faceted engine will be created on demand');
-                }
-                if (!quantumEngine) {
-                    console.log('⚠️ Quantum engine will be created on demand');
-                }
-                if (!holographicSystem) {
-                    console.log('⚠️ Holographic system will be created on demand');
-                }
-                
-                // CRITICAL PERFORMANCE FIX: Set moduleReady flag immediately after core engines
-                // This prevents 500ms+ delays when switching systems
+                // Set moduleReady flag
                 window.moduleReady = true;
-                console.log('⚡ Core engines ready - system switching enabled');
                 
                 // CRITICAL FIX: If gallery preview, don't activate default system yet
                 if (window.galleryPreviewData) {
