@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Debug - VIB34D</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px; 
+            font-family: monospace; 
+            background: #000; 
+            color: #0f0;
+        }
+        .debug-info {
+            background: #111;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #333;
+        }
+        .test-btn {
+            background: #333;
+            color: #0f0;
+            border: 1px solid #666;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+        .warning { color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>🔍 VIB34D Mobile Debug</h1>
+    
+    <div class="debug-info">
+        <h3>Device Info</h3>
+        <div id="deviceInfo">Loading...</div>
+    </div>
+    
+    <div class="debug-info">
+        <h3>WebGL Support</h3>
+        <div id="webglInfo">Testing...</div>
+    </div>
+    
+    <div class="debug-info">
+        <h3>Quick Tests</h3>
+        <button class="test-btn" onclick="testEngineImport()">Test Faceted Engine Import</button>
+        <button class="test-btn" onclick="testQuantumImport()">Test Quantum Import</button>
+        <button class="test-btn" onclick="testHolographicImport()">Test Holographic Import</button>
+        <button class="test-btn" onclick="testPolychoraImport()">Test Polychora Import</button>
+        <button class="test-btn" onclick="testUniversalSystems()">Test Universal Systems</button>
+        <div id="testResults"></div>
+    </div>
+    
+    <div class="debug-info">
+        <h3>Error Log</h3>
+        <div id="errorLog">No errors yet...</div>
+    </div>
+
+    <script>
+        // Capture all errors
+        const errorLog = document.getElementById('errorLog');
+        let errorCount = 0;
+        
+        function logError(message, source = 'Unknown') {
+            errorCount++;
+            const timestamp = new Date().toISOString().substring(11, 23);
+            errorLog.innerHTML += `<div class="error">[${timestamp}] ${source}: ${message}</div>`;
+            console.error(`[MOBILE DEBUG] ${source}:`, message);
+        }
+        
+        function logSuccess(message) {
+            const timestamp = new Date().toISOString().substring(11, 23);
+            const testResults = document.getElementById('testResults');
+            testResults.innerHTML += `<div class="success">[${timestamp}] ✅ ${message}</div>`;
+        }
+        
+        function logWarning(message) {
+            const timestamp = new Date().toISOString().substring(11, 23);
+            const testResults = document.getElementById('testResults');
+            testResults.innerHTML += `<div class="warning">[${timestamp}] ⚠️ ${message}</div>`;
+        }
+        
+        // Capture console errors
+        window.addEventListener('error', (e) => {
+            logError(`${e.message} at ${e.filename}:${e.lineno}`, 'JavaScript Error');
+        });
+        
+        window.addEventListener('unhandledrejection', (e) => {
+            logError(`Unhandled promise rejection: ${e.reason}`, 'Promise Error');
+        });
+        
+        // Device info
+        function updateDeviceInfo() {
+            const info = {
+                userAgent: navigator.userAgent,
+                viewport: `${window.innerWidth}x${window.innerHeight}`,
+                devicePixelRatio: window.devicePixelRatio || 1,
+                platform: navigator.platform,
+                isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+                touchSupport: 'ontouchstart' in window
+            };
+            
+            document.getElementById('deviceInfo').innerHTML = Object.entries(info)
+                .map(([key, value]) => `<strong>${key}:</strong> ${value}`).join('<br>');
+        }
+        
+        // WebGL support test
+        function testWebGLSupport() {
+            const canvas = document.createElement('canvas');
+            const webgl2 = canvas.getContext('webgl2');
+            const webgl1 = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            
+            let info = '';
+            if (webgl2) {
+                info += '<div class="success">✅ WebGL 2.0 supported</div>';
+                info += `<div>Renderer: ${webgl2.getParameter(webgl2.RENDERER)}</div>`;
+                info += `<div>Vendor: ${webgl2.getParameter(webgl2.VENDOR)}</div>`;
+            } else if (webgl1) {
+                info += '<div class="warning">⚠️ Only WebGL 1.0 supported</div>';
+                info += `<div>Renderer: ${webgl1.getParameter(webgl1.RENDERER)}</div>`;
+                info += `<div>Vendor: ${webgl1.getParameter(webgl1.VENDOR)}</div>`;
+            } else {
+                info += '<div class="error">❌ No WebGL support</div>';
+            }
+            
+            document.getElementById('webglInfo').innerHTML = info;
+        }
+        
+        // Test individual system imports
+        async function testEngineImport() {
+            try {
+                const { VIB34DIntegratedEngine } = await import('./src/core/Engine.js');
+                logSuccess('Faceted Engine imported successfully');
+            } catch (error) {
+                logError(`Failed to import Faceted Engine: ${error.message}`, 'Engine Import');
+            }
+        }
+        
+        async function testQuantumImport() {
+            try {
+                const { QuantumEngine } = await import('./src/quantum/QuantumEngine.js');
+                logSuccess('Quantum Engine imported successfully');
+            } catch (error) {
+                logError(`Failed to import Quantum Engine: ${error.message}`, 'Quantum Import');
+            }
+        }
+        
+        async function testHolographicImport() {
+            try {
+                const { RealHolographicSystem } = await import('./src/holograms/RealHolographicSystem.js');
+                logSuccess('Holographic System imported successfully');
+            } catch (error) {
+                logError(`Failed to import Holographic System: ${error.message}`, 'Holographic Import');
+            }
+        }
+        
+        async function testPolychoraImport() {
+            try {
+                const { PolychoraSystem } = await import('./src/core/PolychoraSystem.js');
+                logSuccess('Polychora System imported successfully');
+            } catch (error) {
+                logError(`Failed to import Polychora System: ${error.message}`, 'Polychora Import');
+            }
+        }
+        
+        async function testUniversalSystems() {
+            try {
+                const audioModule = await import('./src/audio/UniversalAudioEngine.js');
+                logSuccess('Universal Audio Engine imported successfully');
+            } catch (error) {
+                logError(`Failed to import Universal Audio: ${error.message}`, 'Universal Audio');
+            }
+            
+            try {
+                const interactionModule = await import('./src/interactions/UniversalInteractionEngine.js');
+                logSuccess('Universal Interaction Engine imported successfully');
+            } catch (error) {
+                logError(`Failed to import Universal Interactions: ${error.message}`, 'Universal Interactions');
+            }
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDeviceInfo();
+            testWebGLSupport();
+            
+            // Auto-run import tests
+            setTimeout(() => {
+                logSuccess('Starting auto-tests...');
+                testEngineImport();
+                testQuantumImport();
+                testHolographicImport();
+                testPolychoraImport();
+                testUniversalSystems();
+            }, 1000);
+        });
+        
+        console.log('🔍 Mobile debug page loaded');
+    </script>
+</body>
+</html>
