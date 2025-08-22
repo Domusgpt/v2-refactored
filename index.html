@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIB34D Engine - Canvas Explosion FIXED</title>
+    <title>VIB34D Engine - Mobile Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./src/styles/universal-controls.css">
+    
+    <!-- CRITICAL: Load mobile fix BEFORE any other scripts -->
+    <script src="./MOBILE_FIX.js"></script>
     <style>
         * {
             margin: 0;
@@ -370,6 +373,11 @@
     <!-- Top Bar -->
     <div class="top-bar">
         <div class="logo">VIB34D ENGINE</div>
+        
+        <!-- Mobile Debug Indicator (hidden by default) -->
+        <div id="mobileDebug" style="display: none; font-size: 10px; color: #ff0; position: absolute; top: 5px; right: 10px;">
+            📱 MOBILE MODE
+        </div>
         
         <div class="system-selector">
             <button class="system-btn active" data-system="faceted" onclick="switchSystem('faceted')">
@@ -941,12 +949,13 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-            // CRITICAL TIMING FIX: Run mobile canvas fix FIRST before engine initialization
+            // CRITICAL TIMING FIX: Wait for mobile WebGL fix to complete
             const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (isMobile) {
-                // Wait for any other mobile fixes to complete first
-                await new Promise(resolve => setTimeout(resolve, 100));
-                window.mobileOptimization.log(`⚡ Engine initialization starting after mobile canvas fix`);
+            if (isMobile && window.MobileWebGLFix) {
+                console.log('📱 Mobile detected - waiting for WebGL fixes to complete');
+                // Give mobile fixes time to initialize
+                await new Promise(resolve => setTimeout(resolve, 200));
+                console.log('📱 Mobile WebGL fixes ready - starting engine initialization');
             }
             
             // URL parameters already parsed outside the module
