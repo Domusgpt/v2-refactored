@@ -901,7 +901,7 @@
         import { ParameterMapper } from './src/core/ParameterMapper.js';
         import { SmartCanvasPool } from './src/core/SmartCanvasPool.js';
         import { TradingCardGenerator } from './src/export/TradingCardGenerator.js';
-        import universalReactivity from './src/interactions/UniversalReactivitySystem.js';
+        // Universal reactivity system removed - implementing clean system-specific interactions
         
         // Global state - CRITICAL FIX: Check for gallery preview data FIRST
         let currentSystem = window.galleryPreviewData ? window.galleryPreviewData.system : 'faceted';
@@ -1132,12 +1132,10 @@
                 engine.parameterMapper = parameterMapper;
                 console.log('✅ Unified Save System ready');
                 
-                // Connect systems to universal reactivity
-                universalReactivity.connectSystem(engine, 'faceted');
-                universalReactivity.connectSystem(quantumEngine, 'quantum');
-                // Note: holographic system already has its own reactivity, so we don't connect it
-                universalReactivity.setupUniversalInteractions();
-                console.log('🎵 Universal Reactivity System connected to all systems');
+                // Initialize clean system-specific interactions
+                console.log('🎛️ Setting up clean system-specific interactions...');
+                setupCleanInteractions();
+                console.log('✅ Clean interaction architecture initialized');
                 
                 // Apply gallery preview parameters if present
                 console.log('🔍 Checking for gallery preview data...');
@@ -1719,9 +1717,201 @@
             }
         }
         
-        window.toggleInteractivity = async function() {
-            console.log(`🎛️ Universal Interactivity System currently disabled - requires repair before use`);
-            console.log(`🔧 This system needs to be fixed before it can work with the existing visualization engines`);
+        /**
+         * Clean System-Specific Interaction Architecture
+         * Each system gets exactly what it needs - no conflicts
+         */
+        function setupCleanInteractions() {
+            console.log('🏗️ Implementing clean interaction architecture...');
+            
+            // 1. Faceted System: Simple mouse tracking for elegant minimalism
+            setupFacetedInteractions();
+            
+            // 2. Quantum System: Enhanced mouse + basic audio for complex patterns  
+            setupQuantumInteractions();
+            
+            // 3. Holographic System: Already has its own robust system - leave as-is
+            console.log('🌌 Holographic system: Using existing robust interaction system');
+            
+            // 4. Polychora System: 4D-optimized mouse tracking for mathematical precision
+            setupPolychoraInteractions();
+            
+            console.log('✅ Clean interaction architecture complete - no conflicts');
+        }
+        
+        /**
+         * Faceted System: Elegant mouse tracking for simple geometric patterns
+         */
+        function setupFacetedInteractions() {
+            let facetedMouseX = 0.5;
+            let facetedMouseY = 0.5;
+            let facetedIntensity = 0.0;
+            
+            // Canvas-scoped mouse tracking - only when faceted is active
+            const facetedCanvases = [
+                'background-canvas', 'shadow-canvas', 'content-canvas', 
+                'highlight-canvas', 'accent-canvas'
+            ];
+            
+            facetedCanvases.forEach(canvasId => {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                
+                canvas.addEventListener('mousemove', (e) => {
+                    if (currentSystem !== 'faceted') return;
+                    
+                    const rect = canvas.getBoundingClientRect();
+                    facetedMouseX = (e.clientX - rect.left) / rect.width;
+                    facetedMouseY = 1.0 - ((e.clientY - rect.top) / rect.height);
+                    facetedIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 30);
+                    
+                    // Apply to faceted engine
+                    if (engine && engine.updateMouseState) {
+                        engine.updateMouseState(facetedMouseX, facetedMouseY, facetedIntensity * 0.5);
+                    }
+                });
+                
+                canvas.addEventListener('click', (e) => {
+                    if (currentSystem !== 'faceted') return;
+                    
+                    // Gentle click effect for elegant patterns
+                    if (engine && engine.triggerClick) {
+                        engine.triggerClick(0.7);
+                    }
+                });
+            });
+            
+            console.log('🔷 Faceted interactions: Elegant mouse tracking enabled');
+        }
+        
+        /**
+         * Quantum System: Enhanced interactions for complex lattice patterns
+         */
+        function setupQuantumInteractions() {
+            let quantumMouseX = 0.5;
+            let quantumMouseY = 0.5;
+            let quantumIntensity = 0.0;
+            
+            // Canvas-scoped tracking for quantum system
+            const quantumCanvases = [
+                'quantum-background-canvas', 'quantum-shadow-canvas', 'quantum-content-canvas',
+                'quantum-highlight-canvas', 'quantum-accent-canvas'
+            ];
+            
+            quantumCanvases.forEach(canvasId => {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                
+                canvas.addEventListener('mousemove', (e) => {
+                    if (currentSystem !== 'quantum') return;
+                    
+                    const rect = canvas.getBoundingClientRect();
+                    quantumMouseX = (e.clientX - rect.left) / rect.width;
+                    quantumMouseY = 1.0 - ((e.clientY - rect.top) / rect.height);
+                    quantumIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 25);
+                    
+                    // Apply to quantum engine with enhanced responsiveness
+                    if (quantumEngine && quantumEngine.updateMouseState) {
+                        quantumEngine.updateMouseState(quantumMouseX, quantumMouseY, quantumIntensity);
+                    }
+                });
+                
+                canvas.addEventListener('click', (e) => {
+                    if (currentSystem !== 'quantum') return;
+                    
+                    // Stronger click effect for complex patterns
+                    if (quantumEngine && quantumEngine.triggerClick) {
+                        quantumEngine.triggerClick(1.0);
+                    }
+                });
+                
+                // Touch support for mobile quantum interactions
+                canvas.addEventListener('touchstart', (e) => {
+                    if (currentSystem !== 'quantum') return;
+                    
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    quantumMouseX = (touch.clientX - rect.left) / rect.width;
+                    quantumMouseY = 1.0 - ((touch.clientY - rect.top) / rect.height);
+                    
+                    if (quantumEngine && quantumEngine.updateMouseState) {
+                        quantumEngine.updateMouseState(quantumMouseX, quantumMouseY, 0.8);
+                    }
+                    
+                    e.preventDefault();
+                });
+            });
+            
+            console.log('🌌 Quantum interactions: Enhanced mouse tracking + touch enabled');
+        }
+        
+        /**
+         * Polychora System: 4D-optimized interactions for mathematical precision
+         */
+        function setupPolychoraInteractions() {
+            let polychoraMouseX = 0.5;
+            let polychoraMouseY = 0.5;
+            let polychoraIntensity = 0.0;
+            
+            // Canvas-scoped tracking for polychora system
+            const polychoraCanvases = [
+                'polychora-background-canvas', 'polychora-shadow-canvas', 'polychora-content-canvas',
+                'polychora-highlight-canvas', 'polychora-accent-canvas'
+            ];
+            
+            polychoraCanvases.forEach(canvasId => {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                
+                canvas.addEventListener('mousemove', (e) => {
+                    if (currentSystem !== 'polychora') return;
+                    
+                    const rect = canvas.getBoundingClientRect();
+                    polychoraMouseX = (e.clientX - rect.left) / rect.width;
+                    polychoraMouseY = 1.0 - ((e.clientY - rect.top) / rect.height);
+                    polychoraIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 35);
+                    
+                    // Apply to polychora system with 4D mathematical precision
+                    if (polychoraSystem && polychoraSystem.updateMouseState) {
+                        polychoraSystem.updateMouseState(polychoraMouseX, polychoraMouseY, polychoraIntensity);
+                    }
+                });
+                
+                canvas.addEventListener('click', (e) => {
+                    if (currentSystem !== 'polychora') return;
+                    
+                    // Precise click effect for 4D mathematics
+                    if (polychoraSystem && polychoraSystem.triggerClick) {
+                        polychoraSystem.triggerClick(0.8);
+                    }
+                });
+                
+                // 4D rotation gestures on touch devices
+                canvas.addEventListener('touchstart', (e) => {
+                    if (currentSystem !== 'polychora') return;
+                    
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    polychoraMouseX = (touch.clientX - rect.left) / rect.width;
+                    polychoraMouseY = 1.0 - ((touch.clientY - rect.top) / rect.height);
+                    
+                    if (polychoraSystem && polychoraSystem.updateMouseState) {
+                        polychoraSystem.updateMouseState(polychoraMouseX, polychoraMouseY, 0.6);
+                    }
+                    
+                    e.preventDefault();
+                });
+            });
+            
+            console.log('🔮 Polychora interactions: 4D-optimized precision tracking enabled');
+        }
+        
+        window.toggleInteractivity = function() {
+            console.log('🎛️ Clean interaction architecture: System-specific interactions always active');
+            console.log('🔷 Faceted: Elegant mouse tracking');
+            console.log('🌌 Quantum: Enhanced mouse + touch'); 
+            console.log('✨ Holographic: Full audio-reactive system (unchanged)');
+            console.log('🔮 Polychora: 4D-optimized precision tracking');
         }
         
         // Helper function to update UI sliders when LLM sets parameters

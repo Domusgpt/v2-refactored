@@ -351,37 +351,53 @@ export class RealHolographicSystem {
     }
     
     setupInteractions() {
-        // Mouse tracking system
-        document.addEventListener('mousemove', (e) => {
-            if (!this.isActive) return;
+        // Canvas-scoped mouse tracking system - no more UI conflicts!
+        const holographicCanvases = [
+            'holo-background-canvas', 'holo-shadow-canvas', 'holo-content-canvas',
+            'holo-highlight-canvas', 'holo-accent-canvas'
+        ];
+        
+        holographicCanvases.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             
-            const mouseX = e.clientX / window.innerWidth;
-            const mouseY = 1.0 - (e.clientY / window.innerHeight);
-            const mouseIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 40);
-            
-            // Update all visualizers
-            this.visualizers.forEach(visualizer => {
-                visualizer.updateInteraction(mouseX, mouseY, mouseIntensity);
-            });
-            
-            // Density variation based on mouse position
-            const densityVar = Math.sin(mouseX * Math.PI) * Math.sin(mouseY * Math.PI) * 2.0;
-            this.visualizers.forEach(visualizer => {
-                visualizer.updateDensity(densityVar);
+            canvas.addEventListener('mousemove', (e) => {
+                if (!this.isActive) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left) / rect.width;
+                const mouseY = 1.0 - ((e.clientY - rect.top) / rect.height);
+                const mouseIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 40);
+                
+                // Update all visualizers
+                this.visualizers.forEach(visualizer => {
+                    visualizer.updateInteraction(mouseX, mouseY, mouseIntensity);
+                });
+                
+                // Density variation based on mouse position
+                const densityVar = Math.sin(mouseX * Math.PI) * Math.sin(mouseY * Math.PI) * 2.0;
+                this.visualizers.forEach(visualizer => {
+                    visualizer.updateDensity(densityVar);
+                });
             });
         });
         
-        // Click interactions
-        document.addEventListener('click', (e) => {
-            if (!this.isActive) return;
+        // Canvas-scoped click interactions - no more UI conflicts!
+        holographicCanvases.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             
-            const rect = document.body.getBoundingClientRect();
-            const clickX = (e.clientX - rect.left) / rect.width;
-            const clickY = 1.0 - ((e.clientY - rect.top) / rect.height);
-            
-            // Trigger click effect on all visualizers
-            this.visualizers.forEach(visualizer => {
-                visualizer.triggerClick(clickX, clickY);
+            canvas.addEventListener('click', (e) => {
+                if (!this.isActive) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const clickX = (e.clientX - rect.left) / rect.width;
+                const clickY = 1.0 - ((e.clientY - rect.top) / rect.height);
+                
+                // Trigger click effect on all visualizers
+                this.visualizers.forEach(visualizer => {
+                    visualizer.triggerClick(clickX, clickY);
+                });
             });
         });
         
@@ -422,58 +438,53 @@ export class RealHolographicSystem {
         let currentTouch = null;
         let touchStartTime = 0;
         
-        document.addEventListener('touchstart', (e) => {
-            if (!this.isActive) return;
+        // Canvas-scoped touch interactions - completely clean!
+        const holographicCanvases = [
+            'holo-background-canvas', 'holo-shadow-canvas', 'holo-content-canvas',
+            'holo-highlight-canvas', 'holo-accent-canvas'
+        ];
+        
+        holographicCanvases.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             
-            // CRITICAL FIX: Only capture touches on canvas area, not UI controls
-            const target = e.target;
-            const isUIElement = target.matches('button, input, .control-panel, .control-panel *, .top-bar, .top-bar *');
-            if (isUIElement) return; // Let UI handle its own touches
-            
-            if (e.touches.length > 0) {
-                const canvasContainer = document.getElementById('canvasContainer');
-                const touch = e.touches[0];
-                const containerRect = canvasContainer?.getBoundingClientRect();
+            canvas.addEventListener('touchstart', (e) => {
+                if (!this.isActive) return;
                 
-                // Only preventDefault if touch is within canvas area
-                if (containerRect && 
-                    touch.clientX >= containerRect.left && 
-                    touch.clientX <= containerRect.right &&
-                    touch.clientY >= containerRect.top && 
-                    touch.clientY <= containerRect.bottom) {
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    
                     e.preventDefault();
                     currentTouch = touch;
                     touchStartTime = Date.now();
-                    const touchX = currentTouch.clientX / window.innerWidth;
-                    const touchY = 1.0 - (currentTouch.clientY / window.innerHeight);
+                    const touchX = (touch.clientX - rect.left) / rect.width;
+                    const touchY = 1.0 - ((touch.clientY - rect.top) / rect.height);
                     
                     this.visualizers.forEach(visualizer => {
                         visualizer.triggerClick(touchX, touchY);
                         visualizer.updateTouch(touchX, touchY, true);
                     });
                 }
-            }
-        }, { passive: false });
+            }, { passive: false });
+        });
         
-        document.addEventListener('touchmove', (e) => {
-            if (!this.isActive || !currentTouch) return;
+        // Canvas-scoped touchmove - complete cleanup!
+        holographicCanvases.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             
-            // CRITICAL FIX: Only preventDefault if we're actively tracking a touch in canvas area
-            if (e.touches.length > 0) {
-                const touch = e.touches[0];
-                const canvasContainer = document.getElementById('canvasContainer');
-                const containerRect = canvasContainer?.getBoundingClientRect();
+            canvas.addEventListener('touchmove', (e) => {
+                if (!this.isActive || !currentTouch) return;
                 
-                // Only preventDefault and update if touch is in canvas area
-                if (containerRect && 
-                    touch.clientX >= containerRect.left && 
-                    touch.clientX <= containerRect.right &&
-                    touch.clientY >= containerRect.top && 
-                    touch.clientY <= containerRect.bottom) {
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    
                     e.preventDefault();
                     
-                    const touchX = touch.clientX / window.innerWidth;
-                    const touchY = 1.0 - (touch.clientY / window.innerHeight);
+                    const touchX = (touch.clientX - rect.left) / rect.width;
+                    const touchY = 1.0 - ((touch.clientY - rect.top) / rect.height);
                     
                     this.visualizers.forEach(visualizer => {
                         visualizer.updateTouch(touchX, touchY, true);
@@ -481,27 +492,34 @@ export class RealHolographicSystem {
                     
                     currentTouch = touch;
                 }
-            }
-        }, { passive: false });
+            }, { passive: false });
+        });
         
-        document.addEventListener('touchend', (e) => {
-            if (!this.isActive) return;
+        // Canvas-scoped touchend - complete cleanup!
+        holographicCanvases.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
             
-            if (currentTouch) {
-                const touchDuration = Date.now() - touchStartTime;
+            canvas.addEventListener('touchend', (e) => {
+                if (!this.isActive) return;
                 
-                if (touchDuration < 150) {
+                if (currentTouch) {
+                    const touchDuration = Date.now() - touchStartTime;
+                    
+                    if (touchDuration < 150) {
+                        this.visualizers.forEach(visualizer => {
+                            visualizer.clickIntensity = Math.min(1.0, visualizer.clickIntensity + 0.3);
+                        });
+                    }
+                    
                     this.visualizers.forEach(visualizer => {
-                        visualizer.clickIntensity = Math.min(1.0, visualizer.clickIntensity + 0.3);
+                        visualizer.updateTouch(0.5, 0.5, false);
                     });
+                    
+                    currentTouch = null;
                 }
-                
-                this.visualizers.forEach(visualizer => {
-                    visualizer.updateTouch(0.5, 0.5, false);
-                });
-                currentTouch = null;
-            }
-        }, { passive: false });
+            }, { passive: false });
+        });
     }
     
     setupScrollInteractions() {
