@@ -5,10 +5,36 @@
 
 export class Polychora4DPhysics {
     constructor() {
+        // === 4D PHYSICS CONFIGURATION CONSTANTS ===
+        // Physics simulation parameters
+        this.DEFAULT_GRAVITY_4D = -2.5;    // Default 4D gravity strength (W-axis)
+        this.DEFAULT_AIR_RESISTANCE = 0.02; // Default 4D drag coefficient
+        this.PHYSICS_TIMESTEP = 1.0 / 60.0; // Physics simulation timestep (60 FPS)
+        
+        // Collision and behavior parameters
+        this.MIN_DISTANCE_THRESHOLD = 0.001; // Minimum distance for calculations
+        this.SLEEP_ENERGY_THRESHOLD = 0.01;  // Energy threshold for body sleeping
+        this.SLEEP_WAKE_MULTIPLIER = 2;      // Wake threshold = sleep threshold * this
+        this.SEPARATION_FACTOR = 0.5;        // Body separation multiplier during collision
+        this.BROWNIAN_MOTION_DEFAULT = 0.1;  // Default thermal motion amount
+        this.TERRITORIAL_SEPARATION = 0.3;   // Territorial distance as fraction of radius
+        
+        // Flocking behavior parameters
+        this.FLOCKING_SEPARATION_WEIGHT = 0.5; // Separation force weight
+        this.FLOCKING_ALIGNMENT_WEIGHT = 0.3;  // Alignment force weight  
+        this.FLOCKING_COHESION_WEIGHT = 0.2;   // Cohesion force weight
+        this.FLOCKING_NEIGHBOR_THRESHOLD = 0.3; // Neighbor distance threshold
+        
+        // Visual feedback parameters
+        this.VELOCITY_FEEDBACK_SCALE = 0.5;     // Velocity to visual intensity scale
+        this.ACCELERATION_FEEDBACK_SCALE = 0.3;  // Acceleration to glow scale
+        this.IMPACT_FEEDBACK_SCALE = 0.1;       // Impact to visual feedback scale
+        this.IMPACT_DECAY_FACTOR = 0.95;        // Impact intensity decay per frame
+        
         // 4D physics world properties
-        this.gravity4D = [0, 0, 0, -2.5];  // 4D gravitational field
-        this.airResistance = 0.02;         // 4D drag coefficient
-        this.timeStep = 1.0 / 60.0;        // Physics simulation timestep
+        this.gravity4D = [0, 0, 0, this.DEFAULT_GRAVITY_4D];
+        this.airResistance = this.DEFAULT_AIR_RESISTANCE;
+        this.timeStep = this.PHYSICS_TIMESTEP;
         
         // 4D rigid bodies (polytopes)
         this.bodies = [];
@@ -140,7 +166,7 @@ export class Polychora4DPhysics {
      */
     applyDrag(body) {
         const speed = this.magnitude4D(body.velocity);
-        if (speed < 0.001) return;
+        if (speed < this.MIN_DISTANCE_THRESHOLD) return;
         
         const dragMagnitude = this.airResistance * speed * speed;
         const dragDirection = this.normalize4D(body.velocity);
@@ -181,7 +207,7 @@ export class Polychora4DPhysics {
         ];
         
         const flowSpeed = this.magnitude4D(relativeVelocity);
-        if (flowSpeed < 0.001) return;
+        if (flowSpeed < this.MIN_DISTANCE_THRESHOLD) return;
         
         const flowForce = this.multiply4D(relativeVelocity, body.viscosity * flowSpeed);
         this.addForce(body, flowForce);
@@ -238,7 +264,7 @@ export class Polychora4DPhysics {
             neighborCount++;
             
             // Separation: avoid crowding
-            if (distance < maxDistance * 0.3) {
+            if (distance < maxDistance * this.FLOCKING_NEIGHBOR_THRESHOLD) {
                 const diff = this.subtract4D(body.position, other.position);
                 const separationForce = this.multiply4D(this.normalize4D(diff), 1.0 / (distance + 0.1));
                 separation = this.add4D(separation, separationForce);
@@ -254,18 +280,18 @@ export class Polychora4DPhysics {
         if (neighborCount > 0) {
             // Apply separation
             if (this.magnitude4D(separation) > 0) {
-                separation = this.multiply4D(this.normalize4D(separation), 0.5);
+                separation = this.multiply4D(this.normalize4D(separation), this.FLOCKING_SEPARATION_WEIGHT);
                 this.addForce(body, separation);
             }
             
             // Apply alignment
             alignment = this.multiply4D(alignment, 1.0 / neighborCount);
-            const alignmentForce = this.multiply4D(this.subtract4D(alignment, body.velocity), 0.3);
+            const alignmentForce = this.multiply4D(this.subtract4D(alignment, body.velocity), this.FLOCKING_ALIGNMENT_WEIGHT);
             this.addForce(body, alignmentForce);
             
             // Apply cohesion
             cohesion = this.multiply4D(cohesion, 1.0 / neighborCount);
-            const cohesionForce = this.multiply4D(this.subtract4D(cohesion, body.position), 0.2);
+            const cohesionForce = this.multiply4D(this.subtract4D(cohesion, body.position), this.FLOCKING_COHESION_WEIGHT);
             this.addForce(body, cohesionForce);
         }
     }
@@ -337,7 +363,7 @@ export class Polychora4DPhysics {
         
         // Separate bodies to prevent overlap
         const overlap = (bodyA.boundingRadius + bodyB.boundingRadius) - distance;
-        const separation = this.multiply4D(normal, overlap * 0.5);
+        const separation = this.multiply4D(normal, overlap * this.SEPARATION_FACTOR);
         
         bodyA.position = this.subtract4D(bodyA.position, separation);
         bodyB.position = this.add4D(bodyB.position, separation);
@@ -360,7 +386,7 @@ export class Polychora4DPhysics {
         bodyB.velocity = this.subtract4D(bodyB.velocity, this.multiply4D(impulseVector, 1/bodyB.mass));
         
         // Update visual feedback
-        const impactIntensity = Math.abs(impulse) * 0.1;
+        const impactIntensity = Math.abs(impulse) * this.IMPACT_FEEDBACK_SCALE;
         bodyA.physicsFeedback.impactIntensity = Math.max(bodyA.physicsFeedback.impactIntensity, impactIntensity);
         bodyB.physicsFeedback.impactIntensity = Math.max(bodyB.physicsFeedback.impactIntensity, impactIntensity);
         
@@ -401,14 +427,14 @@ export class Polychora4DPhysics {
     updateVisualFeedback(body) {
         // Velocity-based intensity
         const speed = this.magnitude4D(body.velocity);
-        body.physicsFeedback.velocityIntensity = Math.min(speed * 0.5, 2.0);
+        body.physicsFeedback.velocityIntensity = Math.min(speed * this.VELOCITY_FEEDBACK_SCALE, 2.0);
         
         // Acceleration-based glow
         const acceleration = this.magnitude4D(body.acceleration);
-        body.physicsFeedback.accelerationGlow = Math.min(acceleration * 0.3, 1.0);
+        body.physicsFeedback.accelerationGlow = Math.min(acceleration * this.ACCELERATION_FEEDBACK_SCALE, 1.0);
         
         // Decay impact intensity
-        body.physicsFeedback.impactIntensity *= 0.95;
+        body.physicsFeedback.impactIntensity *= this.IMPACT_DECAY_FACTOR;
     }
     
     // === 4D VECTOR MATH UTILITIES ===
@@ -435,7 +461,7 @@ export class Polychora4DPhysics {
     
     normalize4D(vec) {
         const mag = this.magnitude4D(vec);
-        return mag > 0.001 ? this.multiply4D(vec, 1.0 / mag) : [0, 0, 0, 0];
+        return mag > this.MIN_DISTANCE_THRESHOLD ? this.multiply4D(vec, 1.0 / mag) : [0, 0, 0, 0];
     }
     
     distance4D(a, b) {
@@ -487,7 +513,7 @@ export class Polychora4DPhysics {
         
         if (totalEnergy < body.sleepThreshold) {
             body.sleeping = true;
-        } else if (totalEnergy > body.sleepThreshold * 2) {
+        } else if (totalEnergy > body.sleepThreshold * this.SLEEP_WAKE_MULTIPLIER) {
             body.sleeping = false;
         }
     }
