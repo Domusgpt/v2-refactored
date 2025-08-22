@@ -914,7 +914,7 @@
         let currentSystem = window.galleryPreviewData ? window.galleryPreviewData.system : 'faceted';
         window.currentSystem = currentSystem;
         console.log(`🚀 Initial system determined: ${currentSystem} (gallery preview: ${!!window.galleryPreviewData})`);
-        let audioEnabled = false;
+        let audioEnabled = window.audioEnabled || false;
         let interactivityVisible = false;
         let engine = null;
         let quantumEngine = null;
@@ -1751,7 +1751,7 @@
                 if (!canvas) return;
                 
                 canvas.addEventListener('mousemove', (e) => {
-                    if (currentSystem !== 'faceted') return;
+                    if (window.currentSystem !== 'faceted') return;
                     if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const rect = canvas.getBoundingClientRect();
@@ -1766,7 +1766,7 @@
                 });
                 
                 canvas.addEventListener('click', (e) => {
-                    if (currentSystem !== 'faceted') return;
+                    if (window.currentSystem !== 'faceted') return;
                     
                     // Gentle click effect for elegant patterns
                     if (engine && engine.triggerClick) {
@@ -1797,7 +1797,7 @@
                 if (!canvas) return;
                 
                 canvas.addEventListener('mousemove', (e) => {
-                    if (currentSystem !== 'quantum') return;
+                    if (window.currentSystem !== 'quantum') return;
                     if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const rect = canvas.getBoundingClientRect();
@@ -1812,7 +1812,7 @@
                 });
                 
                 canvas.addEventListener('click', (e) => {
-                    if (currentSystem !== 'quantum') return;
+                    if (window.currentSystem !== 'quantum') return;
                     
                     // Stronger click effect for complex patterns
                     if (quantumEngine && quantumEngine.triggerClick) {
@@ -1822,7 +1822,7 @@
                 
                 // Touch support for mobile quantum interactions
                 canvas.addEventListener('touchstart', (e) => {
-                    if (currentSystem !== 'quantum') return;
+                    if (window.currentSystem !== 'quantum') return;
                     if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const touch = e.touches[0];
@@ -1860,7 +1860,7 @@
                 if (!canvas) return;
                 
                 canvas.addEventListener('mousemove', (e) => {
-                    if (currentSystem !== 'polychora') return;
+                    if (window.currentSystem !== 'polychora') return;
                     if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const rect = canvas.getBoundingClientRect();
@@ -1875,7 +1875,7 @@
                 });
                 
                 canvas.addEventListener('click', (e) => {
-                    if (currentSystem !== 'polychora') return;
+                    if (window.currentSystem !== 'polychora') return;
                     
                     // Precise click effect for 4D mathematics
                     if (polychoraSystem && polychoraSystem.triggerClick) {
@@ -1885,7 +1885,7 @@
                 
                 // 4D rotation gestures on touch devices
                 canvas.addEventListener('touchstart', (e) => {
-                    if (currentSystem !== 'polychora') return;
+                    if (window.currentSystem !== 'polychora') return;
                     if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const touch = e.touches[0];
@@ -2018,8 +2018,8 @@
         
         function randomizeGeometryAndHue() {
             // Randomize geometry selection
-            if (currentSystem !== 'holographic') {
-                const geometryCount = geometries[currentSystem]?.length || 8;
+            if (window.currentSystem !== 'holographic') {
+                const geometryCount = geometries[window.currentSystem]?.length || 8;
                 const randomGeometry = Math.floor(Math.random() * geometryCount);
                 selectGeometry(randomGeometry);
             }
@@ -2168,7 +2168,7 @@
                     localStorage.removeItem('vib34d-load-params');
                     
                     // Switch to the appropriate system
-                    if (data.system && data.system !== currentSystem) {
+                    if (data.system && data.system !== window.currentSystem) {
                         switchSystem(data.system);
                         // Wait for system switch to complete
                         setTimeout(() => loadGalleryParameters(data), 20);
@@ -2234,12 +2234,12 @@
         
         function getCurrentSystemState() {
             const state = {
-                system: currentSystem,
+                system: window.currentSystem,
                 parameters: {},
                 geometryName: ''
             };
             
-            if (currentSystem === 'faceted') {
+            if (window.currentSystem === 'faceted') {
                 // Get VIB34D Faceted parameters
                 state.parameters = {
                     geometry: getActiveGeometryIndex(),
@@ -2257,7 +2257,7 @@
                 };
                 state.geometryName = geometries.faceted[getActiveGeometryIndex()];
                 
-            } else if (currentSystem === 'quantum') {
+            } else if (window.currentSystem === 'quantum') {
                 // Get Quantum system parameters (same as faceted but with quantum names)
                 state.parameters = {
                     geometry: getActiveGeometryIndex(),
@@ -2275,7 +2275,7 @@
                 };
                 state.geometryName = geometries.quantum[getActiveGeometryIndex()];
                 
-            } else if (currentSystem === 'holographic') {
+            } else if (window.currentSystem === 'holographic') {
                 // Get Holographic system parameters
                 const holoInfo = holographicSystem.getCurrentVariantInfo();
                 state.parameters = {
@@ -2293,7 +2293,7 @@
                 };
                 state.geometryName = holoInfo.name;
                 
-            } else if (currentSystem === 'polychora') {
+            } else if (window.currentSystem === 'polychora') {
                 // Get Polychora system parameters
                 state.parameters = {
                     polytope: getActiveGeometryIndex(),
