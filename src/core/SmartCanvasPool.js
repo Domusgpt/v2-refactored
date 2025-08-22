@@ -45,6 +45,17 @@ export class SmartCanvasPool {
   async switchToSystem(systemName, engine) {
     console.log(`🔄 Switching to ${systemName} - managing contexts and engines`);
     
+    // If we're already on this system, just activate it
+    if (this.activeSystem === systemName) {
+      console.log(`✅ Already on ${systemName} - just activating engine`);
+      this.showSystemLayers(systemName);
+      const currentEngine = this.getEngineForSystem(systemName);
+      if (currentEngine && currentEngine.setActive) {
+        currentEngine.setActive(true);
+      }
+      return currentEngine;
+    }
+    
     // Hide all layer containers first
     this.hideAllLayers();
     
@@ -60,8 +71,8 @@ export class SmartCanvasPool {
       }
     }
     
-    // Destroy previous system contexts
-    if (this.activeSystem) {
+    // Destroy previous system contexts (but NOT the target system!)
+    if (this.activeSystem && this.activeSystem !== systemName) {
       this.destroySystemContexts(this.activeSystem);
     }
     
@@ -71,8 +82,14 @@ export class SmartCanvasPool {
     // Update active system
     this.activeSystem = systemName;
     
-    // Create NEW contexts for target system
-    await this.createSystemContexts(systemName);
+    // Create contexts for target system (only if needed)
+    const existingContexts = this.countSystemContexts(systemName);
+    if (existingContexts === 0) {
+      console.log(`🆕 Creating contexts for ${systemName} (none exist)`);
+      await this.createSystemContexts(systemName);
+    } else {
+      console.log(`♻️ Reusing existing ${existingContexts} contexts for ${systemName}`);
+    }
     
     // CRITICAL: Validate contexts are working before creating engine
     const contextValidation = this.validateSystemContexts(systemName);
@@ -407,8 +424,13 @@ export class SmartCanvasPool {
 
   getActiveContextCount() {
     if (!this.activeSystem) return 0;
+    return this.countSystemContexts(this.activeSystem);
+  }
+
+  countSystemContexts(systemName) {
+    const configs = this.canvasConfigs[systemName];
+    if (!configs) return 0;
     
-    const configs = this.canvasConfigs[this.activeSystem];
     let activeCount = 0;
     
     configs.forEach(config => {
