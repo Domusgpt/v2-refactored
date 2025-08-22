@@ -183,6 +183,8 @@ export class RealHolographicSystem {
     }
     
     updateParameter(param, value) {
+        console.log(`🔥 HOLOGRAPHIC DEBUG: updateParameter(${param}, ${value}) called, visualizers: ${this.visualizers.length}`);
+        
         // CRITICAL: Update tilt controller base rotations when user changes 4D rotation sliders
         if (this.tiltController && (param === 'rot4dXW' || param === 'rot4dYW' || param === 'rot4dZW')) {
             const axis = param.replace('rot4d', '').toLowerCase(); // 'rot4dXW' -> 'xw'

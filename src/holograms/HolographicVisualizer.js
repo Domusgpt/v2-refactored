@@ -839,10 +839,15 @@ export class HolographicVisualizer {
      * This method was missing and causing parameter sliders to not work in holographic system
      */
     updateParameters(params) {
+        console.log(`🔥 HOLOGRAPHIC VISUALIZER DEBUG: updateParameters called for ${this.canvas?.id}, params:`, params);
+        console.log(`🔥 Current variantParams before update:`, this.variantParams);
+        
         // Update variant parameters with proper mapping and scaling
         if (this.variantParams) {
             Object.keys(params).forEach(param => {
                 const mappedParam = this.mapParameterName(param);
+                console.log(`🔥 Mapping ${param} → ${mappedParam}`);
+                
                 if (mappedParam !== null) {
                     let scaledValue = params[param];
                     
@@ -855,6 +860,7 @@ export class HolographicVisualizer {
                     }
                     
                     this.variantParams[mappedParam] = scaledValue;
+                    console.log(`🔥 Set ${mappedParam} = ${scaledValue} in variantParams`);
                     
                     // Handle special parameter types
                     if (mappedParam === 'geometryType') {
@@ -864,6 +870,8 @@ export class HolographicVisualizer {
                 }
             });
         }
+        
+        console.log(`🔥 variantParams after update:`, this.variantParams);
         
         // CRITICAL: Force immediate re-render with new parameters
         this.render();
