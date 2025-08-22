@@ -665,39 +665,31 @@ export class HolographicVisualizer {
             };
         }
         
-        // Speed: More responsive to rhythm and bass (but respect manual overrides)
+        // Speed: More responsive to rhythm and bass
         const targetSpeed = audioData.rhythm > 0 ? audioData.rhythm * 0.8 : 
                            audioData.bass > 0.3 ? audioData.bass * 0.6 : 0;
         this.audioSmooth.speed = this.audioSmooth.speed * smoothing + targetSpeed * (1 - smoothing);
-        // Only apply audio boost if no manual parameter override
-        if (!this.manualParameterOverride || !this.manualParameterOverride.speed) {
-            this.audioSpeedBoost = this.audioSmooth.speed;
-        }
+        // DISABLED: Audio boost disabled to fix manual parameter interference
+        // this.audioSpeedBoost = this.audioSmooth.speed;
         
-        // Density: More reactive to energy (but respect manual overrides)
+        // Density: More reactive to energy  
         const targetDensity = audioData.energy * 1.2 + audioData.bass * 0.8;
         this.audioSmooth.density = this.audioSmooth.density * smoothing + targetDensity * (1 - smoothing);
-        // Only apply audio boost if no manual parameter override
-        if (!this.manualParameterOverride || !this.manualParameterOverride.density) {
-            this.audioDensityBoost = this.audioSmooth.density;
-        }
+        // DISABLED: Audio boost disabled to fix manual parameter interference
+        // this.audioDensityBoost = this.audioSmooth.density;
         
-        // Morph: More flowing with melody and mid frequencies (but respect manual overrides)
+        // Morph: More flowing with melody and mid frequencies
         const targetMorph = audioData.melody * 1.2 + audioData.mid * 0.8;
         this.audioSmooth.morph = this.audioSmooth.morph * smoothing + targetMorph * (1 - smoothing);
-        // Only apply audio boost if no manual parameter override
-        if (!this.manualParameterOverride || !this.manualParameterOverride.morph) {
-            this.audioMorphBoost = this.audioSmooth.morph;
-        }
+        // DISABLED: Audio boost disabled to fix manual parameter interference
+        // this.audioMorphBoost = this.audioSmooth.morph;
         
-        // Chaos: More responsive to bass and high frequencies (but respect manual overrides)
+        // Chaos: More responsive to bass and high frequencies
         const targetChaos = audioData.bass > 0.4 ? audioData.bass * 0.8 : 
                            audioData.high > 0.6 ? audioData.high * 0.6 : 0;
         this.audioSmooth.chaos = this.audioSmooth.chaos * smoothing + targetChaos * (1 - smoothing);
-        // Only apply audio boost if no manual parameter override
-        if (!this.manualParameterOverride || !this.manualParameterOverride.chaos) {
-            this.audioChaosBoost = this.audioSmooth.chaos;
-        }
+        // DISABLED: Audio boost disabled to fix manual parameter interference
+        // this.audioChaosBoost = this.audioSmooth.chaos;
         
         // Color: More dynamic color shifting
         const targetColor = (audioData.melody + audioData.high + audioData.mid) * 0.6;
@@ -854,10 +846,7 @@ export class HolographicVisualizer {
         console.log(`🔥 HOLOGRAPHIC VISUALIZER DEBUG: updateParameters called for ${this.canvas?.id}, params:`, params);
         console.log(`🔥 Current variantParams before update:`, this.variantParams);
         
-        // CRITICAL FIX: Set manual parameter override flag to prevent audio interference
-        if (!this.manualParameterOverride) {
-            this.manualParameterOverride = {};
-        }
+        // SIMPLIFIED: Audio boosts disabled, so no need for override system
         
         // Update variant parameters with proper mapping and scaling
         if (this.variantParams) {
@@ -879,10 +868,6 @@ export class HolographicVisualizer {
                     this.variantParams[mappedParam] = scaledValue;
                     console.log(`🔥 Set ${mappedParam} = ${scaledValue} in variantParams`);
                     
-                    // Mark this parameter as manually overridden to prevent audio interference
-                    this.manualParameterOverride[mappedParam] = true;
-                    console.log(`🚫 Audio disabled for ${mappedParam} (manual override active)`);
-                    
                     // Handle special parameter types
                     if (mappedParam === 'geometryType') {
                         // Regenerate role params with new geometry
@@ -893,7 +878,6 @@ export class HolographicVisualizer {
         }
         
         console.log(`🔥 variantParams after update:`, this.variantParams);
-        console.log(`🚫 Manual overrides active:`, Object.keys(this.manualParameterOverride || {}).join(', '));
         
         // CRITICAL: Force immediate re-render with new parameters
         this.render();
