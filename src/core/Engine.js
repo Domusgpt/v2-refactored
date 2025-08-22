@@ -141,9 +141,8 @@ export class VIB34DIntegratedEngine {
      * Set up mouse/touch interactions
      */
     setupInteractions() {
-        this.interactionHandler.setupMouseTracking();
-        this.interactionHandler.setupClickHandling();
-        this.interactionHandler.setupTouchSupport();
+        // Each system handles its own interactions - no central handler needed
+        console.log('🎮 Faceted Engine: Using system-specific interactions');
     }
     
     /**

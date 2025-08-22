@@ -305,6 +305,10 @@ export class SmartCanvasPool {
       layerContainer.style.display = 'block';
       layerContainer.style.visibility = 'visible';
       layerContainer.style.opacity = '1';
+      
+      // CRITICAL: Wait for browser to actually render the container as visible
+      await new Promise(resolve => setTimeout(resolve, 100));
+      console.log(`⏱️ Waited 100ms for ${layerId} to become visible`);
     }
     
     // INVESTIGATION 2: Stagger context creation to prevent GPU overload
@@ -327,7 +331,7 @@ export class SmartCanvasPool {
         // CRITICAL: Don't create contexts for invisible/zero-sized canvases
         if (!isVisible || !hasSize) {
           console.warn(`⚠️ Skipping context creation for ${config.id} - invisible or zero size`);
-          return;
+          continue; // Skip this canvas but continue with others
         }
         
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
