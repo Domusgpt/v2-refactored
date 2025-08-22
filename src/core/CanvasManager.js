@@ -1,45 +1,35 @@
 /**
- * Simple Canvas Manager - Destroy old, create new
- * Just makes tab switching work without crashing
+ * Simple Canvas Manager - System switching only
+ * Just handles layer visibility and engine loading
  */
 
 export class CanvasManager {
   constructor() {
     this.currentSystem = null;
-    this.canvasConfigs = {
-      faceted: [
-        'background-canvas', 'shadow-canvas', 'content-canvas', 'highlight-canvas', 'accent-canvas'
-      ],
-      quantum: [
-        'quantum-background-canvas', 'quantum-shadow-canvas', 'quantum-content-canvas', 'quantum-highlight-canvas', 'quantum-accent-canvas'
-      ],
-      holographic: [
-        'holo-background-canvas', 'holo-shadow-canvas', 'holo-content-canvas', 'holo-highlight-canvas', 'holo-accent-canvas'
-      ],
-      polychora: [
-        'polychora-background-canvas', 'polychora-shadow-canvas', 'polychora-content-canvas', 'polychora-highlight-canvas', 'polychora-accent-canvas'
-      ]
-    };
+    this.currentEngine = null;
   }
 
   async switchToSystem(systemName, engineClasses) {
     console.log(`🔄 Switching to ${systemName}`);
     
-    // STEP 1: Destroy old visualizer canvases
-    if (this.currentSystem && this.currentSystem !== systemName) {
-      this.destroySystemCanvases(this.currentSystem);
+    // STEP 1: Stop current engine
+    if (this.currentEngine && this.currentEngine.setActive) {
+      this.currentEngine.setActive(false);
     }
     
     // STEP 2: Show new system layers
     this.showSystemLayers(systemName);
     
-    // STEP 3: Create new visualizer canvases
-    this.createSystemCanvases(systemName);
-    
-    // STEP 4: Load the correct engine for this system
+    // STEP 3: Load the correct engine for this system
     const engine = await this.loadEngine(systemName, engineClasses);
     
+    // STEP 4: Start new engine
+    if (engine && engine.setActive) {
+      engine.setActive(true);
+    }
+    
     this.currentSystem = systemName;
+    this.currentEngine = engine;
     console.log(`✅ Switched to ${systemName}`);
     return engine;
   }
@@ -88,54 +78,6 @@ export class CanvasManager {
     return engine;
   }
 
-  destroySystemCanvases(systemName) {
-    const canvasIds = this.canvasConfigs[systemName];
-    if (!canvasIds) return;
-    
-    console.log(`🧽 Destroying ${canvasIds.length} canvases for ${systemName}`);
-    
-    canvasIds.forEach(canvasId => {
-      const canvas = document.getElementById(canvasId);
-      if (canvas) {
-        // Get context and lose it properly
-        const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-        if (gl) {
-          const ext = gl.getExtension('WEBGL_lose_context');
-          if (ext) {
-            ext.loseContext();
-          }
-        }
-        
-        // Clear canvas
-        canvas.width = 1;
-        canvas.height = 1;
-        console.log(`✨ Destroyed canvas: ${canvasId}`);
-      }
-    });
-  }
-
-  createSystemCanvases(systemName) {
-    const canvasIds = this.canvasConfigs[systemName];
-    if (!canvasIds) return;
-    
-    console.log(`🎨 Creating ${canvasIds.length} canvases for ${systemName}`);
-    
-    canvasIds.forEach(canvasId => {
-      const canvas = document.getElementById(canvasId);
-      if (canvas) {
-        // Set proper canvas size
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        
-        // Create WebGL context
-        const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-        if (gl) {
-          console.log(`✨ Created canvas: ${canvasId}`);
-        }
-      }
-    });
-  }
 
   showSystemLayers(systemName) {
     // Hide all layer containers
