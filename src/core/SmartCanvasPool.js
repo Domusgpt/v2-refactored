@@ -72,7 +72,15 @@ export class SmartCanvasPool {
     this.activeSystem = systemName;
     
     // Create NEW contexts for target system
-    this.createSystemContexts(systemName);
+    await this.createSystemContexts(systemName);
+    
+    // CRITICAL: Validate contexts are working before creating engine
+    const contextValidation = this.validateSystemContexts(systemName);
+    if (!contextValidation.success) {
+      console.error(`❌ Context validation failed for ${systemName}: ${contextValidation.error}`);
+      return null;
+    }
+    console.log(`✅ Context validation passed for ${systemName}`);
     
     // Get or create engine for target system
     let targetEngine = this.getEngineForSystem(systemName);
@@ -390,6 +398,11 @@ export class SmartCanvasPool {
         }
       }
     }
+    
+    // CRITICAL: Wait for all contexts to fully stabilize before returning
+    console.log(`⏱️ Waiting 200ms for all ${configs.length} contexts to stabilize...`);
+    await new Promise(resolve => setTimeout(resolve, 200));
+    console.log(`✅ Context creation and stabilization complete for ${systemName}`);
   }
 
   getActiveContextCount() {
@@ -453,6 +466,46 @@ export class SmartCanvasPool {
     } else {
       console.error(`❌ Layer container not found: ${layerId}`);
     }
+  }
+
+  validateSystemContexts(systemName) {
+    const configs = this.canvasConfigs[systemName];
+    if (!configs) {
+      return { success: false, error: `No configs for system ${systemName}` };
+    }
+    
+    let validContexts = 0;
+    let totalCanvases = 0;
+    
+    for (const config of configs) {
+      const canvas = document.getElementById(config.id);
+      if (canvas) {
+        totalCanvases++;
+        const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+        if (gl && !gl.isContextLost()) {
+          // Test basic WebGL functionality
+          try {
+            const testProgram = gl.createProgram();
+            if (testProgram) {
+              gl.deleteProgram(testProgram);
+              validContexts++;
+            }
+          } catch (error) {
+            console.warn(`⚠️ Context ${config.id} failed basic test:`, error);
+          }
+        }
+      }
+    }
+    
+    if (validContexts === 0) {
+      return { success: false, error: `No valid contexts created (0/${totalCanvases})` };
+    }
+    
+    if (validContexts < totalCanvases) {
+      console.warn(`⚠️ Only ${validContexts}/${totalCanvases} contexts valid for ${systemName}`);
+    }
+    
+    return { success: true, validContexts, totalCanvases };
   }
 
   getStats() {
