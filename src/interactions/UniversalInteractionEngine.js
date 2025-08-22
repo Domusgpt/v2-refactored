@@ -188,27 +188,47 @@ export class UniversalInteractionEngine {
      * Set up comprehensive event listeners
      */
     setupEventListeners() {
-        // Mouse events
-        this.container.addEventListener('mousemove', this.handleMouseMove.bind(this));
-        this.container.addEventListener('mousedown', this.handleMouseDown.bind(this));
-        this.container.addEventListener('mouseup', this.handleMouseUp.bind(this));
-        this.container.addEventListener('click', this.handleClick.bind(this));
-        this.container.addEventListener('dblclick', this.handleDoubleClick.bind(this));
-        this.container.addEventListener('wheel', this.handleWheel.bind(this));
+        // MOBILE FIX: Only capture events on canvas areas, not UI controls
+        const canvasAreas = document.querySelectorAll('.canvas-container, canvas');
         
-        // Touch events for mobile/tablet
-        this.container.addEventListener('touchstart', this.handleTouchStart.bind(this));
-        this.container.addEventListener('touchmove', this.handleTouchMove.bind(this));
-        this.container.addEventListener('touchend', this.handleTouchEnd.bind(this));
-        this.container.addEventListener('touchcancel', this.handleTouchEnd.bind(this));
+        if (canvasAreas.length === 0) {
+            // Fallback to container but exclude UI elements
+            this.setupSelectiveEventListeners(this.container);
+        } else {
+            // Attach to canvas areas only
+            canvasAreas.forEach(area => {
+                this.setupSelectiveEventListeners(area);
+            });
+        }
+    }
+    
+    /**
+     * Setup event listeners with UI element exclusion
+     */
+    setupSelectiveEventListeners(element) {
+        // Mouse events - only on canvas areas
+        element.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        element.addEventListener('mousedown', this.handleMouseDown.bind(this));
+        element.addEventListener('mouseup', this.handleMouseUp.bind(this));
+        element.addEventListener('click', this.handleCanvasClick.bind(this)); // Renamed to avoid UI conflicts
+        element.addEventListener('dblclick', this.handleDoubleClick.bind(this));
+        element.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
         
-        // Gesture events
-        this.container.addEventListener('gesturestart', this.handleGestureStart.bind(this));
-        this.container.addEventListener('gesturechange', this.handleGestureChange.bind(this));
-        this.container.addEventListener('gestureend', this.handleGestureEnd.bind(this));
+        // Touch events - ONLY on canvas areas to avoid UI conflicts
+        element.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+        element.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+        element.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
+        element.addEventListener('touchcancel', this.handleTouchEnd.bind(this), { passive: false });
         
-        // Prevent default touch behaviors for better control
-        this.container.style.touchAction = 'none';
+        // Gesture events - canvas only
+        element.addEventListener('gesturestart', this.handleGestureStart.bind(this), { passive: false });
+        element.addEventListener('gesturechange', this.handleGestureChange.bind(this), { passive: false });
+        element.addEventListener('gestureend', this.handleGestureEnd.bind(this), { passive: false });
+        
+        // Only prevent touch behaviors on canvas areas, not UI
+        if (element.classList.contains('canvas-container') || element.tagName === 'CANVAS') {
+            element.style.touchAction = 'none';
+        }
     }
     
     /**
@@ -275,10 +295,15 @@ export class UniversalInteractionEngine {
     }
     
     /**
-     * Handle click events
+     * Handle canvas click events (renamed from handleClick to avoid UI conflicts)
      */
-    handleClick(event) {
+    handleCanvasClick(event) {
         if (!this.isActive) return;
+        
+        // MOBILE FIX: Only handle clicks on canvas areas, not UI elements
+        if (this.isUIElement(event.target)) {
+            return; // Let UI handle its own clicks
+        }
         
         const now = Date.now();
         if (now - this.lastClickTime < 300) {
@@ -292,6 +317,53 @@ export class UniversalInteractionEngine {
         this.connectedSystems.forEach((system, systemName) => {
             this.handleSystemClick(systemName, system);
         });
+    }
+    
+    /**
+     * Check if element is a UI control that should not be intercepted
+     */
+    isUIElement(element) {
+        // Check if element or its parents are UI controls
+        let current = element;
+        while (current && current !== document.body) {
+            if (current.classList.contains('system-btn') ||
+                current.classList.contains('action-btn') ||
+                current.classList.contains('panel-btn') ||
+                current.classList.contains('geom-btn') ||
+                current.classList.contains('control-panel') ||
+                current.classList.contains('top-bar') ||
+                current.classList.contains('mobile-collapse-btn') ||
+                current.tagName === 'BUTTON' ||
+                current.tagName === 'INPUT' ||
+                current.tagName === 'SELECT' ||
+                current.type === 'range') {
+                return true;
+            }
+            current = current.parentElement;
+        }
+        return false;
+    }
+    
+    /**
+     * Get the proper container rectangle for touch coordinate calculation
+     */
+    getContainerRect(target) {
+        // Try to find the closest canvas container or use the main container
+        let container = target;
+        while (container && container !== document.body) {
+            if (container.classList.contains('canvas-container') || 
+                container.tagName === 'CANVAS') {
+                break;
+            }
+            container = container.parentElement;
+        }
+        
+        // Fallback to main container if no canvas container found
+        if (!container || container === document.body) {
+            container = this.container || document.body;
+        }
+        
+        return container.getBoundingClientRect();
     }
     
     /**
@@ -337,12 +409,19 @@ export class UniversalInteractionEngine {
     handleTouchStart(event) {
         if (!this.isActive) return;
         
+        // MOBILE FIX: Don't intercept touches on UI elements
+        if (event.touches.length > 0 && this.isUIElement(event.touches[0].target)) {
+            return; // Let UI handle its own touches
+        }
+        
         event.preventDefault();
+        
+        const containerRect = this.getContainerRect(event.target);
         
         Array.from(event.changedTouches).forEach(touch => {
             this.touches.set(touch.identifier, {
-                x: touch.clientX / this.container.getBoundingClientRect().width,
-                y: touch.clientY / this.container.getBoundingClientRect().height,
+                x: (touch.clientX - containerRect.left) / containerRect.width,
+                y: (touch.clientY - containerRect.top) / containerRect.height,
                 startTime: Date.now()
             });
         });
@@ -361,14 +440,21 @@ export class UniversalInteractionEngine {
     handleTouchMove(event) {
         if (!this.isActive) return;
         
+        // MOBILE FIX: Don't intercept touches on UI elements
+        if (event.touches.length > 0 && this.isUIElement(event.touches[0].target)) {
+            return; // Let UI handle its own touches
+        }
+        
         event.preventDefault();
+        
+        const containerRect = this.getContainerRect(event.target);
         
         Array.from(event.changedTouches).forEach(touch => {
             if (this.touches.has(touch.identifier)) {
                 this.touches.set(touch.identifier, {
                     ...this.touches.get(touch.identifier),
-                    x: touch.clientX / this.container.getBoundingClientRect().width,
-                    y: touch.clientY / this.container.getBoundingClientRect().height
+                    x: (touch.clientX - containerRect.left) / containerRect.width,
+                    y: (touch.clientY - containerRect.top) / containerRect.height
                 });
             }
         });
@@ -386,6 +472,11 @@ export class UniversalInteractionEngine {
      */
     handleTouchEnd(event) {
         if (!this.isActive) return;
+        
+        // MOBILE FIX: Don't intercept touches on UI elements
+        if (event.changedTouches.length > 0 && this.isUIElement(event.changedTouches[0].target)) {
+            return; // Let UI handle its own touches
+        }
         
         Array.from(event.changedTouches).forEach(touch => {
             this.touches.delete(touch.identifier);
