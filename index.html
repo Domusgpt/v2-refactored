@@ -1255,8 +1255,8 @@
                     window.addEventListener('message', (event) => {
                         if (event.data && event.data.type === 'mouseMove') {
                             const engine = engines[activeSystem];
-                            if (engine && engine.updateMouseState) {
-                                engine.updateMouseState(event.data.x, event.data.y, event.data.intensity);
+                            if (engine && engine.updateInteraction) {
+                                engine.updateInteraction(event.data.x, event.data.y, event.data.intensity);
                             }
                         } else if (event.data && event.data.type === 'click') {
                             const engine = engines[activeSystem];
@@ -1766,8 +1766,8 @@
                     facetedIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 30);
                     
                     // Apply to faceted engine
-                    if (engine && engine.updateMouseState) {
-                        engine.updateMouseState(facetedMouseX, facetedMouseY, facetedIntensity * 0.5);
+                    if (engine && engine.updateInteraction) {
+                        engine.updateInteraction(facetedMouseX, facetedMouseY, facetedIntensity * 0.5);
                     }
                 });
                 
@@ -1811,8 +1811,8 @@
                     quantumIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 25);
                     
                     // Apply to quantum engine with enhanced responsiveness
-                    if (quantumEngine && quantumEngine.updateMouseState) {
-                        quantumEngine.updateMouseState(quantumMouseX, quantumMouseY, quantumIntensity);
+                    if (quantumEngine && quantumEngine.updateInteraction) {
+                        quantumEngine.updateInteraction(quantumMouseX, quantumMouseY, quantumIntensity);
                     }
                 });
                 
@@ -1834,8 +1834,8 @@
                     quantumMouseX = (touch.clientX - rect.left) / rect.width;
                     quantumMouseY = 1.0 - ((touch.clientY - rect.top) / rect.height);
                     
-                    if (quantumEngine && quantumEngine.updateMouseState) {
-                        quantumEngine.updateMouseState(quantumMouseX, quantumMouseY, 0.8);
+                    if (quantumEngine && quantumEngine.updateInteraction) {
+                        quantumEngine.updateInteraction(quantumMouseX, quantumMouseY, 0.8);
                     }
                     
                     e.preventDefault();
@@ -1872,8 +1872,8 @@
                     polychoraIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 35);
                     
                     // Apply to polychora system with 4D mathematical precision
-                    if (polychoraSystem && polychoraSystem.updateMouseState) {
-                        polychoraSystem.updateMouseState(polychoraMouseX, polychoraMouseY, polychoraIntensity);
+                    if (polychoraSystem && polychoraSystem.updateInteraction) {
+                        polychoraSystem.updateInteraction(polychoraMouseX, polychoraMouseY, polychoraIntensity);
                     }
                 });
                 
@@ -1895,8 +1895,8 @@
                     polychoraMouseX = (touch.clientX - rect.left) / rect.width;
                     polychoraMouseY = 1.0 - ((touch.clientY - rect.top) / rect.height);
                     
-                    if (polychoraSystem && polychoraSystem.updateMouseState) {
-                        polychoraSystem.updateMouseState(polychoraMouseX, polychoraMouseY, 0.6);
+                    if (polychoraSystem && polychoraSystem.updateInteraction) {
+                        polychoraSystem.updateInteraction(polychoraMouseX, polychoraMouseY, 0.6);
                     }
                     
                     e.preventDefault();

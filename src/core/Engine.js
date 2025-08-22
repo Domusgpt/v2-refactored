@@ -9,7 +9,7 @@ import { ParameterManager } from './Parameters.js';
 import { VariationManager } from '../variations/VariationManager.js';
 import { GallerySystem } from '../gallery/GallerySystem.js';
 import { ExportManager } from '../export/ExportManager.js';
-import { InteractionHandler } from '../utils/InteractionHandler.js';
+// InteractionHandler removed - each system handles its own interactions
 import { StatusManager } from '../ui/StatusManager.js';
 
 export class VIB34DIntegratedEngine {
@@ -20,7 +20,7 @@ export class VIB34DIntegratedEngine {
         this.variationManager = new VariationManager(this); // CRITICAL FIX: Pass this as engine parameter
         this.gallerySystem = new GallerySystem(this);
         this.exportManager = new ExportManager(this);
-        this.interactionHandler = new InteractionHandler(this);
+        // Each system handles its own interactions - no central handler needed
         this.statusManager = new StatusManager();
         
         // Current state
@@ -328,10 +328,17 @@ export class VIB34DIntegratedEngine {
     /**
      * Update mouse interaction state
      */
-    updateMouseState(x, y, intensity = 0.5) {
+    updateInteraction(x, y, intensity = 0.5) {
         this.mouseX = x;
         this.mouseY = y;
         this.mouseIntensity = intensity;
+        
+        // Apply to all faceted visualizers
+        this.visualizers.forEach(visualizer => {
+            if (visualizer.updateInteraction) {
+                visualizer.updateInteraction(x, y, intensity);
+            }
+        });
     }
     
     /**

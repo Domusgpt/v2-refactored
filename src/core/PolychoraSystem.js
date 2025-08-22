@@ -880,6 +880,53 @@ export class PolychoraSystem {
     }
     
     /**
+     * Update 4D mouse interaction - standardized method name
+     */
+    updateInteraction(x, y, intensity = 0.5) {
+        // Apply 4D mouse projection to all visualizers
+        this.visualizers.forEach(visualizer => {
+            if (visualizer.update4DMouse) {
+                visualizer.update4DMouse(x, y, intensity);
+            }
+        });
+        console.log(`🔮 Polychora 4D interaction: ${x.toFixed(2)}, ${y.toFixed(2)}, intensity: ${intensity.toFixed(2)}`);
+    }
+    
+    /**
+     * Trigger 4D click interaction
+     */
+    triggerClick(intensity = 1.0) {
+        this.visualizers.forEach(visualizer => {
+            if (visualizer.trigger4DClick) {
+                visualizer.trigger4DClick(intensity);
+            }
+        });
+        console.log(`🔮 Polychora 4D click: intensity ${intensity.toFixed(2)}`);
+    }
+    
+    /**
+     * Update 4D audio reactivity
+     */
+    updateAudioReactivity(audioData) {
+        this.visualizers.forEach(visualizer => {
+            if (visualizer.updateAudio) {
+                visualizer.updateAudio(audioData);
+            }
+        });
+    }
+    
+    /**
+     * Update 4D scroll interaction (cross-section navigation)
+     */
+    updateScroll(velocity) {
+        this.visualizers.forEach(visualizer => {
+            if (visualizer.updateCrossSection) {
+                visualizer.updateCrossSection(velocity);
+            }
+        });
+    }
+    
+    /**
      * Get current polytope information
      */
     getCurrentPolytope() {
