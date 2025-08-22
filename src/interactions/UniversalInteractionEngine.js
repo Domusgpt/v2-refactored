@@ -346,13 +346,21 @@ export class UniversalInteractionEngine {
                 current.classList.contains('action-btn') ||
                 current.classList.contains('panel-btn') ||
                 current.classList.contains('geom-btn') ||
+                current.classList.contains('geometry-btn') ||
+                current.classList.contains('geometry-grid') ||
                 current.classList.contains('control-panel') ||
                 current.classList.contains('top-bar') ||
                 current.classList.contains('mobile-collapse-btn') ||
+                current.classList.contains('parameter-control') ||
+                current.classList.contains('parameter-row') ||
+                current.classList.contains('parameter-slider') ||
+                current.classList.contains('slider-container') ||
                 current.tagName === 'BUTTON' ||
                 current.tagName === 'INPUT' ||
                 current.tagName === 'SELECT' ||
-                current.type === 'range') {
+                current.tagName === 'LABEL' ||
+                current.type === 'range' ||
+                current.hasAttribute('onclick')) {
                 return true;
             }
             current = current.parentElement;
@@ -504,6 +512,57 @@ export class UniversalInteractionEngine {
         this.connectedSystems.forEach((system, systemName) => {
             this.handleSystemTouchEnd(systemName, system, event);
         });
+    }
+    
+    /**
+     * Handle gesture start events (iOS Safari only)
+     */
+    handleGestureStart(event) {
+        // Prevent default gesture behavior
+        event.preventDefault();
+        
+        console.log('🖐️ Gesture start detected');
+        
+        // Initialize gesture tracking
+        this.gestureState.isGesturing = true;
+        this.gestureState.initialScale = event.scale || 1;
+        this.gestureState.initialRotation = event.rotation || 0;
+    }
+    
+    /**
+     * Handle gesture change events (iOS Safari only)  
+     */
+    handleGestureChange(event) {
+        event.preventDefault();
+        
+        if (!this.gestureState.isGesturing) return;
+        
+        const scaleChange = (event.scale || 1) - this.gestureState.initialScale;
+        const rotationChange = (event.rotation || 0) - this.gestureState.initialRotation;
+        
+        // Apply gesture effects to active systems
+        this.activeSystems.forEach(([systemName, system]) => {
+            this.handleSystemGesture(systemName, system, {
+                scaleChange,
+                rotationChange,
+                scale: event.scale || 1,
+                rotation: event.rotation || 0
+            });
+        });
+    }
+    
+    /**
+     * Handle gesture end events (iOS Safari only)
+     */
+    handleGestureEnd(event) {
+        event.preventDefault();
+        
+        console.log('🖐️ Gesture end detected');
+        
+        // Reset gesture state
+        this.gestureState.isGesturing = false;
+        this.gestureState.initialScale = 1;
+        this.gestureState.initialRotation = 0;
     }
     
     /**
@@ -745,6 +804,29 @@ export class UniversalInteractionEngine {
      */
     handleSystemTouchEnd(systemName, system, event) {
         // Handle touch end cleanup if needed
+    }
+    
+    /**
+     * Handle system-specific gesture events
+     */
+    handleSystemGesture(systemName, system, gestureData) {
+        const mapping = this.interactionMappings[systemName];
+        if (!mapping) return;
+        
+        console.log(`🖐️ ${systemName} gesture: scale=${gestureData.scale.toFixed(2)}, rotation=${gestureData.rotation.toFixed(1)}°`);
+        
+        // Map gesture to system parameters
+        if (mapping.pinch && system.updateParameter) {
+            // Scale gesture affects density/zoom
+            const densityChange = (gestureData.scale - 1) * 20; // Convert scale to density range
+            system.updateParameter('gridDensity', Math.max(5, Math.min(100, 50 + densityChange)));
+        }
+        
+        if (mapping.rotate && system.updateParameter) {
+            // Rotation gesture affects 4D rotation
+            const rotationValue = gestureData.rotation * 0.01; // Convert degrees to radians
+            system.updateParameter('rot4dXW', rotationValue);
+        }
     }
     
     /**
