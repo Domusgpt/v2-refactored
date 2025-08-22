@@ -723,15 +723,14 @@
         window.switchSystem = async function(system) {
             console.log(`🎯 switchSystem called with: ${system}`);
             
-            // CANVAS EXPLOSION FIX: Use SmartCanvasPool ONLY
-            if (window.canvasPool) {
+            // SIMPLE CANVAS MANAGER: Destroy old, create new
+            if (window.canvasManager) {
                 try {
-                    console.log(`🎯 Lazy loading ${system} system...`);
-                    const newEngine = await window.canvasPool.switchToSystem(system, null);
+                    console.log(`🔄 Switching to ${system} system...`);
+                    const newEngine = await window.canvasManager.switchToSystem(system, window.engineClasses);
                     
                     if (newEngine) {
                         console.log(`✅ ${system} system ready with engine`);
-                        console.log(`📊 Canvas stats: ${JSON.stringify(window.canvasPool.getStats())}`);
                         
                         // Update global state and UI
                         window.currentSystem = system;
@@ -764,8 +763,8 @@
                 }
             }
             
-            // If we get here, SmartCanvasPool failed - this is an error
-            console.error(`💥 SmartCanvasPool failed for ${system} - system may not work properly`);
+            // If we get here, CanvasManager failed - this is an error
+            console.error(`💥 CanvasManager failed for ${system} - system may not work properly`);
         }
         
         // Make other essential functions globally accessible
@@ -899,7 +898,7 @@
         import { CollectionManager } from './src/features/CollectionManager.js';
         import { UnifiedSaveManager } from './src/core/UnifiedSaveManager.js';
         import { ParameterMapper } from './src/core/ParameterMapper.js';
-        import { SmartCanvasPool } from './src/core/SmartCanvasPool.js';
+        import { CanvasManager } from './src/core/CanvasManager.js';
         import { TradingCardGenerator } from './src/export/TradingCardGenerator.js';
         // Universal reactivity system removed - implementing clean system-specific interactions
         
@@ -1066,13 +1065,14 @@
                     }
                 }
                 
-                // CANVAS EXPLOSION FIX: SmartCanvasPool - Lazy load engines
-                console.log('🎯 Initializing SmartCanvasPool - Lazy loading engines on demand');
-                window.canvasPool = new SmartCanvasPool({
+                // SIMPLE CANVAS MANAGER: Destroy old, create new
+                console.log('🎯 Initializing CanvasManager - Simple tab switching');
+                window.canvasManager = new CanvasManager();
+                window.engineClasses = {
                     VIB34DIntegratedEngine,
                     QuantumEngine,
                     RealHolographicSystem
-                });
+                };
                 
                 // Don't create engines yet - they'll be created when system is activated
                 engine = null;
@@ -1080,9 +1080,9 @@
                 holographicSystem = null;
                 
                 // Start with faceted system (this will create the engine)
-                await window.canvasPool.switchToSystem('faceted', null);
+                await window.canvasManager.switchToSystem('faceted', window.engineClasses);
                 
-                // CRITICAL FIX: Update local variables after SmartCanvasPool creates engines
+                // Update local variables after CanvasManager creates engines
                 engine = window.engine;
                 quantumEngine = window.quantumEngine;
                 holographicSystem = window.holographicSystem;
