@@ -351,16 +351,8 @@ export class UniversalInteractionEngine {
                 current.classList.contains('control-panel') ||
                 current.classList.contains('top-bar') ||
                 current.classList.contains('mobile-collapse-btn') ||
-                current.classList.contains('parameter-control') ||
-                current.classList.contains('parameter-row') ||
-                current.classList.contains('parameter-slider') ||
-                current.classList.contains('slider-container') ||
                 current.tagName === 'BUTTON' ||
-                current.tagName === 'INPUT' ||
-                current.tagName === 'SELECT' ||
-                current.tagName === 'LABEL' ||
-                current.type === 'range' ||
-                current.hasAttribute('onclick')) {
+                current.tagName === 'SELECT') {
                 return true;
             }
             current = current.parentElement;
