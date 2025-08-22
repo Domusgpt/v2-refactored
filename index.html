@@ -717,7 +717,7 @@
         parseURLParameters();
         
         // SURGICAL FIX: Smart Canvas Management
-        // CanvasLayerManager removed - SmartCanvasPool handles all layer management
+        // Simple CanvasManager handles all layer management
         
         // Global system switching function - accessible to HTML onclick handlers
         window.switchSystem = async function(system) {
@@ -790,7 +790,7 @@
             }
         };
         
-        // MOBILE OPTIMIZATION: Initialize only active system (5 canvases instead of 20)
+        // MOBILE OPTIMIZATION: Initial canvas setup (CanvasManager handles sizing during switches)
         document.addEventListener('DOMContentLoaded', function() {
             const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             if (isMobile) {
@@ -839,7 +839,7 @@
                         }
                     });
                     
-                    // CRITICAL FIX: Don't hide inactive system canvases - SmartCanvasPool needs them for switching!
+                    // CRITICAL FIX: Don't hide inactive system canvases - CanvasManager needs them for switching!
                     // Just ensure they're properly sized but keep them accessible
                     Object.keys(systemCanvases).forEach(system => {
                         if (system !== activeSystem) {
@@ -1027,42 +1027,10 @@
                     throw new Error('Mobile WebGL not available');
                 }
                 
-                // CRITICAL ANDROID FIX: Only initialize active system canvases to avoid WebGL context limit
+                // CanvasManager handles all layer showing/hiding and canvas setup
                 const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 if (isMobile) {
-                    // Determine active system first
-                    const activeSystem = window.galleryPreviewData?.system || window.currentSystem || 'faceted';
-                    const activeLayerId = activeSystem === 'faceted' ? 'vib34dLayers' : `${activeSystem}Layers`;
-                    
-                    // Show only the active system layers
-                    const activeLayers = document.getElementById(activeLayerId);
-                    if (activeLayers) {
-                        activeLayers.style.display = 'block';
-                        activeLayers.style.visibility = 'visible';
-                        activeLayers.style.opacity = '1';
-                        
-                        const activeCanvases = activeLayers.querySelectorAll('canvas');
-                        const viewWidth = window.innerWidth;
-                        const viewHeight = window.innerHeight;
-                        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-                        
-                        activeCanvases.forEach(canvas => {
-                            // Force canvas style dimensions first
-                            canvas.style.width = '100%';
-                            canvas.style.height = '100%';
-                            canvas.style.position = 'absolute';
-                            canvas.style.top = '0';
-                            canvas.style.left = '0';
-                            
-                            // Then force actual canvas dimensions
-                            canvas.width = viewWidth * dpr;
-                            canvas.height = viewHeight * dpr;
-                            
-                            window.mobileOptimization.log(`🚀 Pre-init canvas ${canvas.id}: ${canvas.width}x${canvas.height}`);
-                        });
-                        
-                        window.mobileOptimization.log(`📱 Mobile optimized: Only ${activeCanvases.length} canvas contexts (${activeSystem} system)`);
-                    }
+                    window.mobileOptimization.log(`📱 Mobile device detected - CanvasManager will handle optimization`);
                 }
                 
                 // SIMPLE CANVAS MANAGER: Destroy old, create new
@@ -1095,16 +1063,15 @@
                     console.log('✅ Faceted engine initialized, others will be created on demand');
                 }
                 
-                // CRITICAL FIX: Don't create stub engines - they break system switching!
-                // SmartCanvasPool will create real engines on demand when switching systems
+                // Engines are created on demand when switching systems
                 if (!engine) {
-                    console.log('⚠️ Faceted engine will be created by SmartCanvasPool');
+                    console.log('⚠️ Faceted engine will be created on demand');
                 }
                 if (!quantumEngine) {
-                    console.log('⚠️ Quantum engine will be created by SmartCanvasPool on demand');
+                    console.log('⚠️ Quantum engine will be created on demand');
                 }
                 if (!holographicSystem) {
-                    console.log('⚠️ Holographic system will be created by SmartCanvasPool on demand');
+                    console.log('⚠️ Holographic system will be created on demand');
                 }
                 
                 // CRITICAL PERFORMANCE FIX: Set moduleReady flag immediately after core engines

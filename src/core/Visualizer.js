@@ -119,7 +119,7 @@ export class IntegratedHolographicVisualizer {
      * Create WebGL context after canvas is properly sized
      */
     createWebGLContext() {
-        // CRITICAL FIX: Check if context already exists from SmartCanvasPool
+        // CRITICAL FIX: Check if context already exists from CanvasManager
         let existingContext = this.canvas.getContext('webgl2') || 
                              this.canvas.getContext('webgl') || 
                              this.canvas.getContext('experimental-webgl');
@@ -630,14 +630,14 @@ void main() {
         this.uniforms = null;
         this.gl = null;
         
-        // CRITICAL FIX: Don't create new context - SmartCanvasPool already did this
-        // Just get the existing context that SmartCanvasPool created
+        // CRITICAL FIX: Don't create new context - CanvasManager already did this
+        // Just get the existing context that CanvasManager created
         this.gl = this.canvas.getContext('webgl2') || 
                   this.canvas.getContext('webgl') ||
                   this.canvas.getContext('experimental-webgl');
         
         if (!this.gl) {
-            console.error(`❌ No WebGL context available for ${this.canvas?.id} - SmartCanvasPool should have created one`);
+            console.error(`❌ No WebGL context available for ${this.canvas?.id} - CanvasManager should have created one`);
             return false;
         }
         

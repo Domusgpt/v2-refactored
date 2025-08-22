@@ -325,7 +325,7 @@ export class VIB34DIntegratedEngine {
     }
     
     /**
-     * Set active state - required by SmartCanvasPool
+     * Set active state - required by CanvasManager
      */
     setActive(active) {
         console.log(`🔷 Faceted Engine setActive: ${active}`);
