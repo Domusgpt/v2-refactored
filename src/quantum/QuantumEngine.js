@@ -163,7 +163,7 @@ export class QuantumEngine {
      * Start the render loop
      */
     startRenderLoop() {
-        if (window.mobileDebug) {
+        if (window.mobileDebug && window.mobileDebug.log) {
             window.mobileDebug.log(`🎬 Quantum Engine: Starting render loop with ${this.visualizers?.length} visualizers, isActive=${this.isActive}`);
         }
         
@@ -195,7 +195,7 @@ export class QuantumEngine {
         render();
         console.log('🎬 Quantum render loop started');
         
-        if (window.mobileDebug) {
+        if (window.mobileDebug && window.mobileDebug.log) {
             window.mobileDebug.log(`✅ Quantum Engine: Render loop started, will render when isActive=true`);
         }
     }

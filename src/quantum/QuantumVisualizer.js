@@ -69,14 +69,14 @@ export class QuantumHolographicVisualizer {
         
         if (!this.gl) {
             console.error(`WebGL not supported for ${canvasId}`);
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 window.mobileDebug.log(`❌ ${canvasId}: WebGL context creation failed`);
             }
             // Show user-friendly error instead of white screen
             this.showWebGLError();
             return;
         } else {
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 const version = this.gl.getParameter(this.gl.VERSION);
                 window.mobileDebug.log(`✅ ${canvasId}: WebGL context created - ${version}`);
             }
@@ -128,14 +128,14 @@ export class QuantumHolographicVisualizer {
                         this.canvas.width = viewWidth * devicePixelRatio;
                         this.canvas.height = viewHeight * devicePixelRatio;
                         
-                        if (window.mobileDebug) {
+                        if (window.mobileDebug && window.mobileDebug.log) {
                             window.mobileDebug.log(`📐 Quantum Canvas ${this.canvas.id}: Using viewport fallback ${this.canvas.width}x${this.canvas.height}`);
                         }
                     } else {
                         this.canvas.width = rect.width * devicePixelRatio;
                         this.canvas.height = rect.height * devicePixelRatio;
                         
-                        if (window.mobileDebug) {
+                        if (window.mobileDebug && window.mobileDebug.log) {
                             window.mobileDebug.log(`📐 Quantum Canvas ${this.canvas.id}: Layout ready ${this.canvas.width}x${this.canvas.height}`);
                         }
                     }
@@ -146,7 +146,7 @@ export class QuantumHolographicVisualizer {
             this.canvas.width = rect.width * devicePixelRatio;
             this.canvas.height = rect.height * devicePixelRatio;
             
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 window.mobileDebug.log(`📐 Quantum Canvas ${this.canvas.id}: ${this.canvas.width}x${this.canvas.height} (DPR: ${devicePixelRatio})`);
             }
         }
@@ -182,14 +182,14 @@ export class QuantumHolographicVisualizer {
         
         if (!this.gl) {
             console.error(`WebGL not supported for ${this.canvas.id}`);
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 window.mobileDebug.log(`❌ Quantum ${this.canvas.id}: WebGL context creation failed (size: ${this.canvas.width}x${this.canvas.height})`);
             }
             // Show user-friendly error instead of white screen
             this.showWebGLError();
             return;
         } else {
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 const version = this.gl.getParameter(this.gl.VERSION);
                 window.mobileDebug.log(`✅ Quantum ${this.canvas.id}: WebGL context created - ${version} (size: ${this.canvas.width}x${this.canvas.height})`);
             }
@@ -584,12 +584,12 @@ void main() {
         if (!this.gl.getProgramParameter(program, this.gl.LINK_STATUS)) {
             const error = this.gl.getProgramInfoLog(program);
             console.error('Program linking failed:', error);
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 window.mobileDebug.log(`❌ ${this.canvas?.id}: Shader program link failed - ${error}`);
             }
             return null;
         } else {
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 window.mobileDebug.log(`✅ ${this.canvas?.id}: Shader program linked successfully`);
             }
         }
@@ -604,7 +604,7 @@ void main() {
         // CRITICAL FIX: Check WebGL context state before shader operations
         if (!this.gl) {
             console.error('❌ Cannot create shader: WebGL context is null');
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 window.mobileDebug.log(`❌ ${this.canvas?.id}: Cannot create shader - WebGL context is null`);
             }
             return null;
@@ -612,7 +612,7 @@ void main() {
         
         if (this.gl.isContextLost()) {
             console.error('❌ Cannot create shader: WebGL context is lost');
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 window.mobileDebug.log(`❌ ${this.canvas?.id}: Cannot create shader - WebGL context is lost`);
             }
             return null;
@@ -623,7 +623,7 @@ void main() {
             
             if (!shader) {
                 console.error('❌ Failed to create shader object - WebGL context may be invalid');
-                if (window.mobileDebug) {
+                if (window.mobileDebug && window.mobileDebug.log) {
                     window.mobileDebug.log(`❌ ${this.canvas?.id}: Failed to create shader object`);
                 }
                 return null;
@@ -645,7 +645,7 @@ void main() {
                 
                 console.error('Shader source:', source);
                 
-                if (window.mobileDebug) {
+                if (window.mobileDebug && window.mobileDebug.log) {
                     const errorMsg = error || 'No error info (context may be invalid)';
                     window.mobileDebug.log(`❌ ${this.canvas?.id}: ${shaderType} shader compile failed - ${errorMsg}`);
                     // Log first few lines of problematic shader for mobile debugging
@@ -656,7 +656,7 @@ void main() {
                 this.gl.deleteShader(shader);
                 return null;
             } else {
-                if (window.mobileDebug) {
+                if (window.mobileDebug && window.mobileDebug.log) {
                     const shaderType = type === this.gl.VERTEX_SHADER ? 'vertex' : 'fragment';
                     window.mobileDebug.log(`✅ ${this.canvas?.id}: ${shaderType} shader compiled successfully`);
                 }
@@ -665,7 +665,7 @@ void main() {
             return shader;
         } catch (error) {
             console.error('❌ Exception during shader creation:', error);
-            if (window.mobileDebug) {
+            if (window.mobileDebug && window.mobileDebug.log) {
                 window.mobileDebug.log(`❌ ${this.canvas?.id}: Exception during shader creation - ${error.message}`);
             }
             return null;

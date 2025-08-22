@@ -167,7 +167,7 @@ export class VIB34DIntegratedEngine {
      * Start the main render loop
      */
     startRenderLoop() {
-        if (window.mobileDebug) {
+        if (window.mobileDebug && window.mobileDebug.log) {
             window.mobileDebug.log(`🎬 VIB34D Faceted Engine: Starting render loop with ${this.visualizers?.length} visualizers`);
         }
         
@@ -179,7 +179,7 @@ export class VIB34DIntegratedEngine {
         render();
         
         // Log successful start
-        if (window.mobileDebug) {
+        if (window.mobileDebug && window.mobileDebug.log) {
             window.mobileDebug.log(`✅ VIB34D Faceted Engine: Render loop started, animationId=${!!this.animationId}`);
         }
     }
