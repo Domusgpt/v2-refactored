@@ -92,6 +92,13 @@
             box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
         }
         
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+        
         /* ========== CANVAS ========== */
         .canvas-container {
             position: fixed;
@@ -1617,11 +1624,27 @@
         window.toggleAudio = async function() {
             audioEnabled = !audioEnabled;
             
-            if (audioEnabled && holographicSystem) {
-                await holographicSystem.initAudio();
+            // Update button visual state
+            const audioBtn = document.querySelector('[onclick="toggleAudio()"]');
+            if (audioBtn) {
+                audioBtn.style.background = audioEnabled ? 
+                    'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 255, 0.1)';
+                audioBtn.style.borderColor = audioEnabled ? '#00ff00' : 'rgba(255, 0, 255, 0.3)';
+                audioBtn.title = `Audio Reactivity: ${audioEnabled ? 'ON' : 'OFF'}`;
             }
             
-            console.log(`🎵 Audio: ${audioEnabled ? 'ON' : 'OFF'}`);
+            // Initialize audio for current system
+            if (audioEnabled) {
+                if (holographicSystem) {
+                    await holographicSystem.initAudio();
+                }
+                // Add audio to other systems if they support it
+                if (window.quantumEngine && window.quantumEngine.initAudio) {
+                    await window.quantumEngine.initAudio();
+                }
+            }
+            
+            console.log(`🎵 Audio Reactivity: ${audioEnabled ? 'ON' : 'OFF'}`);
         }
         
         window.showLLMInterface = async function() {
@@ -1873,12 +1896,43 @@
             console.log('🔮 Polychora interactions: 4D-optimized precision tracking enabled');
         }
         
+        let interactivityEnabled = true; // Default enabled
+        
         window.toggleInteractivity = function() {
-            console.log('🎛️ Clean interaction architecture: System-specific interactions always active');
-            console.log('🔷 Faceted: Elegant mouse tracking');
-            console.log('🌌 Quantum: Enhanced mouse + touch'); 
-            console.log('✨ Holographic: Full audio-reactive system (unchanged)');
-            console.log('🔮 Polychora: 4D-optimized precision tracking');
+            interactivityEnabled = !interactivityEnabled;
+            
+            // Update button visual state
+            const interactBtn = document.querySelector('[onclick="toggleInteractivity()"]');
+            if (interactBtn) {
+                interactBtn.style.background = interactivityEnabled ? 
+                    'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 255, 0.1)';
+                interactBtn.style.borderColor = interactivityEnabled ? '#00ff00' : 'rgba(255, 0, 255, 0.3)';
+                interactBtn.title = `Mouse/Touch Interactions: ${interactivityEnabled ? 'ON' : 'OFF'}`;
+                interactBtn.textContent = interactivityEnabled ? 'I' : 'I';
+            }
+            
+            // Enable/disable interactions for all systems
+            if (window.engine && window.engine.updateInteraction) {
+                window.engine.interactionEnabled = interactivityEnabled;
+            }
+            if (window.quantumEngine && window.quantumEngine.updateInteraction) {
+                window.quantumEngine.interactionEnabled = interactivityEnabled;
+            }
+            if (window.holographicSystem && window.holographicSystem.updateInteraction) {
+                window.holographicSystem.interactionEnabled = interactivityEnabled;
+            }
+            if (window.polychoraSystem && window.polychoraSystem.updateInteraction) {
+                window.polychoraSystem.interactionEnabled = interactivityEnabled;
+            }
+            
+            console.log(`🎛️ Mouse/Touch Interactions: ${interactivityEnabled ? 'ENABLED' : 'DISABLED'}`);
+            console.log('🔷 Faceted: Mouse tracking', interactivityEnabled ? '✅' : '❌');
+            console.log('🌌 Quantum: Enhanced interactions', interactivityEnabled ? '✅' : '❌'); 
+            console.log('✨ Holographic: Touch interactions', interactivityEnabled ? '✅' : '❌');
+            console.log('🔮 Polychora: 4D precision tracking', interactivityEnabled ? '✅' : '❌');
+            
+            // Show status overlay
+            showInteractivityStatus();
         }
         
         // Helper function to update UI sliders when LLM sets parameters
@@ -1892,48 +1946,49 @@
             }
         }
         
-        function showInteractivityOverlay() {
+        function showInteractivityStatus() {
             // Create floating overlay for interactivity status
-            if (!document.getElementById('interactivity-overlay')) {
-                const overlay = document.createElement('div');
-                overlay.id = 'interactivity-overlay';
+            let overlay = document.getElementById('reactivity-status-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'reactivity-status-overlay';
                 overlay.style.cssText = `
                     position: fixed;
                     top: 60px;
-                    left: 20px;
-                    background: rgba(0, 255, 255, 0.1);
-                    border: 2px solid rgba(0, 255, 255, 0.5);
+                    right: 20px;
+                    background: rgba(0, 0, 0, 0.9);
+                    border: 2px solid #00ffff;
                     padding: 15px;
                     border-radius: 10px;
-                    backdrop-filter: blur(10px);
-                    color: #00ffff;
+                    color: #fff;
                     font-family: 'Orbitron', monospace;
                     font-size: 0.9rem;
-                    z-index: 999;
-                    max-width: 250px;
-                `;
-                overlay.innerHTML = `
-                    <div style="font-weight: bold; margin-bottom: 8px;">🎛️ UNIVERSAL INTERACTIVITY</div>
-                    <div style="font-size: 0.8rem; opacity: 0.8;">
-                        Active for ALL systems<br>
-                        Audio: <span id="audio-status">OFF</span><br>
-                        Mouse: <span id="mouse-status">TRACKED</span><br>
-                        Gamepad: <span id="gamepad-status">OFF</span><br>
-                        Wearable: <span id="wearable-status">OFF</span>
-                    </div>
-                    <div style="margin-top: 10px; font-size: 0.7rem; opacity: 0.6;">
-                        Press I to toggle
-                    </div>
+                    z-index: 2000;
+                    backdrop-filter: blur(10px);
+                    animation: fadeInOut 3s ease;
                 `;
                 document.body.appendChild(overlay);
             }
+            
+            overlay.innerHTML = `
+                <div style="color: #00ffff; font-weight: bold; margin-bottom: 10px;">
+                    🎛️ REACTIVITY STATUS
+                </div>
+                <div>🎵 Audio: ${audioEnabled ? '<span style="color: #00ff00">ON</span>' : '<span style="color: #ff4444">OFF</span>'}</div>
+                <div>🖱️ Interactions: ${interactivityEnabled ? '<span style="color: #00ff00">ON</span>' : '<span style="color: #ff4444">OFF</span>'}</div>
+            `;
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                if (overlay && overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+            }, 3000);
         }
         
-        function hideInteractivityOverlay() {
-            const overlay = document.getElementById('interactivity-overlay');
-            if (overlay) {
-                overlay.remove();
-            }
+        function showInteractivityOverlay() {
+            // Legacy function name support
+            showInteractivityStatus();
         }
         
         window.randomizeAll = function() {
