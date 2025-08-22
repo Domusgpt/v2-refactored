@@ -183,7 +183,7 @@ export class RealHolographicSystem {
     }
     
     updateParameter(param, value) {
-        console.log(`🔥 HOLOGRAPHIC DEBUG: updateParameter(${param}, ${value}) called - SETTING BASE VALUE`);
+        console.log(`🔥 HOLOGRAPHIC DEBUG: updateParameter(${param}, ${value}) called, visualizers: ${this.visualizers.length}`);
         
         // CRITICAL: Update tilt controller base rotations when user changes 4D rotation sliders
         if (this.tiltController && (param === 'rot4dXW' || param === 'rot4dYW' || param === 'rot4dZW')) {
@@ -191,7 +191,13 @@ export class RealHolographicSystem {
             this.tiltController.updateBaseRotation(axis, value);
         }
         
-        console.log(`📊 ADDITIVE HOLOGRAPHIC: Setting base ${param} = ${value}`);
+        // Store custom parameter overrides
+        if (!this.customParams) {
+            this.customParams = {};
+        }
+        this.customParams[param] = value;
+        
+        console.log(`🌌 Updating holographic ${param}: ${value} (${this.visualizers.length} visualizers)`);
         
         // CRITICAL FIX: Call updateParameters method on ALL visualizers for immediate render
         this.visualizers.forEach((visualizer, index) => {
@@ -201,7 +207,7 @@ export class RealHolographicSystem {
                     const params = {};
                     params[param] = value;
                     visualizer.updateParameters(params);
-                    console.log(`✅ Updated holographic layer ${index} (${visualizer.role}) with BASE ${param}=${value}`);
+                    console.log(`✅ Updated holographic layer ${index} (${visualizer.role}) with ${param}=${value}`);
                 } else {
                     console.warn(`⚠️ Holographic layer ${index} missing updateParameters method, using fallback`);
                     // Fallback for older method (direct parameter setting)
@@ -223,34 +229,8 @@ export class RealHolographicSystem {
                 console.error(`❌ Failed to update holographic layer ${index}:`, error);
             }
         });
-    }
-    
-    /**
-     * CRITICAL FIX: Apply audio offsets instead of replacing base values
-     */
-    updateAudioOffset(param, offset) {
-        console.log(`🎵 ADDITIVE HOLOGRAPHIC: Setting audio offset ${param} = ${offset}`);
         
-        this.visualizers.forEach((visualizer, index) => {
-            if (visualizer.parameterManager && visualizer.parameterManager.setAudioOffset) {
-                visualizer.parameterManager.setAudioOffset(param, offset);
-                console.log(`🎵 Audio offset applied to layer ${index}: ${param} offset=${offset}`);
-            }
-        });
-    }
-    
-    /**
-     * CRITICAL FIX: Apply interaction offsets instead of replacing base values
-     */
-    updateInteractionOffset(param, offset) {
-        console.log(`🖱️ ADDITIVE HOLOGRAPHIC: Setting interaction offset ${param} = ${offset}`);
-        
-        this.visualizers.forEach((visualizer, index) => {
-            if (visualizer.parameterManager && visualizer.parameterManager.setTouchOffset) {
-                visualizer.parameterManager.setTouchOffset(param, offset);
-                console.log(`🖱️ Interaction offset applied to layer ${index}: ${param} offset=${offset}`);
-            }
-        });
+        console.log(`🔄 Holographic parameter update complete: ${param}=${value}`);
     }
     
     // Override updateVariant to preserve custom parameters
