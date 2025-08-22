@@ -224,22 +224,41 @@ export class SmartCanvasPool {
     configs.forEach(config => {
       const canvas = document.getElementById(config.id);
       if (canvas) {
-        // Get WebGL context to clean up
+        // CRITICAL FIX: Actually destroy the WebGL context properly
         const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
         if (gl) {
-          // DON'T call loseContext() - it permanently breaks canvas elements!
-          // const ext = gl.getExtension('WEBGL_lose_context');
-          // if (ext) {
-          //   ext.loseContext(); // THIS BREAKS WEBGL PERMANENTLY!
-          // }
-          console.log(`🚫 Skipping loseContext() to preserve canvas element`);
+          // Clean up WebGL resources first
+          try {
+            const numTextures = gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+            for (let i = 0; i < numTextures; i++) {
+              gl.activeTexture(gl.TEXTURE0 + i);
+              gl.bindTexture(gl.TEXTURE_2D, null);
+            }
+            
+            // Clear all buffers
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+            gl.useProgram(null);
+            
+            console.log(`🧹 Cleaned WebGL resources for ${config.id}`);
+          } catch (error) {
+            console.warn(`⚠️ Error cleaning WebGL resources for ${config.id}:`, error);
+          }
         }
         
-        // Clear canvas
-        canvas.width = 1;
-        canvas.height = 1;
+        // CRITICAL FIX: Replace canvas element to destroy context completely
+        const parent = canvas.parentNode;
+        const newCanvas = canvas.cloneNode(false); // Clone without context
+        newCanvas.width = 1;
+        newCanvas.height = 1;
         
-        console.log(`✨ Cleaned context: ${config.id} (canvas preserved)`);
+        // Copy important attributes
+        newCanvas.style.cssText = canvas.style.cssText;
+        newCanvas.className = canvas.className;
+        
+        parent.replaceChild(newCanvas, canvas);
+        
+        console.log(`✨ Destroyed context and replaced canvas: ${config.id}`);
       }
     });
   }
@@ -253,7 +272,23 @@ export class SmartCanvasPool {
     console.log(`📊 Total WebGL contexts across all systems: ${totalContextCount}`);
     console.log(`📊 Browser WebGL context limit: ~16-32 typical`);
     
-    if (totalContextCount > 15) {
+    // CRITICAL FIX: Don't create more contexts if we're at the limit
+    if (totalContextCount >= 16) {
+      console.error(`🚫 BLOCKED: Cannot create ${configs.length} more contexts - already at ${totalContextCount}/16 limit`);
+      console.error(`🧽 Force cleaning all existing contexts to prevent browser lockup`);
+      
+      // Emergency cleanup of all systems
+      Object.keys(this.canvasConfigs).forEach(sysName => {
+        if (sysName !== systemName) {
+          this.destroySystemContexts(sysName);
+        }
+      });
+      
+      // Wait a bit for cleanup
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    if (totalContextCount > 12) {
       console.warn(`⚠️ High WebGL context count (${totalContextCount}) - may cause context loss`);
     }
     
@@ -452,6 +487,14 @@ export class SmartCanvasPool {
    * INVESTIGATION 5: GPU memory monitoring
    */
   checkGPUMemory() {
+    const currentContextCount = this.getTotalWebGLContextCount();
+    
+    // CRITICAL FIX: Don't create temp context if we're near the limit
+    if (currentContextCount >= 15) {
+      console.warn(`⚠️ Skipping GPU memory check - too many contexts (${currentContextCount})`);
+      return;
+    }
+    
     try {
       // Create a temporary canvas to check GPU memory
       const tempCanvas = document.createElement('canvas');
@@ -484,6 +527,12 @@ export class SmartCanvasPool {
         }
         
         gl.deleteTexture(testTexture);
+        
+        // CRITICAL: Properly dispose temp context
+        const ext = gl.getExtension('WEBGL_lose_context');
+        if (ext) {
+          ext.loseContext();
+        }
       }
     } catch (error) {
       console.warn(`⚠️ GPU memory check failed:`, error);
