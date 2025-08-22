@@ -800,6 +800,14 @@
             }
         };
         
+        // CRITICAL FIX: Mobile debug system expected by visualizers
+        window.mobileDebug = {
+            log: function(message) {
+                // Silent logging for production - only to console
+                console.log(`[Debug] ${message}`);
+            }
+        };
+        
         // MOBILE OPTIMIZATION: Initialize only active system (5 canvases instead of 20)
         document.addEventListener('DOMContentLoaded', function() {
             const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
