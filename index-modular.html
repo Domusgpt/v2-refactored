@@ -526,30 +526,34 @@
     <script type="module">
         import { SystemManager } from './core/SystemManager.js';
         import { FacetedSystem } from './systems/faceted/FacetedSystem.js';
-        // TODO: Import other systems when created
-        // import { QuantumSystem } from './systems/quantum/QuantumSystem.js';
-        // import { HolographicSystem } from './systems/holographic/HolographicSystem.js';
-        // import { PolychoraSystem } from './systems/polychora/PolychoraSystem.js';
+        import { QuantumSystem } from './systems/quantum/QuantumSystem.js';
+        import { HolographicSystem } from './systems/holographic/HolographicSystem.js';
+        import { PolychoraSystem } from './systems/polychora/PolychoraSystem.js';
         
         // Global system manager
         let systemManager = null;
         
         // Initialize modular VIB34D system
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('🚀 VIB34D Modular System: Initializing');
+            console.log('🚀 VIB34D Modular System: Initializing ALL 4 SYSTEMS');
             
             try {
                 // Create and initialize system manager
                 systemManager = new SystemManager();
                 await systemManager.initialize();
                 
-                // Register Faceted system (proof of concept)
+                // Register ALL 4 systems with ULTRA preservation
+                console.log('📝 Registering Faceted system...');
                 await systemManager.registerSystem('faceted', FacetedSystem);
                 
-                // TODO: Register other systems when created
-                // await systemManager.registerSystem('quantum', QuantumSystem);
-                // await systemManager.registerSystem('holographic', HolographicSystem);
-                // await systemManager.registerSystem('polychora', PolychoraSystem);
+                console.log('📝 Registering Quantum system...');
+                await systemManager.registerSystem('quantum', QuantumSystem);
+                
+                console.log('📝 Registering Holographic system...');
+                await systemManager.registerSystem('holographic', HolographicSystem);
+                
+                console.log('📝 Registering Polychora system...');
+                await systemManager.registerSystem('polychora', PolychoraSystem);
                 
                 // Start with the default system (or gallery preview system)
                 const startSystem = window.galleryPreviewData ? 
@@ -560,7 +564,11 @@
                 // Setup stubs for missing functions (preserve functionality)
                 setupFunctionStubs();
                 
-                console.log('✅ VIB34D Modular System: Ready');
+                console.log('✅ VIB34D Modular System: ALL 4 SYSTEMS READY');
+                console.log('🔷 Faceted: Simple 2D geometric patterns');
+                console.log('🌌 Quantum: Enhanced 3D lattice with holographic effects');
+                console.log('✨ Holographic: Audio-reactive with pink/magenta theme');
+                console.log('🔮 Polychora: True 4D polytope mathematics');
                 
             } catch (error) {
                 console.error('❌ VIB34D Modular System: Initialization failed:', error);
