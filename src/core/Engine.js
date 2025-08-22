@@ -23,6 +23,9 @@ export class VIB34DIntegratedEngine {
         // Each system handles its own interactions - no central handler needed
         this.statusManager = new StatusManager();
         
+        // Active state for reactivity
+        this.isActive = false;
+        
         // Current state
         this.currentVariation = 0;
         this.totalVariations = 100; // 30 default + 70 custom
@@ -141,8 +144,68 @@ export class VIB34DIntegratedEngine {
      * Set up mouse/touch interactions
      */
     setupInteractions() {
-        // Each system handles its own interactions - no central handler needed
-        console.log('🎮 Faceted Engine: Using system-specific interactions');
+        console.log('🔷 Setting up Faceted 4D rotation mouse reactivity');
+        this.setup4DRotationReactivity();
+    }
+    
+    setup4DRotationReactivity() {
+        // Get faceted canvases
+        const facetedCanvases = [
+            'background-canvas', 'shadow-canvas', 'content-canvas',
+            'highlight-canvas', 'accent-canvas'
+        ];
+        
+        facetedCanvases.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            // Mouse movement -> 4D rotation parameters
+            canvas.addEventListener('mousemove', (e) => {
+                if (!this.isActive) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left) / rect.width;
+                const mouseY = (e.clientY - rect.top) / rect.height;
+                
+                this.update4DRotationParameters(mouseX, mouseY);
+            });
+            
+            // Touch movement -> 4D rotation parameters
+            canvas.addEventListener('touchmove', (e) => {
+                if (!this.isActive) return;
+                e.preventDefault();
+                
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    const touchX = (touch.clientX - rect.left) / rect.width;
+                    const touchY = (touch.clientY - rect.top) / rect.height;
+                    
+                    this.update4DRotationParameters(touchX, touchY);
+                }
+            }, { passive: false });
+        });
+    }
+    
+    update4DRotationParameters(x, y) {
+        // Map mouse/touch position to 4D rotation ranges (-6.28 to 6.28)
+        const rotationRange = 6.28 * 2; // Full range is 12.56
+        
+        // X position controls XW and YW planes
+        const rot4dXW = (x - 0.5) * rotationRange; // -6.28 to +6.28
+        const rot4dYW = (x - 0.5) * rotationRange * 0.7; // Slightly different scaling
+        
+        // Y position controls ZW plane  
+        const rot4dZW = (y - 0.5) * rotationRange;
+        
+        // Update parameters through the global parameter system
+        if (window.updateParameter) {
+            window.updateParameter('rot4dXW', rot4dXW.toFixed(2));
+            window.updateParameter('rot4dYW', rot4dYW.toFixed(2));
+            window.updateParameter('rot4dZW', rot4dZW.toFixed(2));
+        }
+        
+        console.log(`🔷 4D Rotations: XW=${rot4dXW.toFixed(2)}, YW=${rot4dYW.toFixed(2)}, ZW=${rot4dZW.toFixed(2)}`);
     }
     
     /**
@@ -329,6 +392,8 @@ export class VIB34DIntegratedEngine {
      */
     setActive(active) {
         console.log(`🔷 Faceted Engine setActive: ${active}`);
+        this.isActive = active; // Set active state for interactions
+        
         if (active && !this.animationId) {
             console.log('🎬 Faceted Engine: Starting animation loop');
             this.startRenderLoop();
