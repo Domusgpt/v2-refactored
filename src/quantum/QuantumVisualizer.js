@@ -8,6 +8,42 @@ import { GeometryLibrary } from '../geometry/GeometryLibrary.js';
 
 export class QuantumHolographicVisualizer {
     constructor(canvasId, role, reactivity, variant) {
+        // === SHADER CONFIGURATION DOCUMENTATION ===
+        // NOTE: The shader code below contains these mathematical constants that define
+        // the visual appearance of each geometry type. They are kept in the shader string
+        // for performance (no uniform overhead) and are documented here:
+        //
+        // TETRAHEDRON LATTICE:
+        // - Vertex glow radius: 0.04 (smoothstep for vertex points)
+        // - Edge thickness: 0.02 (smoothstep for edge lines)
+        // - Vertex positions: 0.4 (offset from center)
+        // - Edge detection radius: 0.2 (distance for edge detection)
+        // - Edge intensity: 0.5 (visibility multiplier)
+        //
+        // HYPERCUBE LATTICE:
+        // - Edge threshold: 0.03 (smoothstep for grid edges)
+        // - Vertex threshold: 0.45-0.5 (range for vertex detection)
+        // - Edge intensity: 0.7 (visibility multiplier)
+        //
+        // SPHERE LATTICE:
+        // - Inner radius: 0.15 (sphere center size)
+        // - Outer radius: 0.25 (sphere fade boundary)
+        // - Ring radii: 0.3, 0.2 (orbital ring positions)
+        // - Ring intensity: 0.6 (visibility multiplier)
+        //
+        // TORUS LATTICE:
+        // - Major radius: 0.3 (torus ring radius)
+        // - Minor radius: 0.1 (torus tube radius)
+        // - Ring count: 8.0 (angular divisions)
+        //
+        // CRYSTAL LATTICE:
+        // - Structure size: 0.3-0.4 (octahedral boundaries)
+        // - Face positions: 0.35 (crystalline face planes)
+        // - Face thickness: 0.02 (face edge smoothstep)
+        //
+        // UNIVERSAL:
+        // - Grid density scale: 0.08 (multiplier for all geometries)
+        
         this.canvas = document.getElementById(canvasId);
         this.role = role;
         this.reactivity = reactivity;

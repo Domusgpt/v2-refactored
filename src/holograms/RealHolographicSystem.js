@@ -8,6 +8,24 @@ import { HolographicTiltController } from '../interactions/HolographicTiltContro
 
 export class RealHolographicSystem {
     constructor() {
+        // === CONFIGURATION CONSTANTS ===
+        // Audio frequency analysis ranges
+        this.BASS_FREQUENCY_RATIO = 0.1;      // Bass covers 0-10% of frequency spectrum
+        this.MID_FREQUENCY_RATIO = 0.4;       // Mid covers 10-40% of frequency spectrum
+        this.AUDIO_SMOOTHING_FACTOR = 0.4;    // How much to smooth audio values (0=no smoothing, 1=full)
+        this.AUDIO_SILENCE_THRESHOLD = 0.05;  // Minimum audio level to register (filters noise)
+        this.BEAT_DETECTION_THRESHOLD = 0.2;  // Bass increase needed to detect a beat
+        this.MELODY_ACTIVITY_THRESHOLD = 0.3; // Minimum mid+high activity for melody detection
+        
+        // Mouse interaction sensitivity
+        this.MOUSE_SENSITIVITY_DIVISOR = 40;  // Pixels of movement for max intensity
+        this.DENSITY_VARIATION_SCALE = 2.0;   // Scale factor for mouse-based density variation
+        
+        // Touch interaction timing
+        this.TOUCH_TAP_DURATION = 150;        // Max milliseconds for tap (vs hold)
+        this.TOUCH_TAP_INTENSITY = 0.3;       // Click intensity boost for quick taps
+        
+        // Visualization configuration
         this.visualizers = [];
         this.currentVariant = 0;
         this.baseVariants = 30; // Original 30 variations
@@ -312,8 +330,8 @@ export class RealHolographicSystem {
         
         this.analyser.getByteFrequencyData(this.frequencyData);
         
-        const bassEnd = Math.floor(this.frequencyData.length * 0.1);
-        const midEnd = Math.floor(this.frequencyData.length * 0.4);
+        const bassEnd = Math.floor(this.frequencyData.length * this.BASS_FREQUENCY_RATIO);
+        const midEnd = Math.floor(this.frequencyData.length * this.MID_FREQUENCY_RATIO);
         
         let bass = 0, mid = 0, high = 0;
         
@@ -355,23 +373,21 @@ export class RealHolographicSystem {
             this.audioSmoothing = { bass: 0, mid: 0, high: 0 };
         }
         
-        const smoothingFactor = 0.4;
-        this.audioSmoothing[type] = this.audioSmoothing[type] * smoothingFactor + currentValue * (1 - smoothingFactor);
+        this.audioSmoothing[type] = this.audioSmoothing[type] * this.AUDIO_SMOOTHING_FACTOR + currentValue * (1 - this.AUDIO_SMOOTHING_FACTOR);
         
-        const threshold = 0.05;
-        return this.audioSmoothing[type] > threshold ? this.audioSmoothing[type] : 0;
+        return this.audioSmoothing[type] > this.AUDIO_SILENCE_THRESHOLD ? this.audioSmoothing[type] : 0;
     }
     
     detectRhythm(bassLevel) {
         if (!this.previousBass) this.previousBass = 0;
-        const beatDetected = bassLevel > this.previousBass + 0.2;
+        const beatDetected = bassLevel > this.previousBass + this.BEAT_DETECTION_THRESHOLD;
         this.previousBass = bassLevel;
         return beatDetected ? 1.0 : 0.0;
     }
     
     detectMelody(midLevel, highLevel) {
         const melodicActivity = (midLevel + highLevel) / 2;
-        return melodicActivity > 0.3 ? melodicActivity : 0.0;
+        return melodicActivity > this.MELODY_ACTIVITY_THRESHOLD ? melodicActivity : 0.0;
     }
     
     setupInteractions() {
@@ -381,7 +397,7 @@ export class RealHolographicSystem {
             
             const mouseX = e.clientX / window.innerWidth;
             const mouseY = 1.0 - (e.clientY / window.innerHeight);
-            const mouseIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / 40);
+            const mouseIntensity = Math.min(1.0, Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY) / this.MOUSE_SENSITIVITY_DIVISOR);
             
             // Update all visualizers
             this.visualizers.forEach(visualizer => {
@@ -389,7 +405,7 @@ export class RealHolographicSystem {
             });
             
             // Density variation based on mouse position
-            const densityVar = Math.sin(mouseX * Math.PI) * Math.sin(mouseY * Math.PI) * 2.0;
+            const densityVar = Math.sin(mouseX * Math.PI) * Math.sin(mouseY * Math.PI) * this.DENSITY_VARIATION_SCALE;
             this.visualizers.forEach(visualizer => {
                 visualizer.updateDensity(densityVar);
             });
@@ -514,9 +530,9 @@ export class RealHolographicSystem {
             if (currentTouch) {
                 const touchDuration = Date.now() - touchStartTime;
                 
-                if (touchDuration < 150) {
+                if (touchDuration < this.TOUCH_TAP_DURATION) {
                     this.visualizers.forEach(visualizer => {
-                        visualizer.clickIntensity = Math.min(1.0, visualizer.clickIntensity + 0.3);
+                        visualizer.clickIntensity = Math.min(1.0, visualizer.clickIntensity + this.TOUCH_TAP_INTENSITY);
                     });
                 }
                 

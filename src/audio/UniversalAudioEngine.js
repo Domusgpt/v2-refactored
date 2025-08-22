@@ -6,6 +6,27 @@
 
 export class UniversalAudioEngine {
     constructor() {
+        // === AUDIO CONFIGURATION CONSTANTS ===
+        // Frequency band definitions (Hz)
+        this.BASS_FREQ_MIN = 20;           // Bass starts at 20 Hz
+        this.BASS_FREQ_MAX = 250;          // Bass ends at 250 Hz
+        this.MID_FREQ_MAX = 2000;          // Mid ends at 2000 Hz
+        this.HIGH_FREQ_MAX = 20000;        // High ends at 20000 Hz (Nyquist limit)
+        
+        // FFT and analysis settings
+        this.FFT_SIZE = 2048;              // FFT resolution (higher = more detail)
+        this.SMOOTHING_TIME_CONSTANT = 0.3; // Audio smoothing (0=none, 1=max)
+        
+        // History buffer sizes for pattern detection
+        this.ENERGY_HISTORY_SIZE = 60;     // 1 second at 60fps
+        this.PEAK_HISTORY_SIZE = 30;       // 0.5 second for peak detection
+        this.RHYTHM_WINDOW_SIZE = 15;      // 0.25 seconds for rhythm correlation
+        
+        // Audio processing factors
+        this.TRANSIENT_AMPLIFICATION = 10; // Amplification for sudden changes
+        this.RHYTHM_SCALE_FACTOR = 2;      // Scale factor for rhythm strength
+        this.SMOOTH_ENERGY_FACTOR = 0.1;   // New energy contribution (vs 0.9 old)
+        
         this.audioContext = null;
         this.analyser = null;
         this.microphone = null;
@@ -31,8 +52,8 @@ export class UniversalAudioEngine {
         };
         
         // Audio history for rhythm detection
-        this.energyHistory = new Array(60).fill(0); // 1 second at 60fps
-        this.peakHistory = new Array(30).fill(0);   // 0.5 second peak detection
+        this.energyHistory = new Array(this.ENERGY_HISTORY_SIZE).fill(0);
+        this.peakHistory = new Array(this.PEAK_HISTORY_SIZE).fill(0);
         this.historyIndex = 0;
         
         // System-specific audio mappings
@@ -171,8 +192,8 @@ export class UniversalAudioEngine {
             
             // Create analyzer with high resolution
             this.analyser = this.audioContext.createAnalyser();
-            this.analyser.fftSize = 2048;  // High resolution for detailed frequency analysis
-            this.analyser.smoothingTimeConstant = 0.3;  // Moderate smoothing
+            this.analyser.fftSize = this.FFT_SIZE;
+            this.analyser.smoothingTimeConstant = this.SMOOTHING_TIME_CONSTANT;
             
             this.bufferLength = this.analyser.frequencyBinCount;
             this.frequencyData = new Uint8Array(this.bufferLength);
@@ -234,25 +255,25 @@ export class UniversalAudioEngine {
         const nyquist = this.audioContext.sampleRate / 2;
         const binWidth = nyquist / this.bufferLength;
         
-        // Bass: 20-250 Hz
-        const bassStart = Math.floor(20 / binWidth);
-        const bassEnd = Math.floor(250 / binWidth);
+        // Bass frequency range
+        const bassStart = Math.floor(this.BASS_FREQ_MIN / binWidth);
+        const bassEnd = Math.floor(this.BASS_FREQ_MAX / binWidth);
         let bassSum = 0;
         for (let i = bassStart; i < bassEnd; i++) {
             bassSum += this.frequencyData[i];
         }
         this.audioFeatures.bass = (bassSum / (bassEnd - bassStart)) / 255;
         
-        // Mid: 250-2000 Hz
+        // Mid frequency range
         const midStart = bassEnd;
-        const midEnd = Math.floor(2000 / binWidth);
+        const midEnd = Math.floor(this.MID_FREQ_MAX / binWidth);
         let midSum = 0;
         for (let i = midStart; i < midEnd; i++) {
             midSum += this.frequencyData[i];
         }
         this.audioFeatures.mid = (midSum / (midEnd - midStart)) / 255;
         
-        // High: 2000-20000 Hz
+        // High frequency range
         const highStart = midEnd;
         const highEnd = this.bufferLength;
         let highSum = 0;
@@ -271,7 +292,7 @@ export class UniversalAudioEngine {
         // Transient detection (sudden energy changes)
         const prevEnergy = this.energyHistory[this.historyIndex];
         const energyDelta = this.audioFeatures.energy - prevEnergy;
-        this.audioFeatures.transients = Math.max(0, energyDelta * 10); // Amplify sudden changes
+        this.audioFeatures.transients = Math.max(0, energyDelta * this.TRANSIENT_AMPLIFICATION);
         
         // Rhythm detection (periodic energy patterns)
         this.updateEnergyHistory();
@@ -281,7 +302,7 @@ export class UniversalAudioEngine {
         this.audioFeatures.peak = Math.max(this.audioFeatures.bass, this.audioFeatures.mid, this.audioFeatures.high);
         
         // Smooth energy (for gentle animations)
-        this.audioFeatures.smooth = this.audioFeatures.energy * 0.1 + this.audioFeatures.smooth * 0.9;
+        this.audioFeatures.smooth = this.audioFeatures.energy * this.SMOOTH_ENERGY_FACTOR + this.audioFeatures.smooth * (1 - this.SMOOTH_ENERGY_FACTOR);
     }
     
     /**
@@ -298,7 +319,7 @@ export class UniversalAudioEngine {
     detectRhythm() {
         // Simple rhythm detection using energy pattern analysis
         let rhythmStrength = 0;
-        const windowSize = 15; // 0.25 seconds at 60fps
+        const windowSize = this.RHYTHM_WINDOW_SIZE;
         
         for (let i = 0; i < this.energyHistory.length - windowSize; i++) {
             let correlation = 0;
@@ -308,7 +329,7 @@ export class UniversalAudioEngine {
             rhythmStrength = Math.max(rhythmStrength, correlation / windowSize);
         }
         
-        return Math.min(rhythmStrength * 2, 1.0);
+        return Math.min(rhythmStrength * this.RHYTHM_SCALE_FACTOR, 1.0);
     }
     
     /**

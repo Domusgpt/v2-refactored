@@ -6,6 +6,22 @@
 
 export class UniversalInteractionEngine {
     constructor() {
+        // === INTERACTION CONFIGURATION CONSTANTS ===
+        // Timing thresholds
+        this.DOUBLE_CLICK_THRESHOLD = 300;    // Max milliseconds between clicks for double-click
+        this.HOLD_DURATION_THRESHOLD = 1000;  // Milliseconds to detect a hold gesture
+        
+        // Gesture detection parameters
+        this.PINCH_SCALE_MIN = 0.1;          // Minimum pinch gesture scale
+        this.PINCH_SCALE_MAX = 3.0;          // Maximum pinch gesture scale
+        this.ROTATION_SENSITIVITY = 1.0;      // Rotation gesture sensitivity multiplier
+        
+        // Effect durations and intensities
+        this.CHAOS_BURST_DURATION = 500;      // Duration of chaos burst effect (ms)
+        this.CHAOS_BURST_INTENSITY = 2.0;     // Intensity of chaos burst
+        this.GEOMETRIC_RIPPLE_DURATION = 1000; // Duration of ripple effect (ms)
+        this.BASS_BOOST_DURATION = 300;       // Duration of bass boost trigger (ms)
+        
         this.isActive = false;
         this.connectedSystems = new Map();
         
@@ -306,7 +322,7 @@ export class UniversalInteractionEngine {
         }
         
         const now = Date.now();
-        if (now - this.lastClickTime < 300) {
+        if (now - this.lastClickTime < this.DOUBLE_CLICK_THRESHOLD) {
             this.clickCount++;
         } else {
             this.clickCount = 1;
@@ -596,7 +612,7 @@ export class UniversalInteractionEngine {
                         if (system.updateParameter) {
                             system.updateParameter('intensity', 0.5);
                         }
-                    }, duration || 300);
+                    }, duration || this.BASS_BOOST_DURATION);
                 }
                 break;
         }
@@ -710,7 +726,7 @@ export class UniversalInteractionEngine {
                 if (touchCount >= 2 && mapping.pinchZoom && system.updateParameter) {
                     // Pinch to zoom grid density
                     const { range } = mapping.pinchZoom;
-                    const pinchScale = Math.max(0.1, Math.min(3.0, this.gestureState.pinchDistance * 2));
+                    const pinchScale = Math.max(this.PINCH_SCALE_MIN, Math.min(this.PINCH_SCALE_MAX, this.gestureState.pinchDistance * 2));
                     const gridDensity = range[0] + (range[1] - range[0]) * (pinchScale / 3.0);
                     system.updateParameter('gridDensity', gridDensity);
                 }
