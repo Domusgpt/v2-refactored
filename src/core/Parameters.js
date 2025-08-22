@@ -72,12 +72,61 @@ export class ParameterManager {
                 value = Math.round(value);
             }
             
-            this.params[name] = value;
+            // CRITICAL FIX: Additive parameter system - store base value separately
+            if (!this.baseParams) this.baseParams = {};
+            if (!this.offsets) this.offsets = { audio: {}, touch: {}, interaction: {} };
+            
+            // Store base parameter value (user slider setting)
+            this.baseParams[name] = value;
+            
+            // Calculate final value: base + all offsets
+            this.updateFinalParameter(name);
             return true;
         }
         
         console.warn(`Unknown parameter: ${name}`);
         return false;
+    }
+    
+    /**
+     * CRITICAL FIX: Calculate final parameter value from base + all offsets
+     */
+    updateFinalParameter(name) {
+        const base = this.baseParams[name] || 0;
+        const audioOffset = this.offsets.audio[name] || 0;
+        const touchOffset = this.offsets.touch[name] || 0;
+        const interactionOffset = this.offsets.interaction[name] || 0;
+        
+        // Final value = base + all offsets (clamped to parameter bounds)
+        const def = this.parameterDefs[name];
+        let finalValue = base + audioOffset + touchOffset + interactionOffset;
+        finalValue = Math.max(def.min, Math.min(def.max, finalValue));
+        
+        // Store final computed value
+        this.params[name] = finalValue;
+        
+        console.log(`📊 ADDITIVE ${name}: base=${base.toFixed(2)} + audio=${audioOffset.toFixed(2)} + touch=${touchOffset.toFixed(2)} = final=${finalValue.toFixed(2)}`);
+    }
+    
+    /**
+     * CRITICAL FIX: Set offset values without destroying base parameters
+     */
+    setAudioOffset(name, offset) {
+        if (!this.offsets) this.offsets = { audio: {}, touch: {}, interaction: {} };
+        this.offsets.audio[name] = offset;
+        this.updateFinalParameter(name);
+    }
+    
+    setTouchOffset(name, offset) {
+        if (!this.offsets) this.offsets = { audio: {}, touch: {}, interaction: {} };
+        this.offsets.touch[name] = offset;
+        this.updateFinalParameter(name);
+    }
+    
+    setInteractionOffset(name, offset) {
+        if (!this.offsets) this.offsets = { audio: {}, touch: {}, interaction: {} };
+        this.offsets.interaction[name] = offset;
+        this.updateFinalParameter(name);
     }
     
     /**
