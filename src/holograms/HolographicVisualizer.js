@@ -760,7 +760,7 @@ export class HolographicVisualizer {
         this.gl.uniform2f(this.uniforms.mouse, this.mouseX, this.mouseY);
         this.gl.uniform1f(this.uniforms.geometryType, this.variantParams.geometryType || 0);
         this.gl.uniform1f(this.uniforms.density, this.variantParams.density || 1.0);
-        this.gl.uniform1f(this.uniforms.speed, ((this.variantParams.speed || 0.5) + (this.audioSpeedBoost || 0.0)) * 0.1);
+        this.gl.uniform1f(this.uniforms.speed, (this.variantParams.speed || 0.5) * 0.1);
         this.gl.uniform3fv(this.uniforms.color, new Float32Array(rgbColor));
         this.gl.uniform1f(this.uniforms.intensity, (this.variantParams.intensity || 0.5) * this.roleParams.intensity);
         this.gl.uniform1f(this.uniforms.roleDensity, this.roleParams.densityMult);
