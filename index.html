@@ -1752,6 +1752,7 @@
                 
                 canvas.addEventListener('mousemove', (e) => {
                     if (currentSystem !== 'faceted') return;
+                    if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const rect = canvas.getBoundingClientRect();
                     facetedMouseX = (e.clientX - rect.left) / rect.width;
@@ -1797,6 +1798,7 @@
                 
                 canvas.addEventListener('mousemove', (e) => {
                     if (currentSystem !== 'quantum') return;
+                    if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const rect = canvas.getBoundingClientRect();
                     quantumMouseX = (e.clientX - rect.left) / rect.width;
@@ -1821,6 +1823,7 @@
                 // Touch support for mobile quantum interactions
                 canvas.addEventListener('touchstart', (e) => {
                     if (currentSystem !== 'quantum') return;
+                    if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const touch = e.touches[0];
                     const rect = canvas.getBoundingClientRect();
@@ -1858,6 +1861,7 @@
                 
                 canvas.addEventListener('mousemove', (e) => {
                     if (currentSystem !== 'polychora') return;
+                    if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const rect = canvas.getBoundingClientRect();
                     polychoraMouseX = (e.clientX - rect.left) / rect.width;
@@ -1882,6 +1886,7 @@
                 // 4D rotation gestures on touch devices
                 canvas.addEventListener('touchstart', (e) => {
                     if (currentSystem !== 'polychora') return;
+                    if (window.interactivityEnabled === false) return; // CHECK GLOBAL FLAG
                     
                     const touch = e.touches[0];
                     const rect = canvas.getBoundingClientRect();

@@ -103,8 +103,8 @@ export class RealHolographicSystem {
                 holoLayers.style.display = 'block';
             }
             
-            // Start audio if not already started
-            if (!this.audioEnabled) {
+            // Start audio only if globally enabled and not already started
+            if (!this.audioEnabled && window.audioEnabled === true) {
                 this.initAudio();
             }
             console.log('🌌 REAL Active Holograms ACTIVATED with audio reactivity');
@@ -284,7 +284,7 @@ export class RealHolographicSystem {
     }
     
     updateAudio() {
-        if (!this.audioEnabled || !this.analyser || !this.isActive) return;
+        if (!this.audioEnabled || !this.analyser || !this.isActive || window.audioEnabled === false) return;
         
         this.analyser.getByteFrequencyData(this.frequencyData);
         
