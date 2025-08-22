@@ -108,11 +108,10 @@
             bottom: 0;
         }
         
-        /* MOBILE FIX: Ensure canvas container takes full viewport on mobile */
         @media (max-width: 768px) {
             .canvas-container {
-                right: 0; /* Remove space for control panel on mobile */
-                top: 0;   /* Use full height on mobile */
+                right: 0;
+                top: 0;
             }
         }
         
@@ -140,7 +139,6 @@
             transition: transform 0.3s ease;
         }
         
-        /* Mobile responsiveness */
         @media (max-width: 768px) {
             .control-panel {
                 width: 100vw;
@@ -151,21 +149,11 @@
                 left: 0;
                 border-left: none;
                 border-top: 2px solid #00ffff;
-                transform: translateY(0);
-            }
-            
-            .control-panel.collapsed {
-                transform: translateY(calc(40vh - 60px));
             }
             
             .canvas-container {
                 right: 0;
                 bottom: 60px;
-            }
-            
-            .top-bar {
-                position: relative;
-                z-index: 200;
             }
             
             .system-selector {
@@ -447,7 +435,6 @@
     <div class="control-panel" id="controlPanel">
         <div class="panel-header" id="panelHeader">
             <span>FACETED SYSTEM</span>
-            <button class="mobile-collapse-btn" id="mobileCollapseBtn" onclick="toggleMobilePanel()" style="display: none;">▼</button>
         </div>
         
         <!-- GEOMETRY SECTION (Faceted & Polychora) -->
@@ -625,7 +612,7 @@
                                 background: #000 !important;
                             `;
                             
-                            // Make all canvas layers fill the container completely - MOBILE FIX
+                            // Make all canvas layers fill the container completely
                             const allCanvases = canvasContainer.querySelectorAll('canvas');
                             allCanvases.forEach((canvas, index) => {
                                 canvas.style.cssText = `
@@ -634,24 +621,7 @@
                                     left: 0 !important;
                                     width: 100% !important;
                                     height: 100% !important;
-                                    min-width: 100vw !important;
-                                    min-height: 100vh !important;
                                 `;
-                                
-                                // CRITICAL MOBILE FIX: Force canvas dimensions immediately
-                                const rect = canvas.getBoundingClientRect();
-                                if (rect.width === 0 || rect.height === 0) {
-                                    const viewWidth = window.innerWidth;
-                                    const viewHeight = window.innerHeight;
-                                    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-                                    
-                                    canvas.width = viewWidth * dpr;
-                                    canvas.height = viewHeight * dpr;
-                                    
-                                    if (window.mobileOptimization) {
-                                        window.mobileOptimization.log(`🔧 Fixed canvas ${canvas.id}: ${canvas.width}x${canvas.height}`);
-                                    }
-                                }
                             });
                         }
                     };
@@ -789,45 +759,6 @@
         window.moduleReady = false;
         window.currentSystem = 'faceted';
         
-        // Simple Canvas Management - Universal (works on all devices)
-        window.smartCanvasManager = {
-            log: function(message) {
-                console.log(`[Canvas] ${message}`);
-            },
-            
-            // Simple canvas sizing for all devices
-            setupAllCanvases: function() {
-                const allCanvases = document.querySelectorAll('canvas');
-                const viewWidth = window.innerWidth;
-                const viewHeight = window.innerHeight;
-                const dpr = Math.min(window.devicePixelRatio || 1, 2);
-                
-                allCanvases.forEach(canvas => {
-                    // Set CSS dimensions first
-                    canvas.style.position = 'absolute';
-                    canvas.style.top = '0';
-                    canvas.style.left = '0';
-                    canvas.style.width = '100%';
-                    canvas.style.height = '100%';
-                    
-                    // Set canvas buffer dimensions
-                    canvas.width = viewWidth * dpr;
-                    canvas.height = viewHeight * dpr;
-                });
-                
-                this.log(`Setup ${allCanvases.length} canvases: ${viewWidth}x${viewHeight} (DPR: ${dpr})`);
-            }
-        };
-        
-        // Setup canvases when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            window.smartCanvasManager.setupAllCanvases();
-        });
-        
-        // Resize all canvases when window resizes
-        window.addEventListener('resize', function() {
-            window.smartCanvasManager.setupAllCanvases();
-        });
     </script>
     
     <script type="module">
@@ -991,74 +922,7 @@
                 } else {
                     console.log('ℹ️ No gallery preview data found - normal index.html usage');
                     
-                    // CRITICAL MOBILE FIX: Use the active system determined by mobile optimization  
-                    let targetSystem = 'faceted';
-                    if (isMobile) {
-                        // Use the SAME system that mobile engine initialization used
-                        targetSystem = activeSystem; // This was already determined above
-                    }
-                    console.log(`📱 Mobile system switch: ${targetSystem} (isMobile: ${isMobile})`);
-                    if (window.mobileOptimization) {
-                        window.mobileOptimization.log(`📱 Switching to ${targetSystem} system for mobile optimization`);
-                    }
-                    
-                    await switchSystem(targetSystem);
-                    
-                    // MOBILE DEBUGGING: Verify system switch worked and engine is rendering
-                    if (isMobile) {
-                        window.mobileOptimization.log(`🔍 Post-switch verification: currentSystem=${window.currentSystem}`);
-                        
-                        // Check which engine should be active and if it's working
-                        if (targetSystem === 'faceted' && window.engine) {
-                            const engine = window.engine;
-                            const hasRealVisualizers = engine.visualizers && engine.visualizers.length > 0 && engine.visualizers[0].canvas;
-                            window.mobileOptimization.log(`🔍 Faceted engine: visualizers=${engine.visualizers?.length}, hasRealVisualizers=${hasRealVisualizers}, animationId=${!!engine.animationId}`);
-                        } else if (targetSystem === 'quantum' && window.quantumEngine) {
-                            const engine = window.quantumEngine;
-                            const hasRealVisualizers = engine.visualizers && engine.visualizers.length > 0 && engine.visualizers[0].canvas;
-                            window.mobileOptimization.log(`🔍 Quantum engine: visualizers=${engine.visualizers?.length}, hasRealVisualizers=${hasRealVisualizers}, isActive=${engine.isActive}`);
-                        } else if (targetSystem === 'holographic' && window.holographicSystem) {
-                            const engine = window.holographicSystem;
-                            const hasRealEngine = engine.isRunning !== undefined; // Check if it's real vs stub
-                            window.mobileOptimization.log(`🔍 Holographic system: hasRealEngine=${hasRealEngine}, isRunning=${engine.isRunning}, isActive=${engine.isActive}`);
-                        }
-                        
-                        // Check which canvas layers are visible and their dimensions
-                        const layerInfo = {};
-                        const systems = ['faceted', 'quantum', 'holographic', 'polychora'];
-                        systems.forEach(sys => {
-                            const layerId = sys === 'faceted' ? 'vib34dLayers' : `${sys}Layers`;
-                            const layers = document.getElementById(layerId);
-                            if (layers) {
-                                const rect = layers.getBoundingClientRect();
-                                layerInfo[sys] = {
-                                    display: layers.style.display,
-                                    visibility: layers.style.visibility,
-                                    opacity: layers.style.opacity,
-                                    rect: `${rect.width}x${rect.height}`,
-                                    position: `${rect.top},${rect.left}`
-                                };
-                            } else {
-                                layerInfo[sys] = 'missing';
-                            }
-                        });
-                        window.mobileOptimization.log(`🔍 Layer info: ${JSON.stringify(layerInfo, null, 2)}`);
-                        
-                        // CRITICAL MOBILE DEBUG: Check canvas container positioning
-                        const canvasContainer = document.getElementById('canvasContainer');
-                        if (canvasContainer) {
-                            const containerRect = canvasContainer.getBoundingClientRect();
-                            const containerStyle = window.getComputedStyle(canvasContainer);
-                            window.mobileOptimization.log(`📦 Canvas Container: ${containerRect.width}x${containerRect.height} at ${containerRect.top},${containerRect.left}`);
-                            window.mobileOptimization.log(`📦 Container CSS: top=${containerStyle.top}, left=${containerStyle.left}, right=${containerStyle.right}, bottom=${containerStyle.bottom}`);
-                            
-                            if (containerRect.width === 0 || containerRect.height === 0) {
-                                window.mobileOptimization.log(`❌ CRITICAL: Canvas container has ZERO dimensions - canvases will be invisible!`);
-                            }
-                        } else {
-                            window.mobileOptimization.log(`❌ CRITICAL: Canvas container #canvasContainer not found!`);
-                        }
-                    }
+                    await switchSystem('faceted');
                 }
                 
                 // SURGICAL FIX: Force gallery preview to start animating immediately
@@ -1928,44 +1792,6 @@
             console.log('🔄 Reset all parameters');
         }
         
-        // Mobile panel toggle
-        window.toggleMobilePanel = function() {
-            const panel = document.getElementById('controlPanel');
-            const btn = document.getElementById('mobileCollapseBtn');
-            
-            panel.classList.toggle('collapsed');
-            btn.textContent = panel.classList.contains('collapsed') ? '▲' : '▼';
-        }
-        
-        // Mobile detection and setup
-        function setupMobileInterface() {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            if (isMobile) {
-                // Start with panel collapsed on mobile
-                const panel = document.getElementById('controlPanel');
-                const btn = document.getElementById('mobileCollapseBtn');
-                panel.classList.add('collapsed');
-                btn.textContent = '▲';
-                btn.style.display = 'block';
-                
-                // Add touch-friendly event listeners
-                document.addEventListener('touchstart', function(e) {
-                    // Improve touch responsiveness
-                    e.target.classList.add('touch-active');
-                }, { passive: true });
-                
-                document.addEventListener('touchend', function(e) {
-                    setTimeout(() => {
-                        e.target.classList.remove('touch-active');
-                    }, 150);
-                }, { passive: true });
-            }
-        }
-        
-        // Initialize mobile interface on load
-        document.addEventListener('DOMContentLoaded', () => {
-            setupMobileInterface();
-        });
         
         // Listen for mouse events from gallery iframe for visualizer interactivity
         window.addEventListener('message', (event) => {

@@ -12,16 +12,10 @@ export class IntegratedHolographicVisualizer {
         this.reactivity = reactivity;
         this.variant = variant;
         
-        // Mobile-specific canvas setup
         if (!this.canvas) {
             console.error(`Canvas ${canvasId} not found`);
-            if (window.mobileDebug) {
-                window.mobileDebug.log(`❌ Canvas ${canvasId} not found in DOM`);
-            }
             return;
         }
-        
-        // Set proper canvas dimensions for mobile - with fallbacks
         let rect = this.canvas.getBoundingClientRect();
         const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for performance
         
@@ -30,11 +24,11 @@ export class IntegratedHolographicVisualizer {
             alpha: true,
             depth: true,
             stencil: false,
-            antialias: false,  // Disable antialiasing on mobile for performance
+            antialias: false,
             premultipliedAlpha: true,
             preserveDrawingBuffer: false,
             powerPreference: 'high-performance',
-            failIfMajorPerformanceCaveat: false  // Don't fail on mobile
+            failIfMajorPerformanceCaveat: false
         };
         
         // CRITICAL FIX: Ensure canvas is properly sized BEFORE creating WebGL context
