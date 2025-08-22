@@ -184,7 +184,7 @@ export class UniversalInteractionEngine {
                     effect: 'physicsToggle',
                     parameters: ['physicsEnabled'],
                     duration: 1000,
-                    4dPhysics: true
+                    fourDPhysics: true
                 }
             }
         };
