@@ -326,6 +326,21 @@ export class VIB34DIntegratedEngine {
     }
     
     /**
+     * Set active state - required by SmartCanvasPool
+     */
+    setActive(active) {
+        console.log(`🔷 Faceted Engine setActive: ${active}`);
+        if (active && !this.animationId) {
+            console.log('🎬 Faceted Engine: Starting animation loop');
+            this.startRenderLoop();
+        } else if (!active && this.animationId) {
+            console.log('⏹️ Faceted Engine: Stopping animation loop');
+            cancelAnimationFrame(this.animationId);
+            this.animationId = null;
+        }
+    }
+    
+    /**
      * Update mouse interaction state
      */
     updateInteraction(x, y, intensity = 0.5) {
