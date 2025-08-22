@@ -15,9 +15,7 @@ export class StatusManager {
      */
     init() {
         this.statusElement = document.getElementById('status');
-        if (!this.statusElement) {
-            console.warn('Status element not found');
-        }
+        // Silent handling - status element is optional
     }
     
     /**

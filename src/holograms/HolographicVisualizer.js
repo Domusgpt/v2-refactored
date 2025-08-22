@@ -865,10 +865,7 @@ export class HolographicVisualizer {
             });
         }
         
-        // CRITICAL: Force immediate re-render with new parameters
-        this.render();
-        
-        console.log(`🌌 Holographic visualizer updated: ${JSON.stringify(params)}`);
+        // Don't call render() here - engine will call it to prevent infinite loop
     }
     
     /**

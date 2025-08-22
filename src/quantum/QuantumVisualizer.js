@@ -705,10 +705,7 @@ void main() {
     updateParameters(params) {
         this.params = { ...this.params, ...params };
         
-        // CRITICAL FIX: Force immediate render with new parameters
-        this.render();
-        
-        console.log(`🔮 Quantum visualizer updated: ${JSON.stringify(params)}`);
+        // Don't call render() here - engine will call it to prevent infinite loop
     }
     
     /**
