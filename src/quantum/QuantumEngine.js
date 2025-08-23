@@ -135,10 +135,15 @@ export class QuantumEngine {
     }
     
     /**
-     * Setup gesture velocity reactivity for Quantum system
+     * Setup enhanced multi-parameter reactivity for Quantum system
      */
     setupGestureVelocityReactivity() {
-        console.log('🌌 Setting up Quantum gesture velocity reactivity');
+        console.log('🌌 Setting up Quantum: velocity + click + scroll + multi-parameter reactivity');
+        
+        // Enhanced state for smooth effects
+        this.clickFlashIntensity = 0;
+        this.scrollMorph = 1.0; // Base morph factor
+        this.velocitySmoothing = 0.8; // Smoother velocity transitions
         
         const quantumCanvases = [
             'quantum-background-canvas', 'quantum-shadow-canvas', 'quantum-content-canvas',
@@ -149,7 +154,7 @@ export class QuantumEngine {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;
             
-            // Mouse movement -> velocity calculation -> parameter changes
+            // Mouse movement -> smooth velocity + multiple parameters
             canvas.addEventListener('mousemove', (e) => {
                 if (!this.isActive) return;
                 
@@ -157,10 +162,10 @@ export class QuantumEngine {
                 const mouseX = (e.clientX - rect.left) / rect.width;
                 const mouseY = (e.clientY - rect.top) / rect.height;
                 
-                this.updateVelocityParameters(mouseX, mouseY);
+                this.updateEnhancedQuantumParameters(mouseX, mouseY);
             });
             
-            // Touch movement -> velocity calculation
+            // Touch movement -> same enhanced parameters  
             canvas.addEventListener('touchmove', (e) => {
                 if (!this.isActive) return;
                 e.preventDefault();
@@ -171,43 +176,129 @@ export class QuantumEngine {
                     const touchX = (touch.clientX - rect.left) / rect.width;
                     const touchY = (touch.clientY - rect.top) / rect.height;
                     
-                    this.updateVelocityParameters(touchX, touchY);
+                    this.updateEnhancedQuantumParameters(touchX, touchY);
                 }
             }, { passive: false });
+            
+            // Click -> quantum flash effect
+            canvas.addEventListener('click', (e) => {
+                if (!this.isActive) return;
+                this.triggerQuantumClick();
+            });
+            
+            // Touch end -> quantum flash effect
+            canvas.addEventListener('touchend', (e) => {
+                if (!this.isActive) return;
+                this.triggerQuantumClick();
+            });
+            
+            // Wheel -> quantum morphing scroll effect
+            canvas.addEventListener('wheel', (e) => {
+                if (!this.isActive) return;
+                e.preventDefault();
+                this.updateQuantumScroll(e.deltaY);
+            }, { passive: false });
         });
+        
+        // Start smooth animation loops
+        this.startQuantumEffectLoops();
     }
     
-    updateVelocityParameters(x, y) {
-        // Calculate velocity from position change
+    updateEnhancedQuantumParameters(x, y) {
+        // Calculate velocity from position change (smoother)
         const deltaX = x - this.lastMousePosition.x;
         const deltaY = y - this.lastMousePosition.y;
         const velocity = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         
-        // Update velocity history
+        // Smooth velocity history (reduced from 10 to 5 for responsiveness)
         this.velocityHistory.push(velocity);
-        if (this.velocityHistory.length > this.maxVelocityHistory) {
+        if (this.velocityHistory.length > 5) {
             this.velocityHistory.shift();
         }
         
-        // Calculate average velocity for smoothing
+        // Calculate smoother average velocity
         const avgVelocity = this.velocityHistory.reduce((sum, v) => sum + v, 0) / this.velocityHistory.length;
         
-        // Map velocity to parameters (fast movement = more chaos and speed)
-        const chaos = Math.min(1.0, avgVelocity * 50); // 0-1 range
-        const speed = 1.0 + (avgVelocity * 20); // 1-21 range, clamped later
-        const finalSpeed = Math.min(3.0, speed); // Clamp to max 3.0
+        // ENHANCED MULTI-PARAMETER MAPPING (5 parameters like holographic)
         
-        // Update parameters
+        // 1. Chaos: Fast movement = more chaos (refined scaling)
+        const chaos = Math.min(1.0, avgVelocity * 30); // Smoother than 50
+        
+        // 2. Speed: Movement affects animation speed
+        const speed = 0.5 + Math.min(2.5, avgVelocity * 15); // 0.5-3.0 range
+        
+        // 3. Grid Density: Mouse position affects complexity  
+        const gridDensity = 10 + (y * 90); // Y position: 10-100 range
+        
+        // 4. Intensity: Mouse X position controls brightness
+        const intensity = 0.4 + (x * 0.6); // X position: 0.4-1.0 range
+        
+        // 5. Hue: Velocity affects color shifts (quantum purple-cyan range)
+        const baseHue = 280; // Quantum purple-blue
+        const hueShift = avgVelocity * 80; // 0-80 degree shift  
+        const hue = (baseHue + hueShift) % 360;
+        
+        // Update all parameters for rich visual feedback
         if (window.updateParameter) {
             window.updateParameter('chaos', chaos.toFixed(2));
-            window.updateParameter('speed', finalSpeed.toFixed(2));
+            window.updateParameter('speed', speed.toFixed(2));
+            window.updateParameter('gridDensity', Math.round(gridDensity));
+            window.updateParameter('intensity', intensity.toFixed(2));
+            window.updateParameter('hue', Math.round(hue));
         }
         
         // Update last position
         this.lastMousePosition.x = x;
         this.lastMousePosition.y = y;
         
-        console.log(`🌌 Velocity: ${avgVelocity.toFixed(3)} → Chaos: ${chaos.toFixed(2)}, Speed: ${finalSpeed.toFixed(2)}`);
+        console.log(`🌌 Quantum Enhanced: Vel=${avgVelocity.toFixed(3)} → Chaos=${chaos.toFixed(2)}, Speed=${speed.toFixed(2)}, Density=${Math.round(gridDensity)}, Int=${intensity.toFixed(2)}, Hue=${Math.round(hue)}`);
+    }
+    
+    triggerQuantumClick() {
+        // Trigger quantum flash effect - affects saturation/morph
+        this.clickFlashIntensity = 1.0;
+        console.log('💥 Quantum click flash triggered');
+    }
+    
+    updateQuantumScroll(deltaY) {
+        // Scroll affects morph factor smoothly
+        const scrollSpeed = 0.02;
+        const scrollDirection = deltaY > 0 ? 1 : -1;
+        
+        this.scrollMorph += scrollDirection * scrollSpeed;
+        this.scrollMorph = Math.max(0.2, Math.min(2.0, this.scrollMorph)); // Clamp 0.2-2.0
+        
+        // Update morph factor
+        if (window.updateParameter) {
+            window.updateParameter('morphFactor', this.scrollMorph.toFixed(2));
+        }
+        
+        console.log(`🌀 Quantum scroll morph: ${this.scrollMorph.toFixed(2)}`);
+    }
+    
+    startQuantumEffectLoops() {
+        const quantumEffects = () => {
+            // Click flash effect animation
+            if (this.clickFlashIntensity > 0.01) {
+                // Flash affects saturation - quantum shimmer effect
+                const flashSaturation = 0.9 + (this.clickFlashIntensity * 0.1); // 0.9-1.0 boost
+                const flashMorph = this.scrollMorph + (this.clickFlashIntensity * 0.5); // Morph boost
+                
+                if (window.updateParameter) {
+                    window.updateParameter('saturation', flashSaturation.toFixed(2));
+                    window.updateParameter('morphFactor', flashMorph.toFixed(2));
+                }
+                
+                // Decay flash
+                this.clickFlashIntensity *= 0.92;
+            }
+            
+            if (this.isActive) {
+                requestAnimationFrame(quantumEffects);
+            }
+        };
+        
+        quantumEffects();
     }
     
     async enableAudio() {
