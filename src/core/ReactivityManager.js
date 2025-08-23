@@ -585,5 +585,5 @@ class SweepMode {
     }
 }
 
-// Create global instance
-window.reactivityManager = new ReactivityManager();
+// Global instance created by index.html after systems are initialized
+// window.reactivityManager = new ReactivityManager();

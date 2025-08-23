@@ -1832,7 +1832,7 @@
             const interactionKey = `${system}${interaction.charAt(0).toUpperCase()}${interaction.slice(1)}`;
             
             if (interaction === 'mouse') {
-                // Set mouse mode based on system
+                // Set mouse mode based on system (FIXED: matching actual mode names)
                 if (enabled) {
                     if (system === 'faceted') {
                         window.reactivityManager.setMouseMode('rotations'); // 4D rotations
@@ -1841,15 +1841,15 @@
                         window.reactivityManager.setMouseMode('velocity'); // Velocity tracking
                         console.log('  🌌 Activating Quantum velocity mouse tracking');
                     } else if (system === 'holographic') {
-                        window.reactivityManager.setMouseMode('distance'); // Shimmer effects
+                        window.reactivityManager.setMouseMode('distance'); // Shimmer effects (distance mode)
                         console.log('  ✨ Activating Holographic shimmer mouse tracking');
                     }
                     window.reactivityManager.toggleMouse(true);
                 } else {
                     // If this system's mouse is being disabled, check if any others are still enabled
-                    const facetedEnabled = document.getElementById('facetedMouse').checked;
-                    const quantumEnabled = document.getElementById('quantumMouse').checked; 
-                    const holographicEnabled = document.getElementById('holographicMouse').checked;
+                    const facetedEnabled = document.getElementById('facetedMouse')?.checked || false;
+                    const quantumEnabled = document.getElementById('quantumMouse')?.checked || false; 
+                    const holographicEnabled = document.getElementById('holographicMouse')?.checked || false;
                     
                     if (!facetedEnabled && !quantumEnabled && !holographicEnabled) {
                         window.reactivityManager.toggleMouse(false);
@@ -1857,24 +1857,24 @@
                     }
                 }
             } else if (interaction === 'click') {
-                // Set click mode based on system
+                // Set click mode based on system (FIXED: matching actual mode names)
                 if (enabled) {
                     if (system === 'faceted') {
-                        window.reactivityManager.setClickMode('flash'); // Color flash
-                        console.log('  🔷 Activating Faceted color flash clicks');
+                        window.reactivityManager.setClickMode('burst'); // FIXED: burst not flash
+                        console.log('  🔷 Activating Faceted burst clicks');
                     } else if (system === 'quantum') {
-                        window.reactivityManager.setClickMode('burst'); // Multi-parameter burst
-                        console.log('  🌌 Activating Quantum dramatic burst clicks');
+                        window.reactivityManager.setClickMode('blast'); // FIXED: blast not burst
+                        console.log('  🌌 Activating Quantum blast clicks');
                     } else if (system === 'holographic') {
-                        window.reactivityManager.setClickMode('burst'); // Color burst (same as quantum)
-                        console.log('  ✨ Activating Holographic color burst clicks');
+                        window.reactivityManager.setClickMode('ripple'); // FIXED: ripple not burst
+                        console.log('  ✨ Activating Holographic ripple clicks');
                     }
                     window.reactivityManager.toggleClick(true);
                 } else {
                     // Check if any other click modes are enabled
-                    const facetedEnabled = document.getElementById('facetedClick').checked;
-                    const quantumEnabled = document.getElementById('quantumClick').checked;
-                    const holographicEnabled = document.getElementById('holographicClick').checked;
+                    const facetedEnabled = document.getElementById('facetedClick')?.checked || false;
+                    const quantumEnabled = document.getElementById('quantumClick')?.checked || false;
+                    const holographicEnabled = document.getElementById('holographicClick')?.checked || false;
                     
                     if (!facetedEnabled && !quantumEnabled && !holographicEnabled) {
                         window.reactivityManager.toggleClick(false);
@@ -1882,24 +1882,24 @@
                     }
                 }
             } else if (interaction === 'scroll') {
-                // Set scroll mode based on system
+                // Set scroll mode based on system (FIXED: matching actual mode names)
                 if (enabled) {
                     if (system === 'faceted') {
-                        window.reactivityManager.setScrollMode('density'); // Density + hue changes
-                        console.log('  🔷 Activating Faceted density scroll effects');
+                        window.reactivityManager.setScrollMode('cycle'); // FIXED: cycle not density
+                        console.log('  🔷 Activating Faceted cycle scroll effects');
                     } else if (system === 'quantum') {
-                        window.reactivityManager.setScrollMode('cycles'); // Parameter cycling
-                        console.log('  🌌 Activating Quantum parameter cycling scroll');
+                        window.reactivityManager.setScrollMode('wave'); // FIXED: wave not cycles
+                        console.log('  🌌 Activating Quantum wave scroll');
                     } else if (system === 'holographic') {
-                        window.reactivityManager.setScrollMode('flow'); // Smooth parameter flow
-                        console.log('  ✨ Activating Holographic flow scroll effects');
+                        window.reactivityManager.setScrollMode('sweep'); // FIXED: sweep not flow
+                        console.log('  ✨ Activating Holographic sweep scroll effects');
                     }
                     window.reactivityManager.toggleScroll(true);
                 } else {
                     // Check if any other scroll modes are enabled
-                    const facetedEnabled = document.getElementById('facetedScroll').checked;
-                    const quantumEnabled = document.getElementById('quantumScroll').checked;
-                    const holographicEnabled = document.getElementById('holographicScroll').checked;
+                    const facetedEnabled = document.getElementById('facetedScroll')?.checked || false;
+                    const quantumEnabled = document.getElementById('quantumScroll')?.checked || false;
+                    const holographicEnabled = document.getElementById('holographicScroll')?.checked || false;
                     
                     if (!facetedEnabled && !quantumEnabled && !holographicEnabled) {
                         window.reactivityManager.toggleScroll(false);
