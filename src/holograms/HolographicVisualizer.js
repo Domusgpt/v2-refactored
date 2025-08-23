@@ -400,7 +400,7 @@ export class HolographicVisualizer {
                 
                 float time = u_time * 0.0004 * u_speed * u_roleSpeed;
                 
-                float mouseInfluence = u_mouseIntensity * 0.5;
+                float mouseInfluence = u_mouseIntensity * 0.25; // FIX: Reduce mouse jarring by 50%
                 vec2 mouseOffset = (u_mouse - 0.5) * mouseInfluence;
                 
                 float parallaxOffset = u_scrollParallax * 0.2;

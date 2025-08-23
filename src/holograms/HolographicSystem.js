@@ -428,7 +428,7 @@ export class HolographicSystem {
             }
             
             // Density variation
-            const densityVar = Math.sin(this.mouseX * Math.PI) * Math.sin(this.mouseY * Math.PI) * 2.0;
+            const densityVar = Math.sin(this.mouseX * Math.PI) * Math.sin(this.mouseY * Math.PI) * 1.0; // FIX: Cut density changes in half
             this.visualizers.forEach(visualizer => {
                 visualizer.updateDensity(densityVar);
             });
