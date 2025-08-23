@@ -400,27 +400,37 @@ export class RealHolographicSystem {
         const centerY = 0.5;
         const distanceFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
         
-        // Convert distance to grid density (closer to center = higher density)
-        // Max distance is ~0.707 (corner to center), so normalize
+        // Normalize distance (0 = center, 1 = corners)
         const normalizedDistance = Math.min(distanceFromCenter / 0.707, 1.0);
         
-        // Invert so center = high density, edges = low density
-        const centerProximity = 1.0 - normalizedDistance;
+        // REVERSED: Center = low density, edges = high density
+        const gridDensity = 5 + (95 * normalizedDistance); // 5-100 range
         
-        // Map to grid density range (5-100, with boost near center)
-        const minDensity = 5;
-        const maxDensity = 100;
-        const densityRange = maxDensity - minDensity;
+        // Multiple parameter modulation for visual cohesion
+        // Intensity: Higher at center, lower at edges (opposite of density)
+        const intensity = 0.3 + (0.7 * (1.0 - normalizedDistance)); // 0.3-1.0
         
-        // Use exponential curve to make center more dramatic
-        const gridDensity = minDensity + (densityRange * Math.pow(centerProximity, 2));
+        // MorphFactor: More morphing near center for fluid effect
+        const morphFactor = 0.5 + (1.5 * (1.0 - normalizedDistance)); // 0.5-2.0
         
-        // Update parameter system
+        // Hue shift: Subtle color variation based on position
+        const baseHue = 320; // Magenta-pink base
+        const hueShift = normalizedDistance * 40; // 0-40 degree shift
+        const hue = (baseHue + hueShift) % 360;
+        
+        // Saturation: More vivid at center
+        const saturation = 0.6 + (0.4 * (1.0 - normalizedDistance)); // 0.6-1.0
+        
+        // Update all parameters for cohesive visual effect
         if (window.updateParameter) {
             window.updateParameter('gridDensity', Math.round(gridDensity));
+            window.updateParameter('intensity', intensity.toFixed(2));
+            window.updateParameter('morphFactor', morphFactor.toFixed(2));
+            window.updateParameter('hue', Math.round(hue));
+            window.updateParameter('saturation', saturation.toFixed(2));
         }
         
-        console.log(`🎯 Distance from center: ${distanceFromCenter.toFixed(3)} -> Grid Density: ${Math.round(gridDensity)}`);
+        console.log(`✨ Center distance: ${distanceFromCenter.toFixed(3)} → Density: ${Math.round(gridDensity)}, Intensity: ${intensity.toFixed(2)}, Morph: ${morphFactor.toFixed(2)}`);
     }
     
     // Removed old touch and scroll interactions - now using center-distance reactivity
