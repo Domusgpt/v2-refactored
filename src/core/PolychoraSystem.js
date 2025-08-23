@@ -732,6 +732,12 @@ export class PolychoraSystem {
         const render = () => {
             if (!this.isActive) return;
             
+            // MVEP-STYLE AUDIO PROCESSING: Process audio directly in render loop
+            // This eliminates conflicts with holographic system and ensures proper audio reactivity
+            if (window.audioEnabled && window.globalAudioData) {
+                this.updateAudioReactivity(window.globalAudioData);
+            }
+            
             // Step physics simulation if enabled
             if (this.parameters.physicsEnabled && this.physicsEnabled) {
                 this.physics.step();

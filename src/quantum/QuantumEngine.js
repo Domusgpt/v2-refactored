@@ -519,8 +519,11 @@ export class QuantumEngine {
         
         const render = () => {
             if (this.isActive) {
-                // Update audio reactivity first
-                this.updateAudioReactivity();
+                // MVEP-STYLE AUDIO PROCESSING: Use global audio data instead of internal processing
+                // This eliminates conflicts with holographic system and ensures consistent audio reactivity
+                if (window.audioEnabled && window.globalAudioData) {
+                    this.updateAudioReactivity(window.globalAudioData);
+                }
                 
                 // CRITICAL FIX: Update visualizer parameters before rendering
                 const currentParams = this.parameters.getAllParameters();

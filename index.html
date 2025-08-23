@@ -2038,20 +2038,15 @@
             }
             
             distributeAudioToActiveSystem(audioData) {
-                if (!audioData || !window.audioEnabled) return;
+                // MVEP-STYLE ARCHITECTURE: Each system processes audio in its own render loop
+                // This eliminates the "holographic override" problem and timing conflicts
                 
-                const currentSystem = window.currentSystem || 'faceted';
+                // Store global audio data for systems that need external audio data
+                window.globalAudioData = audioData;
                 
-                // Send audio data to currently active system
-                if (currentSystem === 'faceted' && window.engine && window.engine.updateAudioReactivity) {
-                    window.engine.updateAudioReactivity(audioData);
-                } else if (currentSystem === 'quantum' && window.quantumEngine && window.quantumEngine.updateAudioReactivity) {
-                    window.quantumEngine.updateAudioReactivity(audioData);
-                } else if (currentSystem === 'holographic' && window.holographicSystem) {
-                    // Holographic system handles its own audio processing, don't duplicate
-                } else if (currentSystem === 'polychora' && window.polychoraSystem && window.polychoraSystem.updateAudioReactivity) {
-                    window.polychoraSystem.updateAudioReactivity(audioData);
-                }
+                // Holographic system uses its own internal audio processing (like MVEP)
+                // Other systems can access globalAudioData in their render loops if needed
+                // This prevents conflicts and ensures proper audio reactivity for all systems
             }
             
             startAudioLoop() {

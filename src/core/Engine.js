@@ -397,6 +397,13 @@ export class VIB34DIntegratedEngine {
         
         const render = () => {
             this.time += 0.016; // ~60fps
+            
+            // MVEP-STYLE AUDIO PROCESSING: Each system processes audio in its own render loop
+            // This eliminates the "holographic override" problem and ensures proper audio reactivity
+            if (window.audioEnabled && window.globalAudioData) {
+                this.updateAudioReactivity(window.globalAudioData);
+            }
+            
             this.updateVisualizers();
             this.animationId = requestAnimationFrame(render);
         };
