@@ -13,6 +13,9 @@ export class RealHolographicSystem {
         this.totalVariants = 30;
         this.isActive = false;
         
+        // Conditional reactivity: Use built-in only if ReactivityManager not active
+        this.useBuiltInReactivity = !window.reactivityManager;
+        
         // Audio reactivity system
         this.audioEnabled = false;
         this.audioContext = null;
@@ -351,15 +354,24 @@ export class RealHolographicSystem {
     }
     
     setupCenterDistanceReactivity() {
-        console.log('✨ Setting up center-distance reactivity + click morph effects for Holographic system');
+        if (!this.useBuiltInReactivity) {
+            console.log('✨ Holographic built-in reactivity DISABLED - ReactivityManager active');
+            return;
+        }
         
-        // Track mouse/touch position for center-distance calculation
+        console.log('✨ Setting up holographic shimmer effects + dramatic color bursts for Holographic system');
+        
+        // Track mouse/touch position for shimmer calculation
         this.currentX = 0.5;
         this.currentY = 0.5;
         
-        // Click morph effect state
-        this.clickMorphIntensity = 0;
-        this.baseMorphFactor = 1.0; // Default morph factor
+        // Holographic color burst state (dramatic multi-parameter effects)
+        this.colorBurstIntensity = 0;
+        this.burstHueShift = 0;
+        this.burstIntensityBoost = 0;
+        this.burstSaturationSpike = 0;
+        this.burstChaosEffect = 0;
+        this.burstSpeedBoost = 0;
         
         const holographicCanvases = [
             'holo-background-canvas', 'holo-shadow-canvas', 'holo-content-canvas',
@@ -370,7 +382,7 @@ export class RealHolographicSystem {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;
             
-            // Mouse movement -> center distance -> density/intensity/saturation (NO MORPH)
+            // Mouse movement -> holographic shimmer (like trading card iridescence)
             canvas.addEventListener('mousemove', (e) => {
                 if (!this.isActive) return;
                 
@@ -378,10 +390,10 @@ export class RealHolographicSystem {
                 const mouseX = (e.clientX - rect.left) / rect.width;
                 const mouseY = (e.clientY - rect.top) / rect.height;
                 
-                this.updateCenterDistanceParameters(mouseX, mouseY);
+                this.updateHolographicShimmer(mouseX, mouseY);
             });
             
-            // Touch movement -> center distance -> parameters (NO MORPH)
+            // Touch movement -> holographic shimmer
             canvas.addEventListener('touchmove', (e) => {
                 if (!this.isActive) return;
                 e.preventDefault();
@@ -392,11 +404,11 @@ export class RealHolographicSystem {
                     const touchX = (touch.clientX - rect.left) / rect.width;
                     const touchY = (touch.clientY - rect.top) / rect.height;
                     
-                    this.updateCenterDistanceParameters(touchX, touchY);
+                    this.updateHolographicShimmer(touchX, touchY);
                 }
             }, { passive: false });
             
-            // Click -> morph effect based on distance from center
+            // Click -> dramatic color burst (like Quantum's dramatic effects)
             canvas.addEventListener('click', (e) => {
                 if (!this.isActive) return;
                 
@@ -404,10 +416,10 @@ export class RealHolographicSystem {
                 const clickX = (e.clientX - rect.left) / rect.width;
                 const clickY = (e.clientY - rect.top) / rect.height;
                 
-                this.triggerHolographicClickMorph(clickX, clickY);
+                this.triggerHolographicColorBurst(clickX, clickY);
             });
             
-            // Touch end -> morph effect based on distance from center
+            // Touch end -> dramatic color burst
             canvas.addEventListener('touchend', (e) => {
                 if (!this.isActive) return;
                 
@@ -417,88 +429,148 @@ export class RealHolographicSystem {
                     const touchX = (touch.clientX - rect.left) / rect.width;
                     const touchY = (touch.clientY - rect.top) / rect.height;
                     
-                    this.triggerHolographicClickMorph(touchX, touchY);
+                    this.triggerHolographicColorBurst(touchX, touchY);
                 }
             });
         });
         
-        // Start click morph animation loop
-        this.startHolographicClickMorphLoop();
+        // Start holographic color burst animation loop
+        this.startHolographicColorBurstLoop();
     }
     
-    updateCenterDistanceParameters(x, y) {
-        // Calculate distance from center (0.5, 0.5)
-        const centerX = 0.5;
-        const centerY = 0.5;
-        const distanceFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+    updateHolographicShimmer(x, y) {
+        // HOLOGRAPHIC TRADING CARD SHIMMER EFFECTS
+        // Calculate position-based shimmer like real holographic cards
         
-        // Normalize distance (0 = center, 1 = corners)
-        const normalizedDistance = Math.min(distanceFromCenter / 0.707, 1.0);
+        // Create iridescent shimmer based on viewing angle (mouse position)
+        const angleX = (x - 0.5) * Math.PI; // -π/2 to π/2 
+        const angleY = (y - 0.5) * Math.PI;
         
-        // REVERSED: Center = low density, edges = high density (as requested)
-        const gridDensity = 5 + (95 * normalizedDistance); // 5-100 range
+        // Holographic rainbow shimmer - shifts through spectrum based on angle
+        const baseHue = 320; // Start with magenta-pink
+        const shimmerRange = 120; // Cover 120 degrees of spectrum
+        const hueShimmer = Math.sin(angleX * 2) * Math.cos(angleY * 2) * shimmerRange;
+        const shimmerHue = (baseHue + hueShimmer + 360) % 360;
         
-        // Enhanced intensity modulation - more dramatic changes
-        const intensity = 0.2 + (0.8 * (1.0 - normalizedDistance)); // 0.2-1.0 range (wider)
+        // Iridescent intensity - varies with viewing angle like real holograms
+        const shimmerIntensity = 0.4 + (0.5 * Math.abs(Math.sin(angleX) * Math.cos(angleY)));
         
-        // Enhanced saturation modulation - more color variation  
-        const saturation = 0.4 + (0.6 * (1.0 - normalizedDistance)); // 0.4-1.0 range (wider)
+        // Holographic saturation pulse - high saturation for vivid colors
+        const saturationPulse = 0.7 + (0.3 * Math.abs(Math.cos(angleX * 1.5) * Math.sin(angleY * 1.5)));
         
-        // Hue shift: Subtle color variation based on position
-        const baseHue = 320; // Magenta-pink base
-        const hueShift = normalizedDistance * 40; // 0-40 degree shift
-        const hue = (baseHue + hueShift) % 360;
+        // Subtle depth illusion - slight morph based on angle (much more subtle than faceted)
+        const depthMorph = 1.0 + (0.15 * Math.sin(angleX * 0.8) * Math.cos(angleY * 0.8));
         
-        // Update parameters (NO MORE MORPH FROM MOUSE MOVEMENT)
+        // Update holographic shimmer parameters
         if (window.updateParameter) {
-            window.updateParameter('gridDensity', Math.round(gridDensity));
-            window.updateParameter('intensity', intensity.toFixed(2));
-            window.updateParameter('saturation', saturation.toFixed(2));
-            window.updateParameter('hue', Math.round(hue));
+            window.updateParameter('hue', Math.round(shimmerHue));
+            window.updateParameter('intensity', shimmerIntensity.toFixed(2));
+            window.updateParameter('saturation', saturationPulse.toFixed(2));
+            window.updateParameter('morphFactor', depthMorph.toFixed(2));
         }
         
-        console.log(`✨ Center distance: ${distanceFromCenter.toFixed(3)} → Density: ${Math.round(gridDensity)}, Intensity: ${intensity.toFixed(2)}, Saturation: ${saturation.toFixed(2)}`);
+        console.log(`✨ Holographic shimmer: angle=(${angleX.toFixed(2)}, ${angleY.toFixed(2)}) → Hue=${Math.round(shimmerHue)}, Intensity=${shimmerIntensity.toFixed(2)}`);
     }
     
-    triggerHolographicClickMorph(x, y) {
-        // Calculate distance from center for morph intensity
+    triggerHolographicColorBurst(x, y) {
+        // DRAMATIC HOLOGRAPHIC COLOR BURST (like Quantum's dramatic click effects)
+        
+        // Calculate energy based on click position 
         const centerX = 0.5;
         const centerY = 0.5;
         const distanceFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
         const normalizedDistance = Math.min(distanceFromCenter / 0.707, 1.0);
         
-        // Morph change based on distance from center (0.1-0.3 as requested)
-        this.clickMorphIntensity = 0.1 + (0.2 * (1.0 - normalizedDistance)); // 0.1-0.3 range
+        // QUANTUM-STYLE DRAMATIC EFFECTS
+        this.colorBurstIntensity = 1.0; // Full burst intensity
         
-        console.log(`💥 Holographic click morph: distance=${distanceFromCenter.toFixed(3)}, morph change=${this.clickMorphIntensity.toFixed(2)}`);
+        // Multi-parameter dramatic effects that decay back
+        this.burstHueShift = 180; // Dramatic hue shift across spectrum
+        this.burstIntensityBoost = 0.7; // Major intensity boost
+        this.burstSaturationSpike = 0.8; // Vivid color spike
+        this.burstChaosEffect = 0.6; // Chaos/morph burst effect
+        this.burstSpeedBoost = 1.8; // Animation speed burst
+        
+        console.log(`🌈💥 HOLOGRAPHIC COLOR BURST: position=(${x.toFixed(2)}, ${y.toFixed(2)}), distance=${distanceFromCenter.toFixed(3)}`);
     }
     
-    startHolographicClickMorphLoop() {
-        const morphEffect = () => {
-            if (this.clickMorphIntensity > 0.01) {
-                // Apply morph change temporarily
-                const currentMorph = this.baseMorphFactor + this.clickMorphIntensity;
+    startHolographicColorBurstLoop() {
+        const burstAnimation = () => {
+            // DRAMATIC HOLOGRAPHIC COLOR BURST ANIMATION (like Quantum's multi-parameter effects)
+            let hasActiveEffects = false;
+            
+            if (this.colorBurstIntensity > 0.01) {
+                hasActiveEffects = true;
                 
-                if (window.updateParameter) {
-                    window.updateParameter('morphFactor', currentMorph.toFixed(2));
+                // Phase-based burst animation with color cycling
+                const burstPhase = this.colorBurstIntensity;
+                
+                // HUE BURST: Cycle through rainbow spectrum
+                if (this.burstHueShift > 1) {
+                    const baseHue = 320; // Holographic magenta base
+                    const currentHueShift = this.burstHueShift * Math.sin(burstPhase * Math.PI * 2);
+                    const burstHue = (baseHue + currentHueShift) % 360;
+                    
+                    if (window.updateParameter) {
+                        window.updateParameter('hue', Math.round(burstHue));
+                    }
+                    this.burstHueShift *= 0.93; // Smooth decay
                 }
                 
-                // Decay back to base morph factor
-                this.clickMorphIntensity *= 0.9; // Decay rate
-            } else if (this.clickMorphIntensity > 0) {
-                // Return to base morph factor
-                if (window.updateParameter) {
-                    window.updateParameter('morphFactor', this.baseMorphFactor.toFixed(2));
+                // INTENSITY BURST: Dramatic brightness flash
+                if (this.burstIntensityBoost > 0.01) {
+                    const baseIntensity = 0.5;
+                    const burstIntensity = Math.min(1.0, baseIntensity + this.burstIntensityBoost * burstPhase);
+                    
+                    if (window.updateParameter) {
+                        window.updateParameter('intensity', burstIntensity.toFixed(2));
+                    }
+                    this.burstIntensityBoost *= 0.92;
                 }
-                this.clickMorphIntensity = 0;
+                
+                // SATURATION SPIKE: Vivid color explosion
+                if (this.burstSaturationSpike > 0.01) {
+                    const baseSaturation = 0.8;
+                    const burstSaturation = Math.min(1.0, baseSaturation + this.burstSaturationSpike * burstPhase);
+                    
+                    if (window.updateParameter) {
+                        window.updateParameter('saturation', burstSaturation.toFixed(2));
+                    }
+                    this.burstSaturationSpike *= 0.91;
+                }
+                
+                // CHAOS/MORPH EFFECT: Geometric distortion burst
+                if (this.burstChaosEffect > 0.01) {
+                    const baseChaos = 0.2;
+                    const burstChaos = baseChaos + this.burstChaosEffect * burstPhase;
+                    
+                    if (window.updateParameter) {
+                        window.updateParameter('chaos', burstChaos.toFixed(2));
+                    }
+                    this.burstChaosEffect *= 0.90;
+                }
+                
+                // SPEED BOOST: Animation acceleration
+                if (this.burstSpeedBoost > 0.01) {
+                    const baseSpeed = 1.0;
+                    const burstSpeed = baseSpeed + this.burstSpeedBoost * burstPhase;
+                    
+                    if (window.updateParameter) {
+                        window.updateParameter('speed', burstSpeed.toFixed(2));
+                    }
+                    this.burstSpeedBoost *= 0.89;
+                }
+                
+                // Master intensity decay
+                this.colorBurstIntensity *= 0.94;
             }
             
             if (this.isActive) {
-                requestAnimationFrame(morphEffect);
+                requestAnimationFrame(burstAnimation);
             }
         };
         
-        morphEffect();
+        burstAnimation();
     }
     
     startRenderLoop() {

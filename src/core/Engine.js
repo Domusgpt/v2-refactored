@@ -26,6 +26,9 @@ export class VIB34DIntegratedEngine {
         // Active state for reactivity
         this.isActive = false;
         
+        // Conditional reactivity: Use built-in only if ReactivityManager not active
+        this.useBuiltInReactivity = !window.reactivityManager;
+        
         // Current state
         this.currentVariation = 0;
         this.totalVariations = 100; // 30 default + 70 custom
@@ -144,6 +147,11 @@ export class VIB34DIntegratedEngine {
      * Set up mouse/touch interactions
      */
     setupInteractions() {
+        if (!this.useBuiltInReactivity) {
+            console.log('🔷 Faceted built-in reactivity DISABLED - ReactivityManager active');
+            return;
+        }
+        
         console.log('🔷 Setting up Faceted 4D rotation mouse reactivity');
         this.setup4DRotationReactivity();
     }

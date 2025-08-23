@@ -269,46 +269,90 @@
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
         }
         
-        /* Reactivity Toggles */
-        .reactivity-toggles {
+        /* 3×3 Modular Reactivity Grid */
+        .reactivity-grid {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr 1fr;
+            grid-template-rows: auto auto auto auto;
+            gap: 4px;
+            margin: 10px 0;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px;
+            background: rgba(0, 20, 40, 0.3);
+        }
+        
+        .reactivity-header {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-align: center;
+            padding: 4px;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        .reactivity-label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .reactivity-cell {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-        }
-        
-        .toggle-group {
-            display: flex;
             align-items: center;
-        }
-        
-        .toggle-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 2px;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
             cursor: pointer;
-            user-select: none;
+            transition: all 0.3s ease;
+            min-height: 40px;
         }
         
-        .toggle-label input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+        .reactivity-cell:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.3);
+        }
+        
+        .reactivity-cell input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
             accent-color: #00ffff;
             cursor: pointer;
+            margin: 0;
         }
         
-        .toggle-text {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.8rem;
+        .cell-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.6rem;
+            text-align: center;
             transition: color 0.3s;
+            line-height: 1;
         }
         
-        .toggle-label input[type="checkbox"]:checked + .toggle-text {
+        .reactivity-cell input[type="checkbox"]:checked + .cell-text {
             color: #00ffff;
+            font-weight: bold;
         }
         
-        .toggle-label input[type="checkbox"]:disabled + .toggle-text {
-            color: rgba(255, 255, 255, 0.4);
-            opacity: 0.6;
+        .reactivity-note {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            margin-top: 6px;
+            font-style: italic;
         }
         
         /* Sliders */
@@ -578,31 +622,66 @@
             </div>
         </div>
         
-        <!-- REACTIVITY SECTION -->
+        <!-- MODULAR REACTIVITY SECTION -->
         <div class="control-section">
-            <div class="section-title">REACTIVITY</div>
+            <div class="section-title">MODULAR REACTIVITY</div>
             
-            <div class="reactivity-toggles">
-                <div class="toggle-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="mouseReactivity" checked onchange="toggleMouseReactivity(this.checked)">
-                        <span class="toggle-text">🖱️ Mouse</span>
-                    </label>
-                </div>
+            <!-- 3×3 Grid: Systems × Interaction Types -->
+            <div class="reactivity-grid">
+                <!-- Header Row -->
+                <div class="reactivity-header"></div>
+                <div class="reactivity-header">🖱️ MOUSE</div>
+                <div class="reactivity-header">👆 CLICK</div>
+                <div class="reactivity-header">🌀 SCROLL</div>
                 
-                <div class="toggle-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="clickReactivity" checked onchange="toggleClickReactivity(this.checked)">
-                        <span class="toggle-text">👆 Click</span>
-                    </label>
-                </div>
+                <!-- Faceted Row -->
+                <div class="reactivity-label">🔷 FACETED</div>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="facetedMouse" checked onchange="toggleSystemReactivity('faceted', 'mouse', this.checked)">
+                    <span class="cell-text">Rotations</span>
+                </label>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="facetedClick" checked onchange="toggleSystemReactivity('faceted', 'click', this.checked)">
+                    <span class="cell-text">Flash</span>
+                </label>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="facetedScroll" checked onchange="toggleSystemReactivity('faceted', 'scroll', this.checked)">
+                    <span class="cell-text">Density</span>
+                </label>
                 
-                <div class="toggle-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="scrollReactivity" checked onchange="toggleScrollReactivity(this.checked)">
-                        <span class="toggle-text">🌀 Scroll</span>
-                    </label>
-                </div>
+                <!-- Quantum Row -->
+                <div class="reactivity-label">🌌 QUANTUM</div>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="quantumMouse" onchange="toggleSystemReactivity('quantum', 'mouse', this.checked)">
+                    <span class="cell-text">Velocity</span>
+                </label>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="quantumClick" onchange="toggleSystemReactivity('quantum', 'click', this.checked)">
+                    <span class="cell-text">Burst</span>
+                </label>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="quantumScroll" onchange="toggleSystemReactivity('quantum', 'scroll', this.checked)">
+                    <span class="cell-text">Cycles</span>
+                </label>
+                
+                <!-- Holographic Row -->
+                <div class="reactivity-label">✨ HOLOGRAPHIC</div>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="holographicMouse" onchange="toggleSystemReactivity('holographic', 'mouse', this.checked)">
+                    <span class="cell-text">Shimmer</span>
+                </label>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="holographicClick" onchange="toggleSystemReactivity('holographic', 'click', this.checked)">
+                    <span class="cell-text">Burst</span>
+                </label>
+                <label class="reactivity-cell">
+                    <input type="checkbox" id="holographicScroll" onchange="toggleSystemReactivity('holographic', 'scroll', this.checked)">
+                    <span class="cell-text">Flow</span>
+                </label>
+            </div>
+            
+            <div class="reactivity-note">
+                📝 Mix and match any system's behavior with any interaction type
             </div>
         </div>
         
@@ -875,6 +954,13 @@
             // Initialize ReactivityManager
             reactivityManager = new ReactivityManager();
             window.reactivityManager = reactivityManager;
+            
+            // Disable built-in reactivity now that ReactivityManager is active
+            if (window.engine) window.engine.useBuiltInReactivity = false;
+            if (window.quantumEngine) window.quantumEngine.useBuiltInReactivity = false;
+            if (window.holographicSystem) window.holographicSystem.useBuiltInReactivity = false;
+            
+            console.log('⚡ Built-in system reactivity DISABLED - ReactivityManager taking control');
             
             // Connect ReactivityManager to global interactivity toggle
             if (window.toggleInteractivity) {
@@ -1733,25 +1819,93 @@
             showInteractivityStatus();
         }
         
-        // ReactivityManager toggle functions (accessible from HTML)
-        window.toggleMouseReactivity = function(enabled) {
-            if (window.reactivityManager) {
-                window.reactivityManager.toggleMouse(enabled);
-                console.log(`🖱️ Mouse reactivity: ${enabled ? 'ON' : 'OFF'}`);
+        // 3×3 Modular Reactivity Grid System (accessible from HTML)
+        window.toggleSystemReactivity = function(system, interaction, enabled) {
+            if (!window.reactivityManager) {
+                console.warn('⚠️ ReactivityManager not initialized');
+                return;
             }
-        }
-        
-        window.toggleClickReactivity = function(enabled) {
-            if (window.reactivityManager) {
-                window.reactivityManager.toggleClick(enabled);
-                console.log(`👆 Click reactivity: ${enabled ? 'ON' : 'OFF'}`);
-            }
-        }
-        
-        window.toggleScrollReactivity = function(enabled) {
-            if (window.reactivityManager) {
-                window.reactivityManager.toggleScroll(enabled);
-                console.log(`🌀 Scroll reactivity: ${enabled ? 'ON' : 'OFF'}`);
+            
+            console.log(`🎛️ ${system.toUpperCase()} ${interaction.toUpperCase()}: ${enabled ? 'ON' : 'OFF'}`);
+            
+            // Map grid selections to ReactivityManager methods
+            const interactionKey = `${system}${interaction.charAt(0).toUpperCase()}${interaction.slice(1)}`;
+            
+            if (interaction === 'mouse') {
+                // Set mouse mode based on system
+                if (enabled) {
+                    if (system === 'faceted') {
+                        window.reactivityManager.setMouseMode('rotations'); // 4D rotations
+                        console.log('  🔷 Activating Faceted 4D rotation mouse tracking');
+                    } else if (system === 'quantum') {
+                        window.reactivityManager.setMouseMode('velocity'); // Velocity tracking
+                        console.log('  🌌 Activating Quantum velocity mouse tracking');
+                    } else if (system === 'holographic') {
+                        window.reactivityManager.setMouseMode('distance'); // Shimmer effects
+                        console.log('  ✨ Activating Holographic shimmer mouse tracking');
+                    }
+                    window.reactivityManager.toggleMouse(true);
+                } else {
+                    // If this system's mouse is being disabled, check if any others are still enabled
+                    const facetedEnabled = document.getElementById('facetedMouse').checked;
+                    const quantumEnabled = document.getElementById('quantumMouse').checked; 
+                    const holographicEnabled = document.getElementById('holographicMouse').checked;
+                    
+                    if (!facetedEnabled && !quantumEnabled && !holographicEnabled) {
+                        window.reactivityManager.toggleMouse(false);
+                        console.log('  🖱️ All mouse reactivity disabled');
+                    }
+                }
+            } else if (interaction === 'click') {
+                // Set click mode based on system
+                if (enabled) {
+                    if (system === 'faceted') {
+                        window.reactivityManager.setClickMode('flash'); // Color flash
+                        console.log('  🔷 Activating Faceted color flash clicks');
+                    } else if (system === 'quantum') {
+                        window.reactivityManager.setClickMode('burst'); // Multi-parameter burst
+                        console.log('  🌌 Activating Quantum dramatic burst clicks');
+                    } else if (system === 'holographic') {
+                        window.reactivityManager.setClickMode('burst'); // Color burst (same as quantum)
+                        console.log('  ✨ Activating Holographic color burst clicks');
+                    }
+                    window.reactivityManager.toggleClick(true);
+                } else {
+                    // Check if any other click modes are enabled
+                    const facetedEnabled = document.getElementById('facetedClick').checked;
+                    const quantumEnabled = document.getElementById('quantumClick').checked;
+                    const holographicEnabled = document.getElementById('holographicClick').checked;
+                    
+                    if (!facetedEnabled && !quantumEnabled && !holographicEnabled) {
+                        window.reactivityManager.toggleClick(false);
+                        console.log('  👆 All click reactivity disabled');
+                    }
+                }
+            } else if (interaction === 'scroll') {
+                // Set scroll mode based on system
+                if (enabled) {
+                    if (system === 'faceted') {
+                        window.reactivityManager.setScrollMode('density'); // Density + hue changes
+                        console.log('  🔷 Activating Faceted density scroll effects');
+                    } else if (system === 'quantum') {
+                        window.reactivityManager.setScrollMode('cycles'); // Parameter cycling
+                        console.log('  🌌 Activating Quantum parameter cycling scroll');
+                    } else if (system === 'holographic') {
+                        window.reactivityManager.setScrollMode('flow'); // Smooth parameter flow
+                        console.log('  ✨ Activating Holographic flow scroll effects');
+                    }
+                    window.reactivityManager.toggleScroll(true);
+                } else {
+                    // Check if any other scroll modes are enabled
+                    const facetedEnabled = document.getElementById('facetedScroll').checked;
+                    const quantumEnabled = document.getElementById('quantumScroll').checked;
+                    const holographicEnabled = document.getElementById('holographicScroll').checked;
+                    
+                    if (!facetedEnabled && !quantumEnabled && !holographicEnabled) {
+                        window.reactivityManager.toggleScroll(false);
+                        console.log('  🌀 All scroll reactivity disabled');
+                    }
+                }
             }
         }
         

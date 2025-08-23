@@ -15,6 +15,9 @@ export class QuantumEngine {
         this.parameters = new ParameterManager();
         this.isActive = false;
         
+        // Conditional reactivity: Use built-in only if ReactivityManager not active
+        this.useBuiltInReactivity = !window.reactivityManager;
+        
         // Gesture velocity reactivity system for Quantum
         this.lastMousePosition = { x: 0.5, y: 0.5 };
         this.mouseVelocity = { x: 0, y: 0 };
@@ -138,6 +141,11 @@ export class QuantumEngine {
      * Setup enhanced multi-parameter reactivity for Quantum system
      */
     setupGestureVelocityReactivity() {
+        if (!this.useBuiltInReactivity) {
+            console.log('🌌 Quantum built-in reactivity DISABLED - ReactivityManager active');
+            return;
+        }
+        
         console.log('🌌 Setting up Quantum: velocity + click + scroll + multi-parameter reactivity');
         
         // Enhanced state for smooth effects
