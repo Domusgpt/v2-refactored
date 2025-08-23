@@ -230,41 +230,67 @@ export class VIB34DIntegratedEngine {
         // Y position controls ZW plane  
         const rot4dZW = (y - 0.5) * rotationRange;
         
+        // SUBTLE MOUSE HUE CHANGES (fluid, not extreme)
+        if (!this.mouseHue) this.mouseHue = this.scrollHue || 200; // Use current scroll hue or default
+        
+        // Gentle hue shifts based on mouse position (subtle)
+        const hueOffset = (x - 0.5) * 30; // ±15 degree gentle shift
+        const mouseHue = (this.mouseHue + hueOffset) % 360;
+        
         // Update parameters through the global parameter system
         if (window.updateParameter) {
             window.updateParameter('rot4dXW', rot4dXW.toFixed(2));
             window.updateParameter('rot4dYW', rot4dYW.toFixed(2));
             window.updateParameter('rot4dZW', rot4dZW.toFixed(2));
+            window.updateParameter('hue', Math.round(mouseHue)); // Gentle hue changes
         }
         
-        console.log(`🔷 4D Rotations: XW=${rot4dXW.toFixed(2)}, YW=${rot4dYW.toFixed(2)}, ZW=${rot4dZW.toFixed(2)}`);
+        console.log(`🔷 Smooth 4D + Hue: XW=${rot4dXW.toFixed(2)}, ZW=${rot4dZW.toFixed(2)}, Hue=${Math.round(mouseHue)}`);
     }
     
     triggerColorFlash() {
-        // Trigger color flash: dip then boost
+        // DRAMATIC BUT FLUID CLICK EFFECT
         this.colorFlashIntensity = 1.0; // Start at full flash
-        console.log('💥 Faceted color flash triggered');
+        
+        // Additional dramatic parameters that decay back
+        this.clickChaosBoost = 0.8; // Temporary chaos boost
+        this.clickSpeedBoost = 1.5; // Temporary speed boost
+        
+        console.log('💥 Faceted dramatic click: color flash + chaos + speed boost');
     }
     
     updateScrollDensity(deltaY) {
-        // Invisible scroll affects grid density
-        const scrollSpeed = 0.5;
+        // ENHANCED SCROLL: More reactive with hue changes + density
+        const scrollSpeed = 0.8; // More reactive
         const scrollDirection = deltaY > 0 ? 1 : -1;
         
+        // Update density
         this.scrollDensity += scrollDirection * scrollSpeed;
         this.scrollDensity = Math.max(5, Math.min(100, this.scrollDensity)); // Clamp 5-100
         
-        // Update parameter
+        // FLUID HUE CYCLING with scroll
+        if (!this.scrollHue) this.scrollHue = 200; // Base blue hue for faceted
+        const hueSpeed = 3; // Smooth hue changes
+        this.scrollHue += scrollDirection * hueSpeed;
+        this.scrollHue = ((this.scrollHue % 360) + 360) % 360; // Keep 0-360 range
+        
+        // Update parameters smoothly
         if (window.updateParameter) {
             window.updateParameter('gridDensity', Math.round(this.scrollDensity));
+            window.updateParameter('hue', Math.round(this.scrollHue));
         }
         
-        console.log(`🌀 Scroll density: ${Math.round(this.scrollDensity)}`);
+        console.log(`🌀 Smooth scroll: Density=${Math.round(this.scrollDensity)}, Hue=${Math.round(this.scrollHue)}`);
     }
     
     startColorFlashLoop() {
         const flashAnimation = () => {
+            // ENHANCED DRAMATIC FLASH EFFECT (multiple parameters)
+            let hasActiveEffects = false;
+            
             if (this.colorFlashIntensity > 0.01) {
+                hasActiveEffects = true;
+                
                 // Create flash effect: dip saturation/intensity then boost
                 const flashPhase = this.colorFlashIntensity;
                 
@@ -291,14 +317,44 @@ export class VIB34DIntegratedEngine {
                 const flashSaturation = Math.max(0.1, Math.min(1.0, baseSaturation * saturationMultiplier));
                 const flashIntensity = Math.max(0.1, Math.min(1.0, baseIntensity * intensityMultiplier));
                 
-                // Update parameters
+                // Update color parameters
                 if (window.updateParameter) {
                     window.updateParameter('saturation', flashSaturation.toFixed(2));
                     window.updateParameter('intensity', flashIntensity.toFixed(2));
                 }
                 
-                // Decay flash
-                this.colorFlashIntensity *= this.flashDecay;
+                // Smooth decay
+                this.colorFlashIntensity *= 0.94; // Slightly slower decay for smoother effect
+            }
+            
+            // DRAMATIC CHAOS BOOST EFFECT (fluid decay)
+            if (this.clickChaosBoost > 0.01) {
+                hasActiveEffects = true;
+                
+                const baseChaos = 0.2; // Default chaos
+                const currentChaos = baseChaos + this.clickChaosBoost;
+                
+                if (window.updateParameter) {
+                    window.updateParameter('chaos', currentChaos.toFixed(2));
+                }
+                
+                // Smooth decay
+                this.clickChaosBoost *= 0.92;
+            }
+            
+            // DRAMATIC SPEED BOOST EFFECT (fluid decay)
+            if (this.clickSpeedBoost > 0.01) {
+                hasActiveEffects = true;
+                
+                const baseSpeed = 1.0; // Default speed
+                const currentSpeed = baseSpeed + this.clickSpeedBoost;
+                
+                if (window.updateParameter) {
+                    window.updateParameter('speed', currentSpeed.toFixed(2));
+                }
+                
+                // Smooth decay
+                this.clickSpeedBoost *= 0.91;
             }
             
             if (this.isActive) {

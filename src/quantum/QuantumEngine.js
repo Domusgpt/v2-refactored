@@ -255,9 +255,15 @@ export class QuantumEngine {
     }
     
     triggerQuantumClick() {
-        // Trigger quantum flash effect - affects saturation/morph
+        // DRAMATIC QUANTUM ENERGY BURST (multi-parameter)
         this.clickFlashIntensity = 1.0;
-        console.log('💥 Quantum click flash triggered');
+        
+        // Additional dramatic quantum effects that decay back
+        this.quantumChaosBlast = 0.7; // Chaos energy burst
+        this.quantumSpeedWave = 2.0; // Speed wave effect  
+        this.quantumHueShift = 60; // Color explosion shift
+        
+        console.log('💥 Quantum energy burst: flash + chaos + speed + hue explosion');
     }
     
     updateQuantumScroll(deltaY) {
@@ -278,8 +284,12 @@ export class QuantumEngine {
     
     startQuantumEffectLoops() {
         const quantumEffects = () => {
-            // Click flash effect animation
+            let hasActiveEffects = false;
+            
+            // QUANTUM FLASH EFFECT (saturation + morph)
             if (this.clickFlashIntensity > 0.01) {
+                hasActiveEffects = true;
+                
                 // Flash affects saturation - quantum shimmer effect
                 const flashSaturation = 0.9 + (this.clickFlashIntensity * 0.1); // 0.9-1.0 boost
                 const flashMorph = this.scrollMorph + (this.clickFlashIntensity * 0.5); // Morph boost
@@ -289,8 +299,53 @@ export class QuantumEngine {
                     window.updateParameter('morphFactor', flashMorph.toFixed(2));
                 }
                 
-                // Decay flash
-                this.clickFlashIntensity *= 0.92;
+                // Smooth decay
+                this.clickFlashIntensity *= 0.91;
+            }
+            
+            // DRAMATIC CHAOS BLAST EFFECT (fluid decay)
+            if (this.quantumChaosBlast > 0.01) {
+                hasActiveEffects = true;
+                
+                const baseChaos = 0.3; // Quantum default chaos
+                const currentChaos = baseChaos + this.quantumChaosBlast;
+                
+                if (window.updateParameter) {
+                    window.updateParameter('chaos', Math.min(1.0, currentChaos).toFixed(2));
+                }
+                
+                // Smooth decay
+                this.quantumChaosBlast *= 0.88; // Slightly faster than faceted for quantum energy feel
+            }
+            
+            // DRAMATIC SPEED WAVE EFFECT (fluid decay)  
+            if (this.quantumSpeedWave > 0.01) {
+                hasActiveEffects = true;
+                
+                const baseSpeed = 1.0; // Quantum default speed
+                const currentSpeed = baseSpeed + this.quantumSpeedWave;
+                
+                if (window.updateParameter) {
+                    window.updateParameter('speed', Math.min(3.0, currentSpeed).toFixed(2));
+                }
+                
+                // Smooth wave decay
+                this.quantumSpeedWave *= 0.89;
+            }
+            
+            // QUANTUM HUE EXPLOSION EFFECT (fluid decay)
+            if (this.quantumHueShift > 1) {
+                hasActiveEffects = true;
+                
+                const baseHue = 280; // Quantum purple-blue
+                const currentHue = (baseHue + this.quantumHueShift) % 360;
+                
+                if (window.updateParameter) {
+                    window.updateParameter('hue', Math.round(currentHue));
+                }
+                
+                // Smooth color return
+                this.quantumHueShift *= 0.90;
             }
             
             if (this.isActive) {
