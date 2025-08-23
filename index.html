@@ -405,6 +405,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             min-height: 40px;
+            user-select: none;
+            position: relative;
         }
         
         .audio-cell:hover {
@@ -777,48 +779,48 @@
                 
                 <!-- Low Sensitivity Row -->
                 <div class="audio-label">🔉 LOW</div>
-                <label class="audio-cell">
-                    <input type="checkbox" id="lowColor" onchange="toggleAudioReactivity('low', 'color', this.checked)">
+                <div class="audio-cell" onclick="toggleAudioCell('lowColor')">
+                    <input type="checkbox" id="lowColor">
                     <span class="cell-text">Subtle</span>
-                </label>
-                <label class="audio-cell">
-                    <input type="checkbox" id="lowGeometry" onchange="toggleAudioReactivity('low', 'geometry', this.checked)">
+                </div>
+                <div class="audio-cell" onclick="toggleAudioCell('lowGeometry')">
+                    <input type="checkbox" id="lowGeometry">
                     <span class="cell-text">Gentle</span>
-                </label>
-                <label class="audio-cell">
-                    <input type="checkbox" id="lowMovement" onchange="toggleAudioReactivity('low', 'movement', this.checked)">
+                </div>
+                <div class="audio-cell" onclick="toggleAudioCell('lowMovement')">
+                    <input type="checkbox" id="lowMovement">
                     <span class="cell-text">Smooth</span>
-                </label>
+                </div>
                 
                 <!-- Medium Sensitivity Row -->
                 <div class="audio-label">🔊 MEDIUM</div>
-                <label class="audio-cell">
-                    <input type="checkbox" id="mediumColor" checked onchange="toggleAudioReactivity('medium', 'color', this.checked)">
+                <div class="audio-cell" onclick="toggleAudioCell('mediumColor')">
+                    <input type="checkbox" id="mediumColor" checked>
                     <span class="cell-text">Dynamic</span>
-                </label>
-                <label class="audio-cell">
-                    <input type="checkbox" id="mediumGeometry" onchange="toggleAudioReactivity('medium', 'geometry', this.checked)">
+                </div>
+                <div class="audio-cell" onclick="toggleAudioCell('mediumGeometry')">
+                    <input type="checkbox" id="mediumGeometry">
                     <span class="cell-text">Morphing</span>
-                </label>
-                <label class="audio-cell">
-                    <input type="checkbox" id="mediumMovement" onchange="toggleAudioReactivity('medium', 'movement', this.checked)">
+                </div>
+                <div class="audio-cell" onclick="toggleAudioCell('mediumMovement')">
+                    <input type="checkbox" id="mediumMovement">
                     <span class="cell-text">Flowing</span>
-                </label>
+                </div>
                 
                 <!-- High Sensitivity Row -->
                 <div class="audio-label">🔊🔊 HIGH</div>
-                <label class="audio-cell">
-                    <input type="checkbox" id="highColor" onchange="toggleAudioReactivity('high', 'color', this.checked)">
+                <div class="audio-cell" onclick="toggleAudioCell('highColor')">
+                    <input type="checkbox" id="highColor">
                     <span class="cell-text">Intense</span>
-                </label>
-                <label class="audio-cell">
-                    <input type="checkbox" id="highGeometry" onchange="toggleAudioReactivity('high', 'geometry', this.checked)">
+                </div>
+                <div class="audio-cell" onclick="toggleAudioCell('highGeometry')">
+                    <input type="checkbox" id="highGeometry">
                     <span class="cell-text">Explosive</span>
-                </label>
-                <label class="audio-cell">
-                    <input type="checkbox" id="highMovement" onchange="toggleAudioReactivity('high', 'movement', this.checked)">
+                </div>
+                <div class="audio-cell" onclick="toggleAudioCell('highMovement')">
+                    <input type="checkbox" id="highMovement">
                     <span class="cell-text">Chaotic</span>
-                </label>
+                </div>
             </div>
             
             <div class="audio-note">
@@ -2155,6 +2157,24 @@
                     overlay.parentNode.removeChild(overlay);
                 }
             }, 4000);
+        }
+        
+        // Helper function for audio cell clicks (makes the checkboxes more clickable)
+        window.toggleAudioCell = function(cellId) {
+            const checkbox = document.getElementById(cellId);
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                
+                // Parse the cell ID to get sensitivity and visual mode
+                const sensitivity = cellId.replace(/Color|Geometry|Movement/, '').toLowerCase();
+                let visualMode = '';
+                if (cellId.includes('Color')) visualMode = 'color';
+                else if (cellId.includes('Geometry')) visualMode = 'geometry';
+                else if (cellId.includes('Movement')) visualMode = 'movement';
+                
+                // Call the main toggle function
+                toggleAudioReactivity(sensitivity, visualMode, checkbox.checked);
+            }
         }
         
         // Helper function to update UI sliders when LLM sets parameters
