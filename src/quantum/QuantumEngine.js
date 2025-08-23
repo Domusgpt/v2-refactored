@@ -393,58 +393,6 @@ export class QuantumEngine {
         }
     }
     
-    updateAudioReactivity() {
-        if (!this.audioEnabled || !this.analyser || !this.frequencyData) return;
-        
-        // Get frequency data
-        this.analyser.getByteFrequencyData(this.frequencyData);
-        
-        // Analyze frequency bands
-        const lowEnd = Math.floor(this.frequencyData.length * 0.1);   // Bass: 0-10%
-        const midEnd = Math.floor(this.frequencyData.length * 0.4);   // Mid: 10-40% 
-        const highEnd = Math.floor(this.frequencyData.length * 0.8);  // High: 40-80%
-        
-        // Calculate band averages (0-255 range)
-        let bassSum = 0, midSum = 0, highSum = 0;
-        
-        for (let i = 0; i < lowEnd; i++) bassSum += this.frequencyData[i];
-        for (let i = lowEnd; i < midEnd; i++) midSum += this.frequencyData[i];
-        for (let i = midEnd; i < highEnd; i++) highSum += this.frequencyData[i];
-        
-        const bassLevel = bassSum / lowEnd / 255;           // Normalize 0-1
-        const midLevel = midSum / (midEnd - lowEnd) / 255;  // Normalize 0-1  
-        const highLevel = highSum / (highEnd - midEnd) / 255; // Normalize 0-1
-        
-        // Map frequency bands to parameters
-        this.updateAudioParameters(bassLevel, midLevel, highLevel);
-    }
-    
-    updateAudioParameters(bass, mid, high) {
-        // Hue modulation: Mid frequencies control hue shifts  
-        const hueShift = mid * 120; // 0-120 degree shift
-        const newHue = (this.baseHue + hueShift) % 360;
-        
-        // MorphFactor modulation: High frequencies control morphing
-        const morphBoost = high * 1.0; // 0-1.0 boost
-        const newMorphFactor = this.baseMorphFactor + morphBoost;
-        
-        // Apply through parameter system
-        if (window.updateParameter) {
-            window.updateParameter('hue', Math.round(newHue));
-            window.updateParameter('morphFactor', newMorphFactor.toFixed(2));
-        }
-        
-        // Optional: Bass affects intensity for extra visual punch
-        if (bass > 0.3) {
-            const intensityBoost = 0.7 + (bass * 0.3); // Base 0.7, boost to 1.0
-            if (window.updateParameter) {
-                window.updateParameter('intensity', intensityBoost.toFixed(2));
-            }
-        }
-        
-        console.log(`🌌 Audio: Bass=${bass.toFixed(2)}, Mid=${mid.toFixed(2)}, High=${high.toFixed(2)} → Hue=${Math.round(newHue)}, Morph=${newMorphFactor.toFixed(2)}`);
-    }
-    
     /**
      * Update parameter across all quantum visualizers with enhanced integration
      */
