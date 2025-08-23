@@ -1,0 +1,167 @@
+# Page snapshot
+
+```yaml
+- generic [active]:
+  - generic [ref=e1]:
+    - generic [ref=e2]: VIB34D ENGINE
+    - generic [ref=e3]:
+      - button "🔷 Faceted" [ref=e4] [cursor=pointer]
+      - button "🌌 Quantum" [ref=e5] [cursor=pointer]
+      - button "✨ Holographic" [ref=e6] [cursor=pointer]
+      - button "🔮 Polychora" [ref=e7] [cursor=pointer]
+    - generic [ref=e8]:
+      - button "🖼️" [ref=e9] [cursor=pointer]
+      - button "🎵" [ref=e10] [cursor=pointer]
+      - button "🤖" [ref=e11] [cursor=pointer]
+      - button "I" [ref=e12] [cursor=pointer]
+  - generic [ref=e19]:
+    - generic [ref=e20]: FACETED SYSTEM
+    - generic [ref=e21]:
+      - generic [ref=e22]: GEOMETRY
+      - generic [ref=e23]:
+        - button "TETRAHEDRON" [ref=e24] [cursor=pointer]
+        - button "HYPERCUBE" [ref=e25] [cursor=pointer]
+        - button "SPHERE" [ref=e26] [cursor=pointer]
+        - button "TORUS" [ref=e27] [cursor=pointer]
+        - button "KLEIN BOTTLE" [ref=e28] [cursor=pointer]
+        - button "FRACTAL" [ref=e29] [cursor=pointer]
+        - button "WAVE" [ref=e30] [cursor=pointer]
+        - button "CRYSTAL" [ref=e31] [cursor=pointer]
+    - generic [ref=e32]:
+      - generic [ref=e33]: 4D ROTATION
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - generic [ref=e36]: XW Plane
+          - generic [ref=e37]: "0.00"
+        - slider [ref=e38]: "0"
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - generic [ref=e41]: YW Plane
+          - generic [ref=e42]: "0.00"
+        - slider [ref=e43]: "0"
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - generic [ref=e46]: ZW Plane
+          - generic [ref=e47]: "0.00"
+        - slider [ref=e48]: "0"
+    - generic [ref=e49]:
+      - generic [ref=e50]: VISUAL
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]: Density
+          - generic [ref=e54]: "15"
+        - slider [ref=e55]: "15"
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]: Morph
+          - generic [ref=e59]: "1.0"
+        - slider [ref=e60]: "1"
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - generic [ref=e63]: Chaos
+          - generic [ref=e64]: "0.2"
+        - slider [ref=e65]: "0.2"
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - generic [ref=e68]: Speed
+          - generic [ref=e69]: "1.0"
+        - slider [ref=e70]: "1"
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]: Hue
+          - generic [ref=e74]: 200°
+        - slider [ref=e75]: "200"
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]: Intensity
+          - generic [ref=e79]: "0.5"
+        - slider [ref=e80]: "0.5"
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - generic [ref=e83]: Saturation
+          - generic [ref=e84]: "0.8"
+        - slider [ref=e85]: "0.8"
+    - generic [ref=e86]:
+      - generic [ref=e87]: MODULAR REACTIVITY
+      - generic [ref=e88]:
+        - generic [ref=e90]: 🖱️ MOUSE
+        - generic [ref=e91]: 👆 CLICK
+        - generic [ref=e92]: 🌀 SCROLL
+        - generic [ref=e93]: 🔷 FACETED
+        - generic [ref=e94] [cursor=pointer]:
+          - checkbox "Rotations" [checked] [ref=e95] [cursor=pointer]
+          - generic [ref=e96] [cursor=pointer]: Rotations
+        - generic [ref=e97] [cursor=pointer]:
+          - checkbox "Flash" [checked] [ref=e98] [cursor=pointer]
+          - generic [ref=e99] [cursor=pointer]: Flash
+        - generic [ref=e100] [cursor=pointer]:
+          - checkbox "Density" [checked] [ref=e101] [cursor=pointer]
+          - generic [ref=e102] [cursor=pointer]: Density
+        - generic [ref=e103]: 🌌 QUANTUM
+        - generic [ref=e104] [cursor=pointer]:
+          - checkbox "Velocity" [ref=e105] [cursor=pointer]
+          - generic [ref=e106] [cursor=pointer]: Velocity
+        - generic [ref=e107] [cursor=pointer]:
+          - checkbox "Burst" [ref=e108] [cursor=pointer]
+          - generic [ref=e109] [cursor=pointer]: Burst
+        - generic [ref=e110] [cursor=pointer]:
+          - checkbox "Cycles" [ref=e111] [cursor=pointer]
+          - generic [ref=e112] [cursor=pointer]: Cycles
+        - generic [ref=e113]: ✨ HOLOGRAPHIC
+        - generic [ref=e114] [cursor=pointer]:
+          - checkbox "Shimmer" [ref=e115] [cursor=pointer]
+          - generic [ref=e116] [cursor=pointer]: Shimmer
+        - generic [ref=e117] [cursor=pointer]:
+          - checkbox "Burst" [ref=e118] [cursor=pointer]
+          - generic [ref=e119] [cursor=pointer]: Burst
+        - generic [ref=e120] [cursor=pointer]:
+          - checkbox "Flow" [ref=e121] [cursor=pointer]
+          - generic [ref=e122] [cursor=pointer]: Flow
+      - generic [ref=e123]: 📝 Mix and match any system's behavior with any interaction type
+    - generic [ref=e124]:
+      - generic [ref=e125]: AUDIO REACTIVITY
+      - generic [ref=e126]:
+        - generic [ref=e128]: 🎨 COLOR
+        - generic [ref=e129]: 📐 GEOMETRY
+        - generic [ref=e130]: 🌊 MOVEMENT
+        - generic [ref=e131]: 🔉 LOW
+        - generic [ref=e132] [cursor=pointer]:
+          - checkbox [ref=e133] [cursor=pointer]
+          - generic [ref=e134] [cursor=pointer]: Subtle
+        - generic [ref=e135] [cursor=pointer]:
+          - checkbox [ref=e136] [cursor=pointer]
+          - generic [ref=e137] [cursor=pointer]: Gentle
+        - generic [ref=e138] [cursor=pointer]:
+          - checkbox [ref=e139] [cursor=pointer]
+          - generic [ref=e140] [cursor=pointer]: Smooth
+        - generic [ref=e141]: 🔊 MEDIUM
+        - generic [ref=e142] [cursor=pointer]:
+          - checkbox [checked] [ref=e143] [cursor=pointer]
+          - generic [ref=e144] [cursor=pointer]: Dynamic
+        - generic [ref=e145] [cursor=pointer]:
+          - checkbox [ref=e146] [cursor=pointer]
+          - generic [ref=e147] [cursor=pointer]: Morphing
+        - generic [ref=e148] [cursor=pointer]:
+          - checkbox [ref=e149] [cursor=pointer]
+          - generic [ref=e150] [cursor=pointer]: Flowing
+        - generic [ref=e151]: 🔊🔊 HIGH
+        - generic [ref=e152] [cursor=pointer]:
+          - checkbox [ref=e153] [cursor=pointer]
+          - generic [ref=e154] [cursor=pointer]: Intense
+        - generic [ref=e155] [cursor=pointer]:
+          - checkbox [ref=e156] [cursor=pointer]
+          - generic [ref=e157] [cursor=pointer]: Explosive
+        - generic [ref=e158] [cursor=pointer]:
+          - checkbox [ref=e159] [cursor=pointer]
+          - generic [ref=e160] [cursor=pointer]: Chaotic
+      - generic [ref=e161]: 🎵 Audio sensitivity and visual response intensity controls
+    - generic [ref=e162]:
+      - button "🎲 Random" [ref=e163] [cursor=pointer]
+      - button "🌀 Full" [ref=e164] [cursor=pointer]
+    - generic [ref=e165]:
+      - button "🔄 Reset" [ref=e166] [cursor=pointer]
+      - button "💾 Save to Gallery" [ref=e167] [cursor=pointer]
+    - generic [ref=e168]:
+      - button "🎴 Trading Card" [ref=e169] [cursor=pointer]
+      - button "📱 Social Card" [ref=e170] [cursor=pointer]
+```

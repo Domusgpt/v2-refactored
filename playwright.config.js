@@ -9,10 +9,10 @@ module.exports = defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:8145',
+    baseURL: 'http://localhost:8080',
     trace: 'on-first-retry',
     video: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    screenshot: 'always',
   },
 
   projects: [
@@ -23,8 +23,8 @@ module.exports = defineConfig({
   ],
 
   webServer: {
-    command: 'python3 -m http.server 8145',
-    url: 'http://localhost:8145',
+    command: 'python3 -m http.server 8080',
+    url: 'http://localhost:8080',
     reuseExistingServer: !process.env.CI,
   },
 });
