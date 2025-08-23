@@ -269,6 +269,48 @@
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
         }
         
+        /* Reactivity Toggles */
+        .reactivity-toggles {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .toggle-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .toggle-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #00ffff;
+            cursor: pointer;
+        }
+        
+        .toggle-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            transition: color 0.3s;
+        }
+        
+        .toggle-label input[type="checkbox"]:checked + .toggle-text {
+            color: #00ffff;
+        }
+        
+        .toggle-label input[type="checkbox"]:disabled + .toggle-text {
+            color: rgba(255, 255, 255, 0.4);
+            opacity: 0.6;
+        }
+        
         /* Sliders */
         .control-group {
             margin-bottom: 12px;
@@ -536,6 +578,34 @@
             </div>
         </div>
         
+        <!-- REACTIVITY SECTION -->
+        <div class="control-section">
+            <div class="section-title">REACTIVITY</div>
+            
+            <div class="reactivity-toggles">
+                <div class="toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="mouseReactivity" checked onchange="toggleMouseReactivity(this.checked)">
+                        <span class="toggle-text">🖱️ Mouse</span>
+                    </label>
+                </div>
+                
+                <div class="toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="clickReactivity" checked onchange="toggleClickReactivity(this.checked)">
+                        <span class="toggle-text">👆 Click</span>
+                    </label>
+                </div>
+                
+                <div class="toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="scrollReactivity" checked onchange="toggleScrollReactivity(this.checked)">
+                        <span class="toggle-text">🌀 Scroll</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
         <!-- ACTION BUTTONS -->
         <div class="action-row">
             <button class="panel-btn" onclick="randomizeAll()">🎲 Random</button>
@@ -684,6 +754,11 @@
                         // Update global state and UI
                         window.currentSystem = system;
                         
+                        // Update ReactivityManager with new active system
+                        if (window.reactivityManager) {
+                            window.reactivityManager.setActiveSystem(system, newEngine);
+                        }
+                        
                         // Update UI buttons
                         document.querySelectorAll('.system-btn').forEach(btn => {
                             btn.classList.toggle('active', btn.dataset.system === system);
@@ -744,7 +819,8 @@
         import { ParameterMapper } from './src/core/ParameterMapper.js';
         import { CanvasManager } from './src/core/CanvasManager.js';
         import { TradingCardGenerator } from './src/export/TradingCardGenerator.js';
-        // Universal reactivity system removed - implementing clean system-specific interactions
+        import { ReactivityManager } from './src/core/ReactivityManager.js';
+        // Universal reactivity system removed - implementing modular reactivity system
         
         // Global state - CRITICAL FIX: Check for gallery preview data FIRST
         let currentSystem = window.galleryPreviewData ? window.galleryPreviewData.system : 'faceted';
@@ -760,6 +836,7 @@
         let unifiedSaveManager = null;
         let parameterMapper = null;
         let savedVariationsCount = 0;
+        let reactivityManager = null;
         
         // Geometry configurations
         const geometries = {
@@ -795,7 +872,22 @@
             window.initializePolychora = initializePolychora;
             window.updateParameter = updateParameter;
             
-            console.log('🚀 VIB34D Clean Interface Ready - All systems initialized');
+            // Initialize ReactivityManager
+            reactivityManager = new ReactivityManager();
+            window.reactivityManager = reactivityManager;
+            
+            // Connect ReactivityManager to global interactivity toggle
+            if (window.toggleInteractivity) {
+                const originalToggle = window.toggleInteractivity;
+                window.toggleInteractivity = function(enabled) {
+                    originalToggle(enabled);
+                    if (reactivityManager) {
+                        reactivityManager.setEnabled(enabled);
+                    }
+                };
+            }
+            
+            console.log('🚀 VIB34D Clean Interface Ready - All systems + modular reactivity initialized');
         });
         
         // URL parameters already parsed outside the ES6 module
@@ -1639,6 +1731,28 @@
             
             // Show status overlay
             showInteractivityStatus();
+        }
+        
+        // ReactivityManager toggle functions (accessible from HTML)
+        window.toggleMouseReactivity = function(enabled) {
+            if (window.reactivityManager) {
+                window.reactivityManager.toggleMouse(enabled);
+                console.log(`🖱️ Mouse reactivity: ${enabled ? 'ON' : 'OFF'}`);
+            }
+        }
+        
+        window.toggleClickReactivity = function(enabled) {
+            if (window.reactivityManager) {
+                window.reactivityManager.toggleClick(enabled);
+                console.log(`👆 Click reactivity: ${enabled ? 'ON' : 'OFF'}`);
+            }
+        }
+        
+        window.toggleScrollReactivity = function(enabled) {
+            if (window.reactivityManager) {
+                window.reactivityManager.toggleScroll(enabled);
+                console.log(`🌀 Scroll reactivity: ${enabled ? 'ON' : 'OFF'}`);
+            }
         }
         
         // Helper function to update UI sliders when LLM sets parameters
