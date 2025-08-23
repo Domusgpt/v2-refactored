@@ -269,41 +269,48 @@
             box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
         }
         
-        /* 3×3 Modular Reactivity Grid */
+        /* 3×3 Modular Reactivity Grid - FIXED WIDTH FOR NO HORIZONTAL SCROLL */
         .reactivity-grid {
             display: grid;
-            grid-template-columns: 80px 1fr 1fr 1fr;
+            grid-template-columns: 65px 1fr 1fr 1fr;
             grid-template-rows: auto auto auto auto;
-            gap: 4px;
-            margin: 10px 0;
+            gap: 3px;
+            margin: 8px 0;
             border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 8px;
+            border-radius: 6px;
+            padding: 6px;
             background: rgba(0, 20, 40, 0.3);
+            max-width: 100%;
+            overflow: hidden;
         }
         
         .reactivity-header {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: bold;
             color: #00ffff;
             text-align: center;
-            padding: 4px;
+            padding: 2px;
             background: rgba(0, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 3px;
             border: 1px solid rgba(0, 255, 255, 0.2);
+            line-height: 1.2;
+            overflow: hidden;
+            white-space: nowrap;
         }
         
         .reactivity-label {
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-weight: bold;
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 4px;
+            padding: 2px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
+            border-radius: 3px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.1;
+            text-align: center;
         }
         
         .reactivity-cell {
@@ -311,12 +318,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            padding: 6px;
+            gap: 1px;
+            padding: 3px;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 3px;
             cursor: pointer;
+            min-height: 32px;
             transition: all 0.3s ease;
             min-height: 40px;
         }
@@ -335,11 +343,13 @@
         }
         
         .cell-text {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.55rem;
             text-align: center;
             transition: color 0.3s;
-            line-height: 1;
+            line-height: 1.1;
+            font-weight: 500;
+            white-space: nowrap;
         }
         
         .reactivity-cell input[type="checkbox"]:checked + .cell-text {
@@ -355,41 +365,48 @@
             font-style: italic;
         }
         
-        /* 3×3 Audio Reactivity Grid (similar to reactivity grid) */
+        /* 3×3 Audio Reactivity Grid - FIXED WIDTH FOR NO HORIZONTAL SCROLL */
         .audio-grid {
             display: grid;
-            grid-template-columns: 80px 1fr 1fr 1fr;
+            grid-template-columns: 65px 1fr 1fr 1fr;
             grid-template-rows: auto auto auto auto;
-            gap: 4px;
-            margin: 10px 0;
+            gap: 3px;
+            margin: 8px 0;
             border: 1px solid rgba(255, 100, 255, 0.3); /* Purple theme for audio */
-            border-radius: 8px;
-            padding: 8px;
+            border-radius: 6px;
+            padding: 6px;
             background: rgba(40, 0, 40, 0.3);
+            max-width: 100%;
+            overflow: hidden;
         }
         
         .audio-header {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: bold;
             color: #ff64ff;
             text-align: center;
-            padding: 4px;
+            padding: 2px;
             background: rgba(255, 100, 255, 0.15);
-            border-radius: 4px;
+            border-radius: 3px;
             border: 1px solid rgba(255, 100, 255, 0.3);
+            line-height: 1.2;
+            overflow: hidden;
+            white-space: nowrap;
         }
         
         .audio-label {
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-weight: bold;
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 4px;
+            padding: 2px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
+            border-radius: 3px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.1;
+            text-align: center;
         }
         
         .audio-cell {
@@ -397,8 +414,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            padding: 6px;
+            gap: 1px;
+            padding: 3px;
+            min-height: 32px;
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 100, 255, 0.1);
             border-radius: 4px;
@@ -710,15 +728,15 @@
             <div class="reactivity-grid">
                 <!-- Header Row -->
                 <div class="reactivity-header"></div>
-                <div class="reactivity-header">🖱️ MOUSE</div>
-                <div class="reactivity-header">👆 CLICK</div>
-                <div class="reactivity-header">🌀 SCROLL</div>
+                <div class="reactivity-header">🖱️ MOVE</div>
+                <div class="reactivity-header">👆 TAP</div>
+                <div class="reactivity-header">🌀 ROLL</div>
                 
                 <!-- Faceted Row -->
-                <div class="reactivity-label">🔷 FACETED</div>
+                <div class="reactivity-label">🔷 FAC</div>
                 <label class="reactivity-cell">
                     <input type="checkbox" id="facetedMouse" checked onchange="toggleSystemReactivity('faceted', 'mouse', this.checked)">
-                    <span class="cell-text">Rotations</span>
+                    <span class="cell-text">Rotate</span>
                 </label>
                 <label class="reactivity-cell">
                     <input type="checkbox" id="facetedClick" checked onchange="toggleSystemReactivity('faceted', 'click', this.checked)">
@@ -730,10 +748,10 @@
                 </label>
                 
                 <!-- Quantum Row -->
-                <div class="reactivity-label">🌌 QUANTUM</div>
+                <div class="reactivity-label">🌌 QUA</div>
                 <label class="reactivity-cell">
                     <input type="checkbox" id="quantumMouse" onchange="toggleSystemReactivity('quantum', 'mouse', this.checked)">
-                    <span class="cell-text">Velocity</span>
+                    <span class="cell-text">Speed</span>
                 </label>
                 <label class="reactivity-cell">
                     <input type="checkbox" id="quantumClick" onchange="toggleSystemReactivity('quantum', 'click', this.checked)">
@@ -745,10 +763,10 @@
                 </label>
                 
                 <!-- Holographic Row -->
-                <div class="reactivity-label">✨ HOLOGRAPHIC</div>
+                <div class="reactivity-label">✨ HOLO</div>
                 <label class="reactivity-cell">
                     <input type="checkbox" id="holographicMouse" onchange="toggleSystemReactivity('holographic', 'mouse', this.checked)">
-                    <span class="cell-text">Shimmer</span>
+                    <span class="cell-text">Shine</span>
                 </label>
                 <label class="reactivity-cell">
                     <input type="checkbox" id="holographicClick" onchange="toggleSystemReactivity('holographic', 'click', this.checked)">
@@ -771,12 +789,12 @@
             <div class="audio-grid">
                 <!-- Header Row -->
                 <div class="audio-header"></div>
-                <div class="audio-header">🎨 COLOR</div>
-                <div class="audio-header">📐 GEOMETRY</div>
-                <div class="audio-header">🌊 MOVEMENT</div>
+                <div class="audio-header">🎨 COL</div>
+                <div class="audio-header">📐 GEO</div>
+                <div class="audio-header">🌊 MOV</div>
                 
                 <!-- Low Sensitivity Row -->
-                <div class="audio-label">🔉 LOW</div>
+                <div class="audio-label">🔉 L</div>
                 <div class="audio-cell" onclick="toggleAudioCell('lowColor')">
                     <input type="checkbox" id="lowColor">
                     <span class="cell-text">Subtle</span>
@@ -791,33 +809,33 @@
                 </div>
                 
                 <!-- Medium Sensitivity Row -->
-                <div class="audio-label">🔊 MEDIUM</div>
+                <div class="audio-label">🔊 M</div>
                 <div class="audio-cell" onclick="toggleAudioCell('mediumColor')">
                     <input type="checkbox" id="mediumColor" checked>
-                    <span class="cell-text">Dynamic</span>
+                    <span class="cell-text">Adapt</span>
                 </div>
                 <div class="audio-cell" onclick="toggleAudioCell('mediumGeometry')">
                     <input type="checkbox" id="mediumGeometry">
-                    <span class="cell-text">Morphing</span>
+                    <span class="cell-text">Morph</span>
                 </div>
                 <div class="audio-cell" onclick="toggleAudioCell('mediumMovement')">
                     <input type="checkbox" id="mediumMovement">
-                    <span class="cell-text">Flowing</span>
+                    <span class="cell-text">Flow</span>
                 </div>
                 
                 <!-- High Sensitivity Row -->
-                <div class="audio-label">🔊🔊 HIGH</div>
+                <div class="audio-label">🔊🔊 H</div>
                 <div class="audio-cell" onclick="toggleAudioCell('highColor')">
                     <input type="checkbox" id="highColor">
                     <span class="cell-text">Intense</span>
                 </div>
                 <div class="audio-cell" onclick="toggleAudioCell('highGeometry')">
                     <input type="checkbox" id="highGeometry">
-                    <span class="cell-text">Explosive</span>
+                    <span class="cell-text">Blast</span>
                 </div>
                 <div class="audio-cell" onclick="toggleAudioCell('highMovement')">
                     <input type="checkbox" id="highMovement">
-                    <span class="cell-text">Chaotic</span>
+                    <span class="cell-text">Wild</span>
                 </div>
             </div>
             
