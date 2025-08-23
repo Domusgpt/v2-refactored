@@ -355,6 +355,84 @@
             font-style: italic;
         }
         
+        /* 3×3 Audio Reactivity Grid (similar to reactivity grid) */
+        .audio-grid {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr 1fr;
+            grid-template-rows: auto auto auto auto;
+            gap: 4px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 100, 255, 0.3); /* Purple theme for audio */
+            border-radius: 8px;
+            padding: 8px;
+            background: rgba(40, 0, 40, 0.3);
+        }
+        
+        .audio-header {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #ff64ff;
+            text-align: center;
+            padding: 4px;
+            background: rgba(255, 100, 255, 0.15);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 100, 255, 0.3);
+        }
+        
+        .audio-label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .audio-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 100, 255, 0.1);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 40px;
+        }
+        
+        .audio-cell:hover {
+            background: rgba(255, 100, 255, 0.15);
+            border-color: rgba(255, 100, 255, 0.4);
+        }
+        
+        .audio-cell input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: #ff64ff;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        .audio-cell input[type="checkbox"]:checked + .cell-text {
+            color: #ff64ff;
+            font-weight: bold;
+        }
+        
+        .audio-note {
+            font-size: 0.65rem;
+            color: rgba(255, 100, 255, 0.6);
+            text-align: center;
+            margin-top: 6px;
+            font-style: italic;
+        }
+        
         /* Sliders */
         .control-group {
             margin-bottom: 12px;
@@ -682,6 +760,69 @@
             
             <div class="reactivity-note">
                 📝 Mix and match any system's behavior with any interaction type
+            </div>
+        </div>
+        
+        <!-- AUDIO REACTIVITY SECTION -->
+        <div class="control-section">
+            <div class="section-title">AUDIO REACTIVITY</div>
+            
+            <!-- 3×3 Audio Grid: Sensitivity × Visual Mode -->
+            <div class="audio-grid">
+                <!-- Header Row -->
+                <div class="audio-header"></div>
+                <div class="audio-header">🎨 COLOR</div>
+                <div class="audio-header">📐 GEOMETRY</div>
+                <div class="audio-header">🌊 MOVEMENT</div>
+                
+                <!-- Low Sensitivity Row -->
+                <div class="audio-label">🔉 LOW</div>
+                <label class="audio-cell">
+                    <input type="checkbox" id="lowColor" onchange="toggleAudioReactivity('low', 'color', this.checked)">
+                    <span class="cell-text">Subtle</span>
+                </label>
+                <label class="audio-cell">
+                    <input type="checkbox" id="lowGeometry" onchange="toggleAudioReactivity('low', 'geometry', this.checked)">
+                    <span class="cell-text">Gentle</span>
+                </label>
+                <label class="audio-cell">
+                    <input type="checkbox" id="lowMovement" onchange="toggleAudioReactivity('low', 'movement', this.checked)">
+                    <span class="cell-text">Smooth</span>
+                </label>
+                
+                <!-- Medium Sensitivity Row -->
+                <div class="audio-label">🔊 MEDIUM</div>
+                <label class="audio-cell">
+                    <input type="checkbox" id="mediumColor" checked onchange="toggleAudioReactivity('medium', 'color', this.checked)">
+                    <span class="cell-text">Dynamic</span>
+                </label>
+                <label class="audio-cell">
+                    <input type="checkbox" id="mediumGeometry" onchange="toggleAudioReactivity('medium', 'geometry', this.checked)">
+                    <span class="cell-text">Morphing</span>
+                </label>
+                <label class="audio-cell">
+                    <input type="checkbox" id="mediumMovement" onchange="toggleAudioReactivity('medium', 'movement', this.checked)">
+                    <span class="cell-text">Flowing</span>
+                </label>
+                
+                <!-- High Sensitivity Row -->
+                <div class="audio-label">🔊🔊 HIGH</div>
+                <label class="audio-cell">
+                    <input type="checkbox" id="highColor" onchange="toggleAudioReactivity('high', 'color', this.checked)">
+                    <span class="cell-text">Intense</span>
+                </label>
+                <label class="audio-cell">
+                    <input type="checkbox" id="highGeometry" onchange="toggleAudioReactivity('high', 'geometry', this.checked)">
+                    <span class="cell-text">Explosive</span>
+                </label>
+                <label class="audio-cell">
+                    <input type="checkbox" id="highMovement" onchange="toggleAudioReactivity('high', 'movement', this.checked)">
+                    <span class="cell-text">Chaotic</span>
+                </label>
+            </div>
+            
+            <div class="audio-note">
+                🎵 Audio sensitivity and visual response intensity controls
             </div>
         </div>
         
@@ -1907,6 +2048,113 @@
                     }
                 }
             }
+        }
+        
+        // 3×3 Audio Reactivity Grid System (accessible from HTML)
+        window.toggleAudioReactivity = function(sensitivity, visualMode, enabled) {
+            console.log(`🎵 ${sensitivity.toUpperCase()} ${visualMode.toUpperCase()}: ${enabled ? 'ON' : 'OFF'}`);
+            
+            // Initialize audio reactivity settings if not exists
+            if (!window.audioReactivitySettings) {
+                window.audioReactivitySettings = {
+                    // Sensitivity multipliers
+                    sensitivity: {
+                        low: 0.3,    // 30% sensitivity
+                        medium: 1.0, // 100% sensitivity (default)
+                        high: 2.0    // 200% sensitivity
+                    },
+                    // Visual mode parameters
+                    visualModes: {
+                        color: ['hue', 'saturation', 'intensity'],
+                        geometry: ['morphFactor', 'gridDensity', 'chaos'],  
+                        movement: ['speed', 'rot4dXW', 'rot4dYW', 'rot4dZW']
+                    },
+                    // Active modes
+                    activeSensitivity: 'medium',
+                    activeVisualModes: new Set(['color']) // Default: medium color only
+                };
+            }
+            
+            const settings = window.audioReactivitySettings;
+            const modeKey = `${sensitivity}-${visualMode}`;
+            
+            if (enabled) {
+                // Enable this mode
+                settings.activeVisualModes.add(modeKey);
+                settings.activeSensitivity = sensitivity;
+                
+                console.log(`  🎵 Activated: ${sensitivity} sensitivity with ${visualMode} visual changes`);
+                console.log(`  📊 Sensitivity multiplier: ${settings.sensitivity[sensitivity]}x`);
+                console.log(`  🎨 Visual parameters:`, settings.visualModes[visualMode]);
+            } else {
+                // Disable this mode  
+                settings.activeVisualModes.delete(modeKey);
+                console.log(`  🎵 Deactivated: ${sensitivity} ${visualMode}`);
+            }
+            
+            // Update audio processing if any system has audio capability
+            if (window.holographicSystem && window.holographicSystem.audioEnabled) {
+                window.holographicSystem.audioReactivitySettings = settings;
+                console.log('  ✨ Updated holographic system audio settings');
+            }
+            
+            if (window.quantumEngine && window.quantumEngine.audioEnabled) {
+                window.quantumEngine.audioReactivitySettings = settings;
+                console.log('  🌌 Updated quantum system audio settings');
+            }
+            
+            // Show audio settings status
+            showAudioReactivityStatus();
+        }
+        
+        function showAudioReactivityStatus() {
+            const settings = window.audioReactivitySettings;
+            if (!settings) return;
+            
+            // Create floating overlay for audio reactivity status
+            let overlay = document.getElementById('audio-reactivity-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'audio-reactivity-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 60px;
+                    left: 20px;
+                    background: rgba(40, 0, 40, 0.9);
+                    border: 2px solid #ff64ff;
+                    padding: 15px;
+                    border-radius: 10px;
+                    color: #fff;
+                    font-family: 'Orbitron', monospace;
+                    font-size: 0.8rem;
+                    z-index: 2000;
+                    backdrop-filter: blur(10px);
+                    animation: fadeInOut 4s ease;
+                    max-width: 300px;
+                `;
+                document.body.appendChild(overlay);
+            }
+            
+            const activeModes = Array.from(settings.activeVisualModes);
+            const modesList = activeModes.length > 0 ? 
+                activeModes.map(mode => mode.replace('-', ' ')).join(', ') : 
+                'None active';
+                
+            overlay.innerHTML = `
+                <div style="color: #ff64ff; font-weight: bold; margin-bottom: 10px;">
+                    🎵 AUDIO REACTIVITY STATUS
+                </div>
+                <div>🔊 Sensitivity: <span style="color: #ff64ff">${settings.activeSensitivity.toUpperCase()}</span></div>
+                <div>🎨 Active Modes: <span style="color: #ff64ff">${modesList}</span></div>
+                <div>📊 Multiplier: <span style="color: #ff64ff">${settings.sensitivity[settings.activeSensitivity]}x</span></div>
+            `;
+            
+            // Auto-hide after 4 seconds
+            setTimeout(() => {
+                if (overlay && overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+            }, 4000);
         }
         
         // Helper function to update UI sliders when LLM sets parameters

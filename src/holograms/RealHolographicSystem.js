@@ -323,6 +323,11 @@ export class RealHolographicSystem {
         
         this.audioData = smoothedAudio;
         
+        // Apply NEW AUDIO REACTIVITY GRID SETTINGS if available
+        if (window.audioReactivitySettings) {
+            this.applyAudioReactivityGrid(smoothedAudio);
+        }
+        
         // Apply audio reactivity to all visualizers
         this.visualizers.forEach(visualizer => {
             visualizer.updateAudio(this.audioData);
@@ -351,6 +356,96 @@ export class RealHolographicSystem {
     detectMelody(midLevel, highLevel) {
         const melodicActivity = (midLevel + highLevel) / 2;
         return melodicActivity > 0.3 ? melodicActivity : 0.0;
+    }
+    
+    applyAudioReactivityGrid(audioData) {
+        const settings = window.audioReactivitySettings;
+        if (!settings || settings.activeVisualModes.size === 0) return;
+        
+        // Get sensitivity multiplier
+        const sensitivityMultiplier = settings.sensitivity[settings.activeSensitivity];
+        
+        // Apply audio changes to different visual modes
+        settings.activeVisualModes.forEach(modeKey => {
+            const [sensitivity, visualMode] = modeKey.split('-');
+            const paramList = settings.visualModes[visualMode];
+            
+            if (!paramList) return;
+            
+            // Calculate audio intensity with sensitivity
+            const audioIntensity = (audioData.energy * sensitivityMultiplier);
+            const bassIntensity = (audioData.bass * sensitivityMultiplier);
+            const rhythmIntensity = (audioData.rhythm * sensitivityMultiplier);
+            
+            paramList.forEach(param => {
+                let currentValue = 0;
+                
+                switch (param) {
+                    case 'hue':
+                        // Color: Audio-reactive hue cycling
+                        if (!this.audioHueBase) this.audioHueBase = 320;
+                        this.audioHueBase += audioIntensity * 5; // Smooth color shifts
+                        currentValue = this.audioHueBase % 360;
+                        break;
+                        
+                    case 'saturation':
+                        // Color: Beat-responsive saturation
+                        currentValue = Math.min(1.0, 0.6 + (rhythmIntensity * 0.4));
+                        break;
+                        
+                    case 'intensity':
+                        // Color: Energy-responsive brightness
+                        currentValue = Math.min(1.0, 0.4 + (audioIntensity * 0.6));
+                        break;
+                        
+                    case 'morphFactor':
+                        // Geometry: Audio-morphing shapes
+                        currentValue = Math.min(2.0, 1.0 + (bassIntensity * 1.0));
+                        break;
+                        
+                    case 'gridDensity':
+                        // Geometry: Beat-responsive density
+                        currentValue = Math.min(100, 15 + (rhythmIntensity * 50));
+                        break;
+                        
+                    case 'chaos':
+                        // Geometry: Energy-chaos correlation
+                        currentValue = Math.min(1.0, audioIntensity * 0.8);
+                        break;
+                        
+                    case 'speed':
+                        // Movement: Tempo-responsive animation
+                        currentValue = Math.min(3.0, 1.0 + (audioIntensity * 2.0));
+                        break;
+                        
+                    case 'rot4dXW':
+                        // Movement: Bass-driven rotation
+                        if (!this.audioRotationXW) this.audioRotationXW = 0;
+                        this.audioRotationXW += bassIntensity * 0.1;
+                        currentValue = this.audioRotationXW % (Math.PI * 2);
+                        break;
+                        
+                    case 'rot4dYW':
+                        // Movement: Mid-frequency rotation
+                        if (!this.audioRotationYW) this.audioRotationYW = 0;
+                        this.audioRotationYW += audioData.mid * sensitivityMultiplier * 0.08;
+                        currentValue = this.audioRotationYW % (Math.PI * 2);
+                        break;
+                        
+                    case 'rot4dZW':
+                        // Movement: High-frequency rotation  
+                        if (!this.audioRotationZW) this.audioRotationZW = 0;
+                        this.audioRotationZW += audioData.high * sensitivityMultiplier * 0.06;
+                        currentValue = this.audioRotationZW % (Math.PI * 2);
+                        break;
+                }
+                
+                // Apply the parameter change
+                if (window.updateParameter && currentValue !== undefined) {
+                    window.updateParameter(param, currentValue.toFixed(2));
+                }
+            });
+        });
     }
     
     setupCenterDistanceReactivity() {
