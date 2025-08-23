@@ -149,6 +149,13 @@ export class VIB34DIntegratedEngine {
     }
     
     setup4DRotationReactivity() {
+        console.log('🔷 Setting up Faceted: 4D rotations + click flash + scroll density');
+        
+        // Color flash animation state
+        this.colorFlashIntensity = 0;
+        this.flashDecay = 0.95;
+        this.scrollDensity = 15; // Base density
+        
         // Get faceted canvases
         const facetedCanvases = [
             'background-canvas', 'shadow-canvas', 'content-canvas',
@@ -184,7 +191,32 @@ export class VIB34DIntegratedEngine {
                     this.update4DRotationParameters(touchX, touchY);
                 }
             }, { passive: false });
+            
+            // Click -> color flash effect
+            canvas.addEventListener('click', (e) => {
+                if (!this.isActive) return;
+                
+                this.triggerColorFlash();
+            });
+            
+            // Touch tap -> color flash effect
+            canvas.addEventListener('touchend', (e) => {
+                if (!this.isActive) return;
+                
+                this.triggerColorFlash();
+            });
+            
+            // Wheel -> invisible scroll density effect
+            canvas.addEventListener('wheel', (e) => {
+                if (!this.isActive) return;
+                e.preventDefault();
+                
+                this.updateScrollDensity(e.deltaY);
+            }, { passive: false });
         });
+        
+        // Start color flash animation loop
+        this.startColorFlashLoop();
     }
     
     update4DRotationParameters(x, y) {
@@ -206,6 +238,75 @@ export class VIB34DIntegratedEngine {
         }
         
         console.log(`🔷 4D Rotations: XW=${rot4dXW.toFixed(2)}, YW=${rot4dYW.toFixed(2)}, ZW=${rot4dZW.toFixed(2)}`);
+    }
+    
+    triggerColorFlash() {
+        // Trigger color flash: dip then boost
+        this.colorFlashIntensity = 1.0; // Start at full flash
+        console.log('💥 Faceted color flash triggered');
+    }
+    
+    updateScrollDensity(deltaY) {
+        // Invisible scroll affects grid density
+        const scrollSpeed = 0.5;
+        const scrollDirection = deltaY > 0 ? 1 : -1;
+        
+        this.scrollDensity += scrollDirection * scrollSpeed;
+        this.scrollDensity = Math.max(5, Math.min(100, this.scrollDensity)); // Clamp 5-100
+        
+        // Update parameter
+        if (window.updateParameter) {
+            window.updateParameter('gridDensity', Math.round(this.scrollDensity));
+        }
+        
+        console.log(`🌀 Scroll density: ${Math.round(this.scrollDensity)}`);
+    }
+    
+    startColorFlashLoop() {
+        const flashAnimation = () => {
+            if (this.colorFlashIntensity > 0.01) {
+                // Create flash effect: dip saturation/intensity then boost
+                const flashPhase = this.colorFlashIntensity;
+                
+                // Phase 1 (1.0 -> 0.5): Dip colors
+                // Phase 2 (0.5 -> 0.0): Boost colors back up
+                let saturationMultiplier, intensityMultiplier;
+                
+                if (flashPhase > 0.5) {
+                    // Dip phase - reduce saturation and intensity
+                    const dipAmount = (flashPhase - 0.5) * 2; // 0-1 range
+                    saturationMultiplier = 1.0 - (dipAmount * 0.7); // Dip to 30%
+                    intensityMultiplier = 1.0 - (dipAmount * 0.5); // Dip to 50%
+                } else {
+                    // Boost phase - increase beyond normal
+                    const boostAmount = (0.5 - flashPhase) * 2; // 0-1 range
+                    saturationMultiplier = 1.0 + (boostAmount * 0.5); // Boost to 150%
+                    intensityMultiplier = 1.0 + (boostAmount * 0.3); // Boost to 130%
+                }
+                
+                // Apply flash modulation to base colors
+                const baseSaturation = 0.8;
+                const baseIntensity = 0.5;
+                
+                const flashSaturation = Math.max(0.1, Math.min(1.0, baseSaturation * saturationMultiplier));
+                const flashIntensity = Math.max(0.1, Math.min(1.0, baseIntensity * intensityMultiplier));
+                
+                // Update parameters
+                if (window.updateParameter) {
+                    window.updateParameter('saturation', flashSaturation.toFixed(2));
+                    window.updateParameter('intensity', flashIntensity.toFixed(2));
+                }
+                
+                // Decay flash
+                this.colorFlashIntensity *= this.flashDecay;
+            }
+            
+            if (this.isActive) {
+                requestAnimationFrame(flashAnimation);
+            }
+        };
+        
+        flashAnimation();
     }
     
     /**

@@ -15,13 +15,13 @@ export class QuantumEngine {
         this.parameters = new ParameterManager();
         this.isActive = false;
         
-        // Audio reactivity system for Quantum
-        this.audioContext = null;
-        this.analyser = null;
-        this.frequencyData = null;
-        this.audioEnabled = false;
+        // Gesture velocity reactivity system for Quantum
+        this.lastMousePosition = { x: 0.5, y: 0.5 };
+        this.mouseVelocity = { x: 0, y: 0 };
+        this.velocityHistory = [];
+        this.maxVelocityHistory = 10;
         
-        // Base parameter values for audio modulation
+        // Base parameter values for gesture modulation
         this.baseHue = 280; // Purple-blue for quantum
         this.baseMorphFactor = 1.0;
         
@@ -41,8 +41,9 @@ export class QuantumEngine {
     init() {
         this.createVisualizers();
         this.setupAudioReactivity();
+        this.setupGestureVelocityReactivity(); // Additional gesture system
         this.startRenderLoop();
-        console.log('✨ Quantum Engine initialized with audio frequency reactivity');
+        console.log('✨ Quantum Engine initialized with audio + gesture velocity reactivity');
     }
     
     /**
@@ -131,6 +132,82 @@ export class QuantumEngine {
     setupAudioReactivity() {
         console.log('🌌 Setting up Quantum audio frequency reactivity');
         // Audio setup will be triggered when audio is enabled
+    }
+    
+    /**
+     * Setup gesture velocity reactivity for Quantum system
+     */
+    setupGestureVelocityReactivity() {
+        console.log('🌌 Setting up Quantum gesture velocity reactivity');
+        
+        const quantumCanvases = [
+            'quantum-background-canvas', 'quantum-shadow-canvas', 'quantum-content-canvas',
+            'quantum-highlight-canvas', 'quantum-accent-canvas'
+        ];
+        
+        quantumCanvases.forEach(canvasId => {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            
+            // Mouse movement -> velocity calculation -> parameter changes
+            canvas.addEventListener('mousemove', (e) => {
+                if (!this.isActive) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = (e.clientX - rect.left) / rect.width;
+                const mouseY = (e.clientY - rect.top) / rect.height;
+                
+                this.updateVelocityParameters(mouseX, mouseY);
+            });
+            
+            // Touch movement -> velocity calculation
+            canvas.addEventListener('touchmove', (e) => {
+                if (!this.isActive) return;
+                e.preventDefault();
+                
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    const touchX = (touch.clientX - rect.left) / rect.width;
+                    const touchY = (touch.clientY - rect.top) / rect.height;
+                    
+                    this.updateVelocityParameters(touchX, touchY);
+                }
+            }, { passive: false });
+        });
+    }
+    
+    updateVelocityParameters(x, y) {
+        // Calculate velocity from position change
+        const deltaX = x - this.lastMousePosition.x;
+        const deltaY = y - this.lastMousePosition.y;
+        const velocity = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        
+        // Update velocity history
+        this.velocityHistory.push(velocity);
+        if (this.velocityHistory.length > this.maxVelocityHistory) {
+            this.velocityHistory.shift();
+        }
+        
+        // Calculate average velocity for smoothing
+        const avgVelocity = this.velocityHistory.reduce((sum, v) => sum + v, 0) / this.velocityHistory.length;
+        
+        // Map velocity to parameters (fast movement = more chaos and speed)
+        const chaos = Math.min(1.0, avgVelocity * 50); // 0-1 range
+        const speed = 1.0 + (avgVelocity * 20); // 1-21 range, clamped later
+        const finalSpeed = Math.min(3.0, speed); // Clamp to max 3.0
+        
+        // Update parameters
+        if (window.updateParameter) {
+            window.updateParameter('chaos', chaos.toFixed(2));
+            window.updateParameter('speed', finalSpeed.toFixed(2));
+        }
+        
+        // Update last position
+        this.lastMousePosition.x = x;
+        this.lastMousePosition.y = y;
+        
+        console.log(`🌌 Velocity: ${avgVelocity.toFixed(3)} → Chaos: ${chaos.toFixed(2)}, Speed: ${finalSpeed.toFixed(2)}`);
     }
     
     async enableAudio() {
