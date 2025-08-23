@@ -607,17 +607,109 @@ export class VIB34DIntegratedEngine {
             }
         });
         
-        // Apply audio data to parameter modulation
-        if (audioData.energy > 0.3) {
-            // Temporarily boost intensity based on audio energy
-            this.parameterManager.setParameter('intensity', Math.min(1.0, 0.5 + audioData.energy * 0.5));
+        // Apply NEW AUDIO REACTIVITY GRID SETTINGS if available
+        if (window.audioReactivitySettings && this.audioReactivitySettings) {
+            this.applyAudioReactivityGrid(audioData);
+        } else {
+            // Fallback to basic audio reactivity
+            if (audioData.energy > 0.3) {
+                // Temporarily boost intensity based on audio energy
+                this.parameterManager.setParameter('intensity', Math.min(1.0, 0.5 + audioData.energy * 0.5));
+            }
+            
+            if (audioData.bass > 0.4) {
+                // Temporarily boost grid density on bass hits
+                const currentDensity = this.parameterManager.getParameter('gridDensity') || 15;
+                this.parameterManager.setParameter('gridDensity', Math.min(100, currentDensity + audioData.bass * 20));
+            }
         }
+    }
+    
+    /**
+     * Apply audio reactivity grid settings (similar to holographic system)
+     */
+    applyAudioReactivityGrid(audioData) {
+        const settings = this.audioReactivitySettings || window.audioReactivitySettings;
+        if (!settings) return;
         
-        if (audioData.bass > 0.4) {
-            // Temporarily boost grid density on bass hits
-            const currentDensity = this.parameterManager.getParameter('gridDensity') || 15;
-            this.parameterManager.setParameter('gridDensity', Math.min(100, currentDensity + audioData.bass * 20));
-        }
+        // Get sensitivity multiplier
+        const sensitivityMultiplier = settings.sensitivity[settings.activeSensitivity];
+        
+        // Apply audio changes to different visual modes based on grid selection
+        settings.activeVisualModes.forEach(modeKey => {
+            const [sensitivity, visualMode] = modeKey.split('-');
+            
+            if (visualMode === 'color') {
+                // COLOR MODE: Affect hue, saturation, intensity
+                const audioIntensity = (audioData.energy * sensitivityMultiplier);
+                const bassIntensity = (audioData.bass * sensitivityMultiplier);
+                const rhythmIntensity = (audioData.rhythm * sensitivityMultiplier);
+                
+                // Modulate hue based on audio frequency spread
+                if (audioData.mid > 0.2) {
+                    const currentHue = this.parameterManager.getParameter('hue') || 180;
+                    const hueShift = audioData.mid * sensitivityMultiplier * 30;
+                    this.parameterManager.setParameter('hue', (currentHue + hueShift) % 360);
+                }
+                
+                // Boost intensity on energy spikes
+                if (audioIntensity > 0.3) {
+                    this.parameterManager.setParameter('intensity', Math.min(1.0, 0.5 + audioIntensity * 0.8));
+                }
+                
+                // Boost saturation on bass hits
+                if (bassIntensity > 0.4) {
+                    this.parameterManager.setParameter('saturation', Math.min(1.0, 0.7 + bassIntensity * 0.3));
+                }
+                
+            } else if (visualMode === 'geometry') {
+                // GEOMETRY MODE: Affect morphFactor, gridDensity, chaos
+                const bassIntensity = (audioData.bass * sensitivityMultiplier);
+                const highIntensity = (audioData.high * sensitivityMultiplier);
+                
+                // Bass affects grid density
+                if (bassIntensity > 0.3) {
+                    const currentDensity = this.parameterManager.getParameter('gridDensity') || 15;
+                    this.parameterManager.setParameter('gridDensity', Math.min(100, currentDensity + bassIntensity * 25));
+                }
+                
+                // Mid frequencies affect morph factor
+                if (audioData.mid > 0.2) {
+                    const morphBoost = audioData.mid * sensitivityMultiplier * 0.5;
+                    this.parameterManager.setParameter('morphFactor', Math.min(2.0, morphBoost));
+                }
+                
+                // High frequencies add chaos
+                if (highIntensity > 0.4) {
+                    this.parameterManager.setParameter('chaos', Math.min(1.0, highIntensity * 0.6));
+                }
+                
+            } else if (visualMode === 'movement') {
+                // MOVEMENT MODE: Affect speed, 4D rotations
+                const energyIntensity = (audioData.energy * sensitivityMultiplier);
+                
+                // Energy affects animation speed
+                if (energyIntensity > 0.2) {
+                    this.parameterManager.setParameter('speed', Math.min(3.0, 0.5 + energyIntensity * 1.5));
+                }
+                
+                // Audio frequencies affect 4D rotations
+                if (audioData.bass > 0.3) {
+                    const currentXW = this.parameterManager.getParameter('rot4dXW') || 0;
+                    this.parameterManager.setParameter('rot4dXW', currentXW + audioData.bass * sensitivityMultiplier * 0.1);
+                }
+                
+                if (audioData.mid > 0.3) {
+                    const currentYW = this.parameterManager.getParameter('rot4dYW') || 0;
+                    this.parameterManager.setParameter('rot4dYW', currentYW + audioData.mid * sensitivityMultiplier * 0.08);
+                }
+                
+                if (audioData.high > 0.3) {
+                    const currentZW = this.parameterManager.getParameter('rot4dZW') || 0;
+                    this.parameterManager.setParameter('rot4dZW', currentZW + audioData.high * sensitivityMultiplier * 0.06);
+                }
+            }
+        });
     }
     
     /**
