@@ -351,11 +351,15 @@ export class RealHolographicSystem {
     }
     
     setupCenterDistanceReactivity() {
-        console.log('✨ Setting up center-distance grid density reactivity for Holographic system');
+        console.log('✨ Setting up center-distance reactivity + click morph effects for Holographic system');
         
         // Track mouse/touch position for center-distance calculation
         this.currentX = 0.5;
         this.currentY = 0.5;
+        
+        // Click morph effect state
+        this.clickMorphIntensity = 0;
+        this.baseMorphFactor = 1.0; // Default morph factor
         
         const holographicCanvases = [
             'holo-background-canvas', 'holo-shadow-canvas', 'holo-content-canvas',
@@ -366,7 +370,7 @@ export class RealHolographicSystem {
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;
             
-            // Mouse movement -> center distance -> grid density
+            // Mouse movement -> center distance -> density/intensity/saturation (NO MORPH)
             canvas.addEventListener('mousemove', (e) => {
                 if (!this.isActive) return;
                 
@@ -377,7 +381,7 @@ export class RealHolographicSystem {
                 this.updateCenterDistanceParameters(mouseX, mouseY);
             });
             
-            // Touch movement -> center distance -> grid density  
+            // Touch movement -> center distance -> parameters (NO MORPH)
             canvas.addEventListener('touchmove', (e) => {
                 if (!this.isActive) return;
                 e.preventDefault();
@@ -391,7 +395,35 @@ export class RealHolographicSystem {
                     this.updateCenterDistanceParameters(touchX, touchY);
                 }
             }, { passive: false });
+            
+            // Click -> morph effect based on distance from center
+            canvas.addEventListener('click', (e) => {
+                if (!this.isActive) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const clickX = (e.clientX - rect.left) / rect.width;
+                const clickY = (e.clientY - rect.top) / rect.height;
+                
+                this.triggerHolographicClickMorph(clickX, clickY);
+            });
+            
+            // Touch end -> morph effect based on distance from center
+            canvas.addEventListener('touchend', (e) => {
+                if (!this.isActive) return;
+                
+                if (e.changedTouches.length > 0) {
+                    const touch = e.changedTouches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    const touchX = (touch.clientX - rect.left) / rect.width;
+                    const touchY = (touch.clientY - rect.top) / rect.height;
+                    
+                    this.triggerHolographicClickMorph(touchX, touchY);
+                }
+            });
         });
+        
+        // Start click morph animation loop
+        this.startHolographicClickMorphLoop();
     }
     
     updateCenterDistanceParameters(x, y) {
@@ -403,37 +435,71 @@ export class RealHolographicSystem {
         // Normalize distance (0 = center, 1 = corners)
         const normalizedDistance = Math.min(distanceFromCenter / 0.707, 1.0);
         
-        // REVERSED: Center = low density, edges = high density
+        // REVERSED: Center = low density, edges = high density (as requested)
         const gridDensity = 5 + (95 * normalizedDistance); // 5-100 range
         
-        // Multiple parameter modulation for visual cohesion
-        // Intensity: Higher at center, lower at edges (opposite of density)
-        const intensity = 0.3 + (0.7 * (1.0 - normalizedDistance)); // 0.3-1.0
+        // Enhanced intensity modulation - more dramatic changes
+        const intensity = 0.2 + (0.8 * (1.0 - normalizedDistance)); // 0.2-1.0 range (wider)
         
-        // MorphFactor: More morphing near center for fluid effect
-        const morphFactor = 0.5 + (1.5 * (1.0 - normalizedDistance)); // 0.5-2.0
+        // Enhanced saturation modulation - more color variation  
+        const saturation = 0.4 + (0.6 * (1.0 - normalizedDistance)); // 0.4-1.0 range (wider)
         
         // Hue shift: Subtle color variation based on position
         const baseHue = 320; // Magenta-pink base
         const hueShift = normalizedDistance * 40; // 0-40 degree shift
         const hue = (baseHue + hueShift) % 360;
         
-        // Saturation: More vivid at center
-        const saturation = 0.6 + (0.4 * (1.0 - normalizedDistance)); // 0.6-1.0
-        
-        // Update all parameters for cohesive visual effect
+        // Update parameters (NO MORE MORPH FROM MOUSE MOVEMENT)
         if (window.updateParameter) {
             window.updateParameter('gridDensity', Math.round(gridDensity));
             window.updateParameter('intensity', intensity.toFixed(2));
-            window.updateParameter('morphFactor', morphFactor.toFixed(2));
-            window.updateParameter('hue', Math.round(hue));
             window.updateParameter('saturation', saturation.toFixed(2));
+            window.updateParameter('hue', Math.round(hue));
         }
         
-        console.log(`✨ Center distance: ${distanceFromCenter.toFixed(3)} → Density: ${Math.round(gridDensity)}, Intensity: ${intensity.toFixed(2)}, Morph: ${morphFactor.toFixed(2)}`);
+        console.log(`✨ Center distance: ${distanceFromCenter.toFixed(3)} → Density: ${Math.round(gridDensity)}, Intensity: ${intensity.toFixed(2)}, Saturation: ${saturation.toFixed(2)}`);
     }
     
-    // Removed old touch and scroll interactions - now using center-distance reactivity
+    triggerHolographicClickMorph(x, y) {
+        // Calculate distance from center for morph intensity
+        const centerX = 0.5;
+        const centerY = 0.5;
+        const distanceFromCenter = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+        const normalizedDistance = Math.min(distanceFromCenter / 0.707, 1.0);
+        
+        // Morph change based on distance from center (0.1-0.3 as requested)
+        this.clickMorphIntensity = 0.1 + (0.2 * (1.0 - normalizedDistance)); // 0.1-0.3 range
+        
+        console.log(`💥 Holographic click morph: distance=${distanceFromCenter.toFixed(3)}, morph change=${this.clickMorphIntensity.toFixed(2)}`);
+    }
+    
+    startHolographicClickMorphLoop() {
+        const morphEffect = () => {
+            if (this.clickMorphIntensity > 0.01) {
+                // Apply morph change temporarily
+                const currentMorph = this.baseMorphFactor + this.clickMorphIntensity;
+                
+                if (window.updateParameter) {
+                    window.updateParameter('morphFactor', currentMorph.toFixed(2));
+                }
+                
+                // Decay back to base morph factor
+                this.clickMorphIntensity *= 0.9; // Decay rate
+            } else if (this.clickMorphIntensity > 0) {
+                // Return to base morph factor
+                if (window.updateParameter) {
+                    window.updateParameter('morphFactor', this.baseMorphFactor.toFixed(2));
+                }
+                this.clickMorphIntensity = 0;
+            }
+            
+            if (this.isActive) {
+                requestAnimationFrame(morphEffect);
+            }
+        };
+        
+        morphEffect();
+    }
     
     startRenderLoop() {
         const render = () => {
