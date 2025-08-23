@@ -539,7 +539,10 @@ void main() {
         this.gl.uniform2f(this.uniforms.mouse, this.mouseX, this.mouseY);
         this.gl.uniform1f(this.uniforms.geometry, this.variantParams.geometryType);
         this.gl.uniform1f(this.uniforms.density, this.variantParams.density);
-        this.gl.uniform1f(this.uniforms.speed, this.variantParams.speed);
+        // FIX: Controlled speed calculation - much slower base speed, audio provides subtle boost
+        const baseSpeed = (this.variantParams.speed || 0.5) * 0.2; // Much slower base speed
+        const audioBoost = (this.audioSpeedBoost || 0.0) * 0.1; // Subtle audio boost only
+        this.gl.uniform1f(this.uniforms.speed, baseSpeed + audioBoost);
         this.gl.uniform3f(this.uniforms.color, rgb[0], rgb[1], rgb[2]);
         this.gl.uniform1f(this.uniforms.intensity, this.roleParams.intensity);
         this.gl.uniform1f(this.uniforms.roleDensity, this.roleParams.densityMult);
