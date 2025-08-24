@@ -19,31 +19,49 @@ export class ReactivityManager {
         this.activeSystem = null;
         this.activeSystemName = 'faceted';
         
-        // Available modes for each category
-        this.mouseModes = {
-            'rotations': new RotationMode(),     // Faceted style
-            'velocity': new VelocityMode(),      // Quantum style  
-            'distance': new DistanceMode()       // Holographic style
-        };
-        
-        this.clickModes = {
-            'burst': new BurstMode(),            // Faceted style
-            'blast': new BlastMode(),            // Quantum style
-            'ripple': new RippleMode()           // Holographic style
-        };
-        
-        this.scrollModes = {
-            'cycle': new CycleMode(),            // Faceted style
-            'wave': new WaveMode(),              // Quantum style
-            'sweep': new SweepMode()             // New mode
-        };
+        // CRITICAL FIX: Initialize mode objects AFTER class definitions are loaded
+        this.mouseModes = {};
+        this.clickModes = {};
+        this.scrollModes = {};
         
         // Current selected modes (default to system-appropriate)
         this.currentMouseMode = 'rotations';   // Start with Faceted default
         this.currentClickMode = 'burst';       // Start with Faceted default  
         this.currentScrollMode = 'cycle';      // Start with Faceted default
         
+        // Initialize modes after constructor completes
+        setTimeout(() => this.initializeModes(), 0);
+        
         this.setupGlobalListeners();
+    }
+    
+    /**
+     * Initialize mode instances after class definitions are loaded
+     */
+    initializeModes() {
+        try {
+            this.mouseModes = {
+                'rotations': new RotationMode(),     // Faceted style
+                'velocity': new VelocityMode(),      // Quantum style  
+                'distance': new DistanceMode()       // Holographic style
+            };
+            
+            this.clickModes = {
+                'burst': new BurstMode(),            // Faceted style
+                'blast': new BlastMode(),            // Quantum style
+                'ripple': new RippleMode()           // Holographic style
+            };
+            
+            this.scrollModes = {
+                'cycle': new CycleMode(),            // Faceted style
+                'wave': new WaveMode(),              // Quantum style
+                'sweep': new SweepMode()             // New mode
+            };
+            
+            console.log('⚡ ReactivityManager modes initialized successfully');
+        } catch (error) {
+            console.error('❌ Failed to initialize ReactivityManager modes:', error);
+        }
     }
     
     /**
@@ -113,8 +131,8 @@ export class ReactivityManager {
         const coords = this.getEventCoords(e);
         if (!coords) return;
         
-        // Route to current mouse mode
-        const mode = this.mouseModes[this.currentMouseMode];
+        // Route to current mouse mode (check if modes are initialized)
+        const mode = this.mouseModes && this.mouseModes[this.currentMouseMode];
         if (mode && mode.handleMouseMove) {
             mode.handleMouseMove(coords.x, coords.y, this.updateParameter.bind(this));
         }
@@ -129,8 +147,8 @@ export class ReactivityManager {
         const coords = this.getEventCoords(e);
         if (!coords) return;
         
-        // Route to current click mode
-        const mode = this.clickModes[this.currentClickMode];
+        // Route to current click mode (check if modes are initialized)
+        const mode = this.clickModes && this.clickModes[this.currentClickMode];
         if (mode && mode.handleClick) {
             mode.handleClick(coords.x, coords.y, this.updateParameter.bind(this));
         }
@@ -144,8 +162,8 @@ export class ReactivityManager {
         
         e.preventDefault();
         
-        // Route to current scroll mode
-        const mode = this.scrollModes[this.currentScrollMode];
+        // Route to current scroll mode (check if modes are initialized)
+        const mode = this.scrollModes && this.scrollModes[this.currentScrollMode];
         if (mode && mode.handleWheel) {
             mode.handleWheel(e.deltaY, this.updateParameter.bind(this));
         }
@@ -186,7 +204,7 @@ export class ReactivityManager {
             const x = (touch.clientX - rect.left) / rect.width;
             const y = (touch.clientY - rect.top) / rect.height;
             
-            const mode = this.mouseModes[this.currentMouseMode];
+            const mode = this.mouseModes && this.mouseModes[this.currentMouseMode];
             if (mode && mode.handleMouseMove) {
                 mode.handleMouseMove(x, y, this.updateParameter.bind(this));
             }
@@ -202,7 +220,7 @@ export class ReactivityManager {
             const x = (touch.clientX - rect.left) / rect.width;
             const y = (touch.clientY - rect.top) / rect.height;
             
-            const mode = this.clickModes[this.currentClickMode];
+            const mode = this.clickModes && this.clickModes[this.currentClickMode];
             if (mode && mode.handleClick) {
                 mode.handleClick(x, y, this.updateParameter.bind(this));
             }
@@ -243,21 +261,21 @@ export class ReactivityManager {
      * Mode selection methods for UI
      */
     setMouseMode(mode) {
-        if (this.mouseModes[mode]) {
+        if (this.mouseModes && this.mouseModes[mode]) {
             this.currentMouseMode = mode;
             console.log(`⚡ Mouse mode: ${mode}`);
         }
     }
     
     setClickMode(mode) {
-        if (this.clickModes[mode]) {
+        if (this.clickModes && this.clickModes[mode]) {
             this.currentClickMode = mode;
             console.log(`⚡ Click mode: ${mode}`);
         }
     }
     
     setScrollMode(mode) {
-        if (this.scrollModes[mode]) {
+        if (this.scrollModes && this.scrollModes[mode]) {
             this.currentScrollMode = mode;
             console.log(`⚡ Scroll mode: ${mode}`);
         }
