@@ -400,9 +400,7 @@ export class VIB34DIntegratedEngine {
             
             // MVEP-STYLE AUDIO PROCESSING: Each system processes audio in its own render loop
             // This eliminates the "holographic override" problem and ensures proper audio reactivity
-            if (window.audioEnabled && window.globalAudioData) {
-                this.updateAudioReactivity(window.globalAudioData);
-            }
+            // Audio reactivity now handled directly in visualizer render loops
             
             this.updateVisualizers();
             this.animationId = requestAnimationFrame(render);
@@ -602,24 +600,7 @@ export class VIB34DIntegratedEngine {
     /**
      * Update audio reactivity (for universal reactivity system)
      */
-    updateAudioReactivity(audioData) {
-        // MVEP-Style: Always receive audio data, individual systems control usage
-        if (!audioData) return;
-        
-        this.visualizers.forEach(visualizer => {
-            if (visualizer.updateAudio) {
-                visualizer.updateAudio(audioData, window.audioEnabled);
-            }
-        });
-        
-        // Apply NEW AUDIO REACTIVITY GRID SETTINGS if available
-        if (window.audioReactivitySettings && this.audioReactivitySettings) {
-            this.applyAudioReactivityGrid(audioData);
-        } else {
-            // MVEP-Style: Basic audio reactivity (only when audio enabled)
-            if (window.audioEnabled && audioData.energy > 0.3) {
-                // Temporarily boost intensity based on audio energy
-                this.parameterManager.setParameter('intensity', Math.min(1.0, 0.5 + audioData.energy * 0.5));
+    // Audio reactivity now handled directly in visualizer render loops - no engine coordination needed
             }
             
             if (audioData.bass > 0.4) {

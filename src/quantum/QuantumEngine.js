@@ -498,9 +498,7 @@ export class QuantumEngine {
             if (this.isActive) {
                 // MVEP-STYLE AUDIO PROCESSING: Use global audio data instead of internal processing
                 // This eliminates conflicts with holographic system and ensures consistent audio reactivity
-                if (window.audioEnabled && window.globalAudioData) {
-                    this.updateAudioReactivity(window.globalAudioData);
-                }
+                // Audio reactivity now handled directly in visualizer render loops
                 
                 // CRITICAL FIX: Update visualizer parameters before rendering
                 const currentParams = this.parameters.getAllParameters();
@@ -536,16 +534,7 @@ export class QuantumEngine {
     /**
      * Update audio reactivity (for universal reactivity system)
      */
-    updateAudioReactivity(audioData) {
-        // MVEP-Style: Always receive audio data, visualizers decide usage
-        if (!audioData) return;
-        
-        this.visualizers.forEach(visualizer => {
-            if (visualizer.updateAudio) {
-                visualizer.updateAudio(audioData, window.audioEnabled);
-            }
-        });
-    }
+    // Audio reactivity now handled directly in visualizer render loops
     
     /**
      * Update click effects (for universal reactivity system)

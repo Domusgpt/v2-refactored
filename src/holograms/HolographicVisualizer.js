@@ -653,10 +653,9 @@ export class HolographicVisualizer {
         this.scrollVelocity = Math.max(-2.0, Math.min(2.0, this.scrollVelocity));
     }
     
-    updateAudio(audioData) {
-        if (!audioData) return;
-        
-        this.audioData = audioData;
+    // Audio reactivity now handled directly in render() loop
+    updateAudio_DISABLED() {
+        return; // No longer used - audio handled in render()
         
         // Musical visualization approach - responsive but controlled
         const smoothing = 0.6; // Less smoothing for more reactivity
@@ -783,12 +782,23 @@ export class HolographicVisualizer {
         this.gl.uniform1f(this.uniforms.gridDensityShift, this.gridDensityShift);
         this.gl.uniform1f(this.uniforms.colorScrollShift, this.colorScrollShift);
         
-        // Audio uniforms
-        this.gl.uniform1f(this.uniforms.audioDensityBoost, this.audioDensityBoost || 0.0);
-        this.gl.uniform1f(this.uniforms.audioMorphBoost, this.audioMorphBoost || 0.0);
-        this.gl.uniform1f(this.uniforms.audioSpeedBoost, this.audioSpeedBoost || 0.0);
-        this.gl.uniform1f(this.uniforms.audioChaosBoost, this.audioChaosBoost || 0.0);
-        this.gl.uniform1f(this.uniforms.audioColorShift, this.audioColorShift || 0.0);
+        // 🎵 HOLOGRAPHIC AUDIO REACTIVITY - Direct and beautiful
+        let audioDensity = 0, audioMorph = 0, audioSpeed = 0, audioChaos = 0, audioColor = 0;
+        
+        if (window.audioEnabled && window.audioReactive) {
+            // Holographic audio mapping: Rich volumetric effects
+            audioDensity = window.audioReactive.bass * 1.5;     // Bass creates density in holographic layers
+            audioMorph = window.audioReactive.mid * 1.2;        // Mid frequencies morph the hologram
+            audioSpeed = window.audioReactive.high * 0.8;       // High frequencies speed up animation
+            audioChaos = window.audioReactive.energy * 0.6;     // Energy creates chaotic holographic distortion
+            audioColor = window.audioReactive.bass * 45;        // Bass affects holographic color shifts
+        }
+        
+        this.gl.uniform1f(this.uniforms.audioDensityBoost, audioDensity);
+        this.gl.uniform1f(this.uniforms.audioMorphBoost, audioMorph);
+        this.gl.uniform1f(this.uniforms.audioSpeedBoost, audioSpeed);
+        this.gl.uniform1f(this.uniforms.audioChaosBoost, audioChaos);
+        this.gl.uniform1f(this.uniforms.audioColorShift, audioColor);
         
         // 4D rotation uniforms
         this.gl.uniform1f(this.uniforms.rot4dXW, this.variantParams.rot4dXW || 0.0);

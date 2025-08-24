@@ -1814,34 +1814,16 @@
                 audioBtn.title = `Audio Reactivity: ${audioEnabled ? 'ON' : 'OFF'}`;
             }
             
-            // CRITICAL FIX: Initialize Central Audio Coordinator
+            // Initialize simple audio engine
             if (audioEnabled) {
-                // Initialize central audio processing
-                const success = await window.centralAudioCoordinator.initialize();
-                if (success) {
-                    window.centralAudioCoordinator.startAudioLoop();
-                    console.log('🎵 Central Audio Coordinator started');
-                } else {
-                    console.error('❌ Failed to initialize central audio');
+                const success = await window.audioEngine.init();
+                if (!success) {
                     audioEnabled = false;
                     window.audioEnabled = false;
                 }
                 
-                // Initialize holographic system (it has its own audio processing)
-                if (holographicSystem) {
-                    await holographicSystem.initAudio();
-                }
-                
-                // Enable Quantum audio frequency reactivity  
-                if (window.quantumEngine && window.quantumEngine.toggleAudio) {
-                    window.quantumEngine.toggleAudio(true);
-                }
             } else {
-                // Disable audio for all systems
-                console.log('🎵 Disabling all audio systems');
-                if (window.quantumEngine && window.quantumEngine.toggleAudio) {
-                    window.quantumEngine.toggleAudio(false);
-                }
+                console.log('🎵 Audio disabled');
             }
             
             console.log(`🎵 Audio Reactivity: ${audioEnabled ? 'ON' : 'OFF'}`);

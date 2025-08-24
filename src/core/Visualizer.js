@@ -591,17 +591,24 @@ void main() {
         this.gl.uniform1f(this.uniforms.time, time);
         this.gl.uniform2f(this.uniforms.mouse, this.mouseX, this.mouseY);
         this.gl.uniform1f(this.uniforms.geometry, this.params.geometry);
-        // Apply audio boosts to parameters (MVEP-style, Faceted-specific)
-        const densityWithAudio = this.params.gridDensity + (this.audioDensityBoost || 0);
-        const intensityWithAudio = this.params.intensity + (this.audioIntensityBoost || 0);
-        const hueWithAudio = this.params.hue + (this.audioHueShift || 0);
+        // 🎵 DIRECT AUDIO REACTIVITY - Simple and works
+        let gridDensity = this.params.gridDensity;
+        let hue = this.params.hue;
+        let intensity = this.params.intensity;
         
-        this.gl.uniform1f(this.uniforms.gridDensity, Math.min(100, densityWithAudio));
+        if (window.audioEnabled && window.audioReactive) {
+            // Faceted audio mapping: Bass affects grid density, Mid affects hue, High affects intensity
+            gridDensity += window.audioReactive.bass * 30;  // Bass makes patterns denser
+            hue += window.audioReactive.mid * 60;           // Mid frequencies shift colors
+            intensity += window.audioReactive.high * 0.4;   // High frequencies brighten
+        }
+        
+        this.gl.uniform1f(this.uniforms.gridDensity, Math.min(100, gridDensity));
         this.gl.uniform1f(this.uniforms.morphFactor, this.params.morphFactor);
         this.gl.uniform1f(this.uniforms.chaos, this.params.chaos);
         this.gl.uniform1f(this.uniforms.speed, this.params.speed);
-        this.gl.uniform1f(this.uniforms.hue, hueWithAudio % 360);
-        this.gl.uniform1f(this.uniforms.intensity, Math.min(1, intensityWithAudio));
+        this.gl.uniform1f(this.uniforms.hue, hue % 360);
+        this.gl.uniform1f(this.uniforms.intensity, Math.min(1, intensity));
         this.gl.uniform1f(this.uniforms.saturation, this.params.saturation);
         this.gl.uniform1f(this.uniforms.dimension, this.params.dimension);
         this.gl.uniform1f(this.uniforms.rot4dXW, this.params.rot4dXW);
@@ -665,55 +672,7 @@ void main() {
         }
     }
 
-    /**
-     * MVEP-Style: Update audio reactivity
-     */
-    updateAudio(audioData, audioEnabled) {
-        if (!audioData) return;
-        
-        // Store audio data for shader use
-        this.audioData = {
-            bass: audioData.bass || 0,
-            mid: audioData.mid || 0,
-            high: audioData.high || 0,
-            energy: audioData.energy || 0,
-            rhythm: audioData.rhythm || 0
-        };
-        
-        // Apply audio reactivity only when enabled
-        if (audioEnabled) {
-            // Faceted-specific audio mapping (simple geometric patterns):
-            // Bass -> Grid density (low frequencies thicken patterns)
-            // Mid -> Color shifts (mid frequencies affect hue)
-            // High -> Intensity boost (high frequencies brighten)
-            
-            const bassBoost = Math.pow(this.audioData.bass, 0.6) * 15;
-            const midShift = this.audioData.mid * 45;
-            const highBoost = Math.pow(this.audioData.high, 0.8) * 0.4;
-            
-            // Temporary parameter boosts (fade over time)
-            if (bassBoost > 2) {
-                this.audioDensityBoost = Math.max(this.audioDensityBoost || 0, bassBoost);
-            }
-            if (midShift > 5) {
-                this.audioHueShift = (this.audioHueShift || 0) + midShift;
-            }
-            if (highBoost > 0.1) {
-                this.audioIntensityBoost = Math.max(this.audioIntensityBoost || 0, highBoost);
-            }
-        }
-        
-        // Fade audio boosts over time
-        if (this.audioDensityBoost) {
-            this.audioDensityBoost *= 0.92;
-        }
-        if (this.audioIntensityBoost) {
-            this.audioIntensityBoost *= 0.94;
-        }
-        if (this.audioHueShift) {
-            this.audioHueShift *= 0.96;
-        }
-    }
+    // Audio reactivity now handled directly in render() loop - no complex methods needed
     
     /**
      * Clean up WebGL resources

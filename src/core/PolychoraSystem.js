@@ -387,22 +387,38 @@ class PolychoraVisualizer {
         this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         
-        // Set uniforms with complete 6D rotation and advanced glass effects
+        // 🎵 POLYCHORA AUDIO REACTIVITY - 4D audio-reactive polytopes
+        let rot4dXW = parameters.rot4dXW || 0;
+        let rot4dYW = parameters.rot4dYW || 0;
+        let rot4dZW = parameters.rot4dZW || 0;
+        let dimension = parameters.dimension || 3.8;
+        let hue = parameters.hue || 280;
+        
+        if (window.audioEnabled && window.audioReactive) {
+            // Polychora audio mapping: Bass drives 4D rotation, Mid affects cross-section, High affects glow
+            rot4dXW += window.audioReactive.bass * 3.0;        // Bass rotates through XW plane
+            rot4dYW += window.audioReactive.mid * 2.5;         // Mid rotates through YW plane  
+            rot4dZW += window.audioReactive.high * 2.0;        // High rotates through ZW plane
+            dimension += window.audioReactive.energy * 0.5;    // Energy affects 4D cross-section depth
+            hue += window.audioReactive.bass * 60;             // Bass affects polytope color
+        }
+        
+        // Set uniforms with audio-reactive 4D rotation and advanced glass effects
         const uniforms = {
             u_time: this.time,
             u_resolution: [this.canvas.width, this.canvas.height],
             u_polytope: parameters.polytope !== undefined ? parameters.polytope : 0,
             
-            // COMPLETE 6D 4D rotations
-            u_rot4dXW: parameters.rot4dXW || 0,
-            u_rot4dYW: parameters.rot4dYW || 0,
-            u_rot4dZW: parameters.rot4dZW || 0,
+            // AUDIO-REACTIVE 4D rotations
+            u_rot4dXW: rot4dXW,
+            u_rot4dYW: rot4dYW,
+            u_rot4dZW: rot4dZW,
             u_rot4dXY: parameters.rot4dXY || 0,
             u_rot4dXZ: parameters.rot4dXZ || 0,
             u_rot4dYZ: parameters.rot4dYZ || 0,
             
-            u_dimension: parameters.dimension || 3.8,
-            u_hue: parameters.hue || 280,
+            u_dimension: Math.min(4, dimension),
+            u_hue: hue % 360,
             u_layerColor: this.config.color,
             u_layerScale: this.config.scale * (parameters.layerScale || 1.0),
             u_layerOpacity: this.config.opacity * (parameters.translucency || 1.0),
@@ -475,48 +491,7 @@ class PolychoraVisualizer {
     /**
      * Update audio reactivity for 4D visualization
      */
-    updateAudio(audioData, audioEnabled) {
-        if (!audioData) return;
-        
-        // Always store audio data (MVEP-style)
-        this.audioState = {
-            bass: audioData.bass || 0,
-            mid: audioData.mid || 0,
-            high: audioData.high || 0,
-            energy: audioData.energy || 0,
-            rhythm: audioData.rhythm || 0
-        };
-        
-        // Apply audio effects only when enabled
-        if (audioEnabled && audioData.energy > 0.1) {
-            // Polychora-specific audio reactivity:
-            // Bass -> 4D rotation speed (low frequencies drive hyperdimensional rotation)
-            // Mid -> Cross-section position (mid frequencies navigate through 4D space)
-            // High -> Intensity and glow (high frequencies brighten polytope edges)
-            
-            const bassRotation = this.audioState.bass * 2.0;
-            const midCrossSection = this.audioState.mid * 0.5;
-            const highIntensity = Math.pow(this.audioState.high, 0.7) * 0.6;
-            
-            // Apply temporary boosts
-            this.audioRotationBoost = Math.max(this.audioRotationBoost || 0, bassRotation);
-            this.audioCrossSectionShift = (this.audioCrossSectionShift || 0) + midCrossSection;
-            this.audioIntensityBoost = Math.max(this.audioIntensityBoost || 0, highIntensity);
-            
-            console.log(`🔮 ${this.canvasId}: Audio reactive - energy: ${audioData.energy.toFixed(2)}, bass: ${this.audioState.bass.toFixed(2)}`);
-        }
-        
-        // Fade audio boosts over time
-        if (this.audioRotationBoost) {
-            this.audioRotationBoost *= 0.90;
-        }
-        if (this.audioIntensityBoost) {
-            this.audioIntensityBoost *= 0.93;
-        }
-        if (this.audioCrossSectionShift) {
-            this.audioCrossSectionShift *= 0.95;
-        }
-    }
+    // Audio reactivity now handled directly in render() loop
     
     /**
      * Update cross-section navigation (4D scroll)
@@ -767,9 +742,7 @@ export class PolychoraSystem {
             
             // MVEP-STYLE AUDIO PROCESSING: Process audio directly in render loop
             // This eliminates conflicts with holographic system and ensures proper audio reactivity
-            if (window.audioEnabled && window.globalAudioData) {
-                this.updateAudioReactivity(window.globalAudioData);
-            }
+            // Audio reactivity now handled directly in visualizer render loops
             
             // Step physics simulation if enabled
             if (this.parameters.physicsEnabled && this.physicsEnabled) {
@@ -1044,13 +1017,7 @@ export class PolychoraSystem {
     /**
      * Update 4D audio reactivity
      */
-    updateAudioReactivity(audioData) {
-        this.visualizers.forEach(visualizer => {
-            if (visualizer.updateAudio) {
-                visualizer.updateAudio(audioData, window.audioEnabled);
-            }
-        });
-    }
+    // Audio reactivity handled directly in visualizer render loops
     
     /**
      * Update 4D scroll interaction (cross-section navigation)
