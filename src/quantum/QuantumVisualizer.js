@@ -801,11 +801,16 @@ void main() {
         this.gl.uniform1f(this.uniforms.time, time);
         this.gl.uniform2f(this.uniforms.mouse, this.mouseX, this.mouseY);
         this.gl.uniform1f(this.uniforms.geometry, this.params.geometry);
-        this.gl.uniform1f(this.uniforms.gridDensity, this.params.gridDensity);
-        this.gl.uniform1f(this.uniforms.morphFactor, this.params.morphFactor);
+        // Apply audio boosts to parameters (MVEP-style)
+        const densityWithAudio = this.params.gridDensity + (this.audioDensityBoost || 0) * 20;
+        const morphWithAudio = this.params.morphFactor + (this.audioMorphBoost || 0) * 0.8;
+        const hueWithAudio = this.params.hue + (this.audioHueShift || 0);
+        
+        this.gl.uniform1f(this.uniforms.gridDensity, Math.min(100, densityWithAudio));
+        this.gl.uniform1f(this.uniforms.morphFactor, Math.min(2, morphWithAudio));
         this.gl.uniform1f(this.uniforms.chaos, this.params.chaos);
         this.gl.uniform1f(this.uniforms.speed, this.params.speed);
-        this.gl.uniform1f(this.uniforms.hue, this.params.hue);
+        this.gl.uniform1f(this.uniforms.hue, hueWithAudio % 360);
         this.gl.uniform1f(this.uniforms.intensity, this.params.intensity);
         this.gl.uniform1f(this.uniforms.saturation, this.params.saturation);
         this.gl.uniform1f(this.uniforms.dimension, this.params.dimension);
@@ -817,6 +822,56 @@ void main() {
         this.gl.uniform1f(this.uniforms.roleIntensity, roleIntensities[this.role] || 1.0);
         
         this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
+    }
+    
+    /**
+     * MVEP-Style: Update audio reactivity
+     */
+    updateAudio(audioData, audioEnabled) {
+        if (!audioData) return;
+        
+        // Store audio data for shader use
+        this.audioData = {
+            bass: audioData.bass || 0,
+            mid: audioData.mid || 0,
+            high: audioData.high || 0,
+            energy: audioData.energy || 0,
+            rhythm: audioData.rhythm || 0
+        };
+        
+        // Apply audio reactivity only when enabled
+        if (audioEnabled) {
+            // Quantum-specific audio mapping:
+            // Bass -> Density variations (lower frequencies affect spatial density)
+            // Mid -> Color shifting (mid frequencies drive hue changes) 
+            // High -> Morphing (high frequencies trigger geometric morphing)
+            
+            const bassIntensity = Math.pow(this.audioData.bass, 0.8) * 2.0;
+            const midIntensity = this.audioData.mid * 1.5;
+            const highIntensity = Math.pow(this.audioData.high, 1.2) * 1.8;
+            
+            // Temporary parameter boosts (fade over time)
+            if (bassIntensity > 0.2) {
+                this.audioDensityBoost = Math.max(this.audioDensityBoost || 0, bassIntensity);
+            }
+            if (midIntensity > 0.1) {
+                this.audioHueShift = (this.audioHueShift || 0) + midIntensity * 30;
+            }
+            if (highIntensity > 0.15) {
+                this.audioMorphBoost = Math.max(this.audioMorphBoost || 0, highIntensity);
+            }
+        }
+        
+        // Fade audio boosts over time
+        if (this.audioDensityBoost) {
+            this.audioDensityBoost *= 0.95;
+        }
+        if (this.audioMorphBoost) {
+            this.audioMorphBoost *= 0.92;
+        }
+        if (this.audioHueShift) {
+            this.audioHueShift *= 0.98;
+        }
     }
     
     /**

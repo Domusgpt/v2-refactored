@@ -603,14 +603,12 @@ export class VIB34DIntegratedEngine {
      * Update audio reactivity (for universal reactivity system)
      */
     updateAudioReactivity(audioData) {
-        // Check if audio is enabled globally
-        if (window.audioEnabled === false) {
-            return; // Skip audio processing when disabled
-        }
+        // MVEP-Style: Always receive audio data, individual systems control usage
+        if (!audioData) return;
         
         this.visualizers.forEach(visualizer => {
             if (visualizer.updateAudio) {
-                visualizer.updateAudio(audioData);
+                visualizer.updateAudio(audioData, window.audioEnabled);
             }
         });
         
@@ -618,8 +616,8 @@ export class VIB34DIntegratedEngine {
         if (window.audioReactivitySettings && this.audioReactivitySettings) {
             this.applyAudioReactivityGrid(audioData);
         } else {
-            // Fallback to basic audio reactivity
-            if (audioData.energy > 0.3) {
+            // MVEP-Style: Basic audio reactivity (only when audio enabled)
+            if (window.audioEnabled && audioData.energy > 0.3) {
                 // Temporarily boost intensity based on audio energy
                 this.parameterManager.setParameter('intensity', Math.min(1.0, 0.5 + audioData.energy * 0.5));
             }

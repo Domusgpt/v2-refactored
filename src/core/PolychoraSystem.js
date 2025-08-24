@@ -475,14 +475,47 @@ class PolychoraVisualizer {
     /**
      * Update audio reactivity for 4D visualization
      */
-    updateAudio(audioData) {
+    updateAudio(audioData, audioEnabled) {
+        if (!audioData) return;
+        
+        // Always store audio data (MVEP-style)
         this.audioState = {
             bass: audioData.bass || 0,
             mid: audioData.mid || 0,
             high: audioData.high || 0,
-            energy: audioData.energy || 0
+            energy: audioData.energy || 0,
+            rhythm: audioData.rhythm || 0
         };
-        console.log(`🔮 ${this.canvasId}: Audio update energy: ${audioData.energy || 0}`);
+        
+        // Apply audio effects only when enabled
+        if (audioEnabled && audioData.energy > 0.1) {
+            // Polychora-specific audio reactivity:
+            // Bass -> 4D rotation speed (low frequencies drive hyperdimensional rotation)
+            // Mid -> Cross-section position (mid frequencies navigate through 4D space)
+            // High -> Intensity and glow (high frequencies brighten polytope edges)
+            
+            const bassRotation = this.audioState.bass * 2.0;
+            const midCrossSection = this.audioState.mid * 0.5;
+            const highIntensity = Math.pow(this.audioState.high, 0.7) * 0.6;
+            
+            // Apply temporary boosts
+            this.audioRotationBoost = Math.max(this.audioRotationBoost || 0, bassRotation);
+            this.audioCrossSectionShift = (this.audioCrossSectionShift || 0) + midCrossSection;
+            this.audioIntensityBoost = Math.max(this.audioIntensityBoost || 0, highIntensity);
+            
+            console.log(`🔮 ${this.canvasId}: Audio reactive - energy: ${audioData.energy.toFixed(2)}, bass: ${this.audioState.bass.toFixed(2)}`);
+        }
+        
+        // Fade audio boosts over time
+        if (this.audioRotationBoost) {
+            this.audioRotationBoost *= 0.90;
+        }
+        if (this.audioIntensityBoost) {
+            this.audioIntensityBoost *= 0.93;
+        }
+        if (this.audioCrossSectionShift) {
+            this.audioCrossSectionShift *= 0.95;
+        }
     }
     
     /**
@@ -1014,7 +1047,7 @@ export class PolychoraSystem {
     updateAudioReactivity(audioData) {
         this.visualizers.forEach(visualizer => {
             if (visualizer.updateAudio) {
-                visualizer.updateAudio(audioData);
+                visualizer.updateAudio(audioData, window.audioEnabled);
             }
         });
     }

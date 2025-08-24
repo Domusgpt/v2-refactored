@@ -537,14 +537,12 @@ export class QuantumEngine {
      * Update audio reactivity (for universal reactivity system)
      */
     updateAudioReactivity(audioData) {
-        // Check if audio is enabled globally
-        if (window.audioEnabled === false) {
-            return; // Skip audio processing when disabled
-        }
+        // MVEP-Style: Always receive audio data, visualizers decide usage
+        if (!audioData) return;
         
         this.visualizers.forEach(visualizer => {
             if (visualizer.updateAudio) {
-                visualizer.updateAudio(audioData);
+                visualizer.updateAudio(audioData, window.audioEnabled);
             }
         });
     }
