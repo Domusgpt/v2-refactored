@@ -997,6 +997,15 @@
                             window.reactivityManager.setActiveSystem(system, newEngine);
                         }
                         
+                        // CRITICAL: Sync new engine to current UI parameter state
+                        setTimeout(() => {
+                            if (window.syncVisualizerToUI) {
+                                window.syncVisualizerToUI(system, newEngine);
+                            } else {
+                                console.warn('⚠️ syncVisualizerToUI function not available');
+                            }
+                        }, 300); // Small delay for system initialization
+                        
                         // Update UI buttons
                         document.querySelectorAll('.system-btn').forEach(btn => {
                             btn.classList.toggle('active', btn.dataset.system === system);
@@ -1040,6 +1049,130 @@
             }
         }
         
+        // PARAMETER SYNC SYSTEM: UI Controls Master Strategy
+        // Persistent parameter store - survives system switches
+        window.userParameterState = {};
+        
+        // Enhanced parameter update that preserves user intent
+        window.enhancedUpdateParameter = function(param, value) {
+            // Store user's parameter choice
+            window.userParameterState[param] = parseFloat(value);
+            console.log(`💾 User set ${param} = ${value}`);
+            
+            // Call original updateParameter
+            if (window.originalUpdateParameter) {
+                window.originalUpdateParameter(param, value);
+            }
+        }
+        
+        // Get all current UI parameter values (prefers user-stored values)
+        window.getCurrentUIParameterState = function() {
+            const parameterIds = [
+                'rot4dXW', 'rot4dYW', 'rot4dZW', 
+                'gridDensity', 'morphFactor', 'chaos', 
+                'speed', 'hue', 'intensity', 'saturation'
+            ];
+            
+            const currentState = {};
+            parameterIds.forEach(paramId => {
+                // PREFER: User-stored values over slider defaults
+                if (window.userParameterState[paramId] !== undefined) {
+                    currentState[paramId] = window.userParameterState[paramId];
+                    console.log(`📋 Using stored ${paramId}: ${currentState[paramId]}`);
+                } else {
+                    const slider = document.getElementById(paramId);
+                    if (slider) {
+                        currentState[paramId] = parseFloat(slider.value);
+                        console.log(`📋 Using slider ${paramId}: ${currentState[paramId]}`);
+                    }
+                }
+            });
+            
+            return currentState;
+        }
+        
+        // Sync UI sliders to stored user values  
+        window.syncSlidersToStoredValues = function() {
+            console.log('🔄 Syncing UI sliders to stored user values...');
+            
+            for (const [param, value] of Object.entries(window.userParameterState)) {
+                const slider = document.getElementById(param);
+                if (slider) {
+                    slider.value = value;
+                    console.log(`   📊 Set ${param} slider to ${value}`);
+                }
+            }
+        }
+        
+        // Sync visualizer to current UI state
+        window.syncVisualizerToUI = function(system, engine) {
+            // FIRST: Ensure sliders reflect stored user values
+            window.syncSlidersToStoredValues();
+            
+            const uiState = window.getCurrentUIParameterState();
+            
+            console.log(`🔄 Syncing ${system} system to UI parameter state...`);
+            
+            // Apply each parameter to the system
+            for (const [param, value] of Object.entries(uiState)) {
+                try {
+                    // Use system-specific parameter update methods
+                    if (system === 'faceted' && engine.parameterManager) {
+                        engine.parameterManager.setParameter(param, value);
+                    } else if (system === 'quantum' && engine.updateParameter) {
+                        engine.updateParameter(param, value);
+                    } else if (system === 'holographic' && engine.updateParameters) {
+                        const params = {};
+                        params[param] = value;
+                        engine.updateParameters(params);
+                    } else if (system === 'polychora' && engine.updateParameter) {
+                        engine.updateParameter(param, value);
+                    }
+                    
+                    console.log(`   ✅ ${param}: ${value} → ${system}`);
+                    
+                } catch (error) {
+                    console.warn(`   ⚠️ ${param} sync failed for ${system}:`, error.message);
+                }
+            }
+            
+            // Update UI displays to match current state
+            window.updateAllParameterDisplays(uiState);
+            
+            console.log(`✅ ${system} system synced to UI state`);
+        }
+        
+        // Update all parameter displays
+        window.updateAllParameterDisplays = function(uiState) {
+            const displayMappings = {
+                rot4dXW: 'xwValue',
+                rot4dYW: 'ywValue', 
+                rot4dZW: 'zwValue',
+                gridDensity: 'densityValue',
+                morphFactor: 'morphValue',
+                chaos: 'chaosValue',
+                speed: 'speedValue',
+                hue: 'hueValue',
+                intensity: 'intensityValue',
+                saturation: 'saturationValue'
+            };
+            
+            for (const [param, displayId] of Object.entries(displayMappings)) {
+                const display = document.getElementById(displayId);
+                const value = uiState[param];
+                
+                if (display && value !== undefined) {
+                    if (param === 'hue') {
+                        display.textContent = value + '°';
+                    } else if (param.startsWith('rot4d')) {
+                        display.textContent = value.toFixed(2);
+                    } else {
+                        display.textContent = value.toFixed(1);
+                    }
+                }
+            }
+        }
+
         // Global flag to indicate module readiness
         window.moduleReady = false;
         window.currentSystem = 'faceted';
@@ -1578,6 +1711,10 @@
         
         // Update parameter with enhanced error handling and system integration
         window.updateParameter = function(param, value) {
+            // CRITICAL: Store user's parameter choice for persistence
+            window.userParameterState[param] = parseFloat(value);
+            console.log(`💾 User parameter: ${param} = ${value}`);
+            
             const displays = {
                 rot4dXW: 'xwValue',
                 rot4dYW: 'ywValue', 
