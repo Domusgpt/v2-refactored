@@ -813,6 +813,11 @@ void main() {
             morphFactor += window.audioReactive.mid * 1.2;      // Mid frequencies morph the geometry
             hue += window.audioReactive.high * 120;             // High frequencies shift colors dramatically
             chaos += window.audioReactive.energy * 0.6;         // Overall energy adds chaos/complexity
+            
+            // Debug logging every 10 seconds to verify audio reactivity is working
+            if (Date.now() % 10000 < 16) {
+                console.log(`🌌 Quantum audio reactivity: Density+${(window.audioReactive.bass * 40).toFixed(1)} Morph+${(window.audioReactive.mid * 1.2).toFixed(2)} Hue+${(window.audioReactive.high * 120).toFixed(1)} Chaos+${(window.audioReactive.energy * 0.6).toFixed(2)}`);
+            }
         }
         
         this.gl.uniform1f(this.uniforms.gridDensity, Math.min(100, gridDensity));

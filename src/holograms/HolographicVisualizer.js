@@ -792,6 +792,11 @@ export class HolographicVisualizer {
             audioSpeed = window.audioReactive.high * 0.8;       // High frequencies speed up animation
             audioChaos = window.audioReactive.energy * 0.6;     // Energy creates chaotic holographic distortion
             audioColor = window.audioReactive.bass * 45;        // Bass affects holographic color shifts
+            
+            // Debug logging every 10 seconds to verify holographic audio reactivity
+            if (Date.now() % 10000 < 16) {
+                console.log(`✨ Holographic audio reactivity: Density+${audioDensity.toFixed(2)} Morph+${audioMorph.toFixed(2)} Speed+${audioSpeed.toFixed(2)} Chaos+${audioChaos.toFixed(2)} Color+${audioColor.toFixed(1)}`);
+            }
         }
         
         this.gl.uniform1f(this.uniforms.audioDensityBoost, audioDensity);

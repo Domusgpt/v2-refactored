@@ -2127,12 +2127,16 @@
                     this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
                     this.isActive = true;
                     
+                    // CRITICAL FIX: Enable global audio flag so visualizers will use the data
+                    window.audioEnabled = true;
+                    
                     this.startProcessing();
-                    console.log('✅ Audio Engine: Active');
+                    console.log('✅ Audio Engine: Active - window.audioEnabled = true');
                     return true;
                     
                 } catch (error) {
                     console.log('⚠️ Audio denied - silent mode');
+                    window.audioEnabled = false; // Keep audio disabled if permission denied
                     return false;
                 }
             }
@@ -2166,6 +2170,11 @@
                     window.audioReactive.mid = mid * smoothing + window.audioReactive.mid * (1 - smoothing);
                     window.audioReactive.high = high * smoothing + window.audioReactive.high * (1 - smoothing);
                     window.audioReactive.energy = (window.audioReactive.bass + window.audioReactive.mid + window.audioReactive.high) / 3;
+                    
+                    // Debug logging every 5 seconds to verify audio processing
+                    if (Date.now() % 5000 < 16) {
+                        console.log(`🎵 Audio levels: Bass=${window.audioReactive.bass.toFixed(2)} Mid=${window.audioReactive.mid.toFixed(2)} High=${window.audioReactive.high.toFixed(2)} Energy=${window.audioReactive.energy.toFixed(2)}`);
+                    }
                     
                     requestAnimationFrame(process);
                 };
