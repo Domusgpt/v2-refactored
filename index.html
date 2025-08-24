@@ -2087,165 +2087,95 @@
         window.interactivityEnabled = interactivityEnabled; // Global flag
         window.audioEnabled = false; // Global audio flag (will auto-enable on interaction)
         
-        // MVEP-Style Unified Audio System (Auto-initializing)
-        class CentralAudioCoordinator {
+        // 🎵 SIMPLE AUDIO ENGINE - Mobile-safe and actually works
+        class SimpleAudioEngine {
             constructor() {
-                this.audioContext = null;
+                this.context = null;
                 this.analyser = null;
-                this.microphone = null;
-                this.frequencyData = null;
-                this.isInitialized = false;
-                this.audioData = { bass: 0, mid: 0, high: 0, energy: 0, rhythm: 0 };
-                this.initAttempted = false;
+                this.dataArray = null;
+                this.isActive = false;
+                
+                // Mobile-safe: Initialize with defaults
+                window.audioReactive = {
+                    bass: 0,
+                    mid: 0, 
+                    high: 0,
+                    energy: 0
+                };
             }
             
-            async initialize() {
-                if (this.isInitialized || this.initAttempted) return this.isInitialized;
-                this.initAttempted = true;
+            async init() {
+                if (this.isActive) return true;
                 
                 try {
-                    console.log('🎵 MVEP-Style Audio: Auto-initializing...');
+                    console.log('🎵 Simple Audio Engine: Starting...');
                     
-                    // Resume audio context if needed (Chrome requirement)
-                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    if (this.audioContext.state === 'suspended') {
-                        await this.audioContext.resume();
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.context = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    if (this.context.state === 'suspended') {
+                        await this.context.resume();
                     }
                     
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        audio: {
-                            echoCancellation: false,
-                            noiseSuppression: false,
-                            autoGainControl: false
-                        }
-                    });
-                    
-                    this.analyser = this.audioContext.createAnalyser();
-                    this.analyser.fftSize = 512; // Higher resolution like MVEP
+                    this.analyser = this.context.createAnalyser();
+                    this.analyser.fftSize = 256;
                     this.analyser.smoothingTimeConstant = 0.8;
-                    this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
                     
-                    this.microphone = this.audioContext.createMediaStreamSource(stream);
-                    this.microphone.connect(this.analyser);
+                    const source = this.context.createMediaStreamSource(stream);
+                    source.connect(this.analyser);
                     
-                    this.isInitialized = true;
-                    console.log('✅ MVEP-Style Audio: Initialized successfully');
+                    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                    this.isActive = true;
+                    
+                    this.startProcessing();
+                    console.log('✅ Audio Engine: Active');
                     return true;
+                    
                 } catch (error) {
-                    console.log('⚠️ Audio permission denied - running in silent mode');
-                    // Provide default values for silent mode
-                    this.audioData = { bass: 0.1, mid: 0.1, high: 0.1, energy: 0.1, rhythm: 0 };
+                    console.log('⚠️ Audio denied - silent mode');
                     return false;
                 }
             }
             
-            processAudio() {
-                if (!this.isInitialized || !this.analyser) {
-                    // Return stable default values for silent mode
-                    return this.audioData;
-                }
-                
-                this.analyser.getByteFrequencyData(this.frequencyData);
-                
-                // MVEP-style frequency band processing (more precise)
-                const bassEnd = Math.floor(this.frequencyData.length * 0.15);   // 0-15%
-                const midEnd = Math.floor(this.frequencyData.length * 0.4);     // 15-40%  
-                const highStart = Math.floor(this.frequencyData.length * 0.4);  // 40-100%
-                
-                let bass = 0, mid = 0, high = 0;
-                let bassCount = 0, midCount = 0, highCount = 0;
-                
-                // Bass frequencies (0-15%)
-                for (let i = 1; i < bassEnd; i++) { // Skip DC component
-                    bass += this.frequencyData[i];
-                    bassCount++;
-                }
-                
-                // Mid frequencies (15-40%) 
-                for (let i = bassEnd; i < midEnd; i++) {
-                    mid += this.frequencyData[i];
-                    midCount++;
-                }
-                
-                // High frequencies (40-100%)
-                for (let i = highStart; i < this.frequencyData.length; i++) {
-                    high += this.frequencyData[i];
-                    highCount++;
-                }
-                
-                // Normalize and apply MVEP-style scaling
-                bass = bassCount > 0 ? Math.pow((bass / bassCount) / 255, 0.7) : 0;  // Power curve for bass
-                mid = midCount > 0 ? (mid / midCount) / 255 : 0;
-                high = highCount > 0 ? Math.pow((high / highCount) / 255, 1.2) : 0;   // Emphasize highs
-                
-                const energy = Math.sqrt(bass * bass + mid * mid + high * high) / Math.sqrt(3);
-                const rhythm = bass > 0.3 ? Math.min(bass * 1.5, 1.0) : 0;
-                
-                // Smooth the values (MVEP-style)
-                const smoothing = 0.3;
-                this.audioData.bass = bass * smoothing + this.audioData.bass * (1 - smoothing);
-                this.audioData.mid = mid * smoothing + this.audioData.mid * (1 - smoothing);
-                this.audioData.high = high * smoothing + this.audioData.high * (1 - smoothing);
-                this.audioData.energy = energy * smoothing + this.audioData.energy * (1 - smoothing);
-                this.audioData.rhythm = rhythm * 0.5 + this.audioData.rhythm * 0.5;
-                
-                return this.audioData;
-            }
-            
-            distributeAudioToActiveSystem(audioData) {
-                // MVEP-STYLE ARCHITECTURE: Each system processes audio in its own render loop
-                // This eliminates the "holographic override" problem and timing conflicts
-                
-                // Store global audio data for systems that need external audio data
-                window.globalAudioData = audioData;
-                
-                // Holographic system uses its own internal audio processing (like MVEP)
-                // Other systems can access globalAudioData in their render loops if needed
-                // This prevents conflicts and ensures proper audio reactivity for all systems
-            }
-            
-            startAudioLoop() {
-                const audioLoop = () => {
-                    // MVEP-Style: Always process audio, let systems decide usage
-                    const audioData = this.processAudio();
-                    if (audioData) {
-                        this.distributeAudioToActiveSystem(audioData);
+            startProcessing() {
+                const process = () => {
+                    if (!this.isActive || !this.analyser) {
+                        requestAnimationFrame(process);
+                        return;
                     }
-                    requestAnimationFrame(audioLoop);
+                    
+                    this.analyser.getByteFrequencyData(this.dataArray);
+                    
+                    // Simple frequency analysis
+                    const len = this.dataArray.length;
+                    const bassRange = Math.floor(len * 0.1);
+                    const midRange = Math.floor(len * 0.3);
+                    
+                    let bass = 0, mid = 0, high = 0;
+                    
+                    for (let i = 0; i < bassRange; i++) bass += this.dataArray[i];
+                    for (let i = bassRange; i < midRange; i++) mid += this.dataArray[i];
+                    for (let i = midRange; i < len; i++) high += this.dataArray[i];
+                    
+                    bass = (bass / bassRange) / 255;
+                    mid = (mid / (midRange - bassRange)) / 255;
+                    high = (high / (len - midRange)) / 255;
+                    
+                    const smoothing = 0.7;
+                    window.audioReactive.bass = bass * smoothing + window.audioReactive.bass * (1 - smoothing);
+                    window.audioReactive.mid = mid * smoothing + window.audioReactive.mid * (1 - smoothing);
+                    window.audioReactive.high = high * smoothing + window.audioReactive.high * (1 - smoothing);
+                    window.audioReactive.energy = (window.audioReactive.bass + window.audioReactive.mid + window.audioReactive.high) / 3;
+                    
+                    requestAnimationFrame(process);
                 };
                 
-                audioLoop();
-                console.log('🎵 MVEP-Style: Audio processing loop started (always running)');
+                process();
             }
         }
         
-        // Initialize global audio coordinator (MVEP-style auto-start)
-        window.centralAudioCoordinator = new CentralAudioCoordinator();
-        
-        // MVEP-Style: Auto-initialize audio on first user interaction
-        let audioAutoInitStarted = false;
-        const startAudioOnInteraction = () => {
-            if (!audioAutoInitStarted) {
-                audioAutoInitStarted = true;
-                console.log('🎵 MVEP-Style: Starting audio on user interaction');
-                
-                // Auto-enable audio and initialize 
-                window.audioEnabled = true;
-                window.centralAudioCoordinator.initialize().then(() => {
-                    window.centralAudioCoordinator.startAudioLoop();
-                });
-                
-                // Remove listeners after first interaction
-                document.removeEventListener('click', startAudioOnInteraction);
-                document.removeEventListener('keydown', startAudioOnInteraction);
-                document.removeEventListener('touchstart', startAudioOnInteraction);
-            }
-        };
-        
-        // Listen for user interactions to auto-start audio
-        document.addEventListener('click', startAudioOnInteraction);
-        document.addEventListener('keydown', startAudioOnInteraction);
-        document.addEventListener('touchstart', startAudioOnInteraction);
+        // Create the simple, mobile-safe audio engine
+        window.audioEngine = new SimpleAudioEngine();
         
         window.toggleInteractivity = function() {
             interactivityEnabled = !interactivityEnabled;
