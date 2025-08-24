@@ -601,15 +601,6 @@ export class VIB34DIntegratedEngine {
      * Update audio reactivity (for universal reactivity system)
      */
     // Audio reactivity now handled directly in visualizer render loops - no engine coordination needed
-            }
-            
-            if (audioData.bass > 0.4) {
-                // Temporarily boost grid density on bass hits
-                const currentDensity = this.parameterManager.getParameter('gridDensity') || 15;
-                this.parameterManager.setParameter('gridDensity', Math.min(100, currentDensity + audioData.bass * 20));
-            }
-        }
-    }
     
     /**
      * Apply audio reactivity grid settings (similar to holographic system)
