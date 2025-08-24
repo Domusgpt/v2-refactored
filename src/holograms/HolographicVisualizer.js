@@ -424,7 +424,10 @@ export class HolographicVisualizer {
                 
                 float scrollDensityMod = 1.0 + u_gridDensityShift * 0.3;
                 float audioDensityMod = 1.0 + u_audioDensityBoost * 0.5;
-                float roleDensity = ((u_density + u_densityVariation) * u_roleDensity) * scrollDensityMod * audioDensityMod;
+                // FIX: Prevent density doubling by using base density with controlled variations
+                float baseDensity = u_density * u_roleDensity;
+                float densityVariations = (u_densityVariation * 0.3 + (scrollDensityMod - 1.0) * 0.4 + (audioDensityMod - 1.0) * 0.2);
+                float roleDensity = baseDensity + densityVariations;
                 
                 float morphedGeometry = u_geometryType + u_morph * 3.0 + u_touchMorph * 2.0 + u_audioMorphBoost * 1.5;
                 float lattice = getDynamicGeometry(p, roleDensity, morphedGeometry);
@@ -849,12 +852,12 @@ export class HolographicVisualizer {
                 if (mappedParam !== null) {
                     let scaledValue = params[param];
                     
-                    // CRITICAL FIX: Scale gridDensity to higher holographic density range (3x higher)
+                    // FIX: Scale gridDensity to reasonable holographic density range (back to normal levels)
                     if (param === 'gridDensity') {
-                        // Convert gridDensity (5-100) to holographic density (0.6-7.5) - 3x higher max
-                        // Formula: density = 0.6 + (gridDensity - 5) / (100 - 5) * (7.5 - 0.6)
-                        scaledValue = 0.6 + (parseFloat(params[param]) - 5) / 95 * 6.9;
-                        console.log(`🔧 Density scaling: gridDensity=${params[param]} → density=${scaledValue.toFixed(3)}`);
+                        // Convert gridDensity (5-100) to holographic density (0.3-2.5) - reasonable range
+                        // Formula: density = 0.3 + (gridDensity - 5) / (100 - 5) * (2.5 - 0.3)
+                        scaledValue = 0.3 + (parseFloat(params[param]) - 5) / 95 * 2.2;
+                        console.log(`🔧 Density scaling: gridDensity=${params[param]} → density=${scaledValue.toFixed(3)} (normal range)`);
                     }
                     
                     this.variantParams[mappedParam] = scaledValue;

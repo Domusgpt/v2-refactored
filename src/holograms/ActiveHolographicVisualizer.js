@@ -346,7 +346,10 @@ void main() {
     
     float scrollDensityMod = 1.0 + u_gridDensityShift * 0.3;
     float audioDensityMod = 1.0 + u_audioDensityBoost * 0.5;
-    float roleDensity = ((u_density + u_densityVariation) * u_roleDensity) * scrollDensityMod * audioDensityMod;
+    // FIX: Prevent density doubling by using base density with controlled variations
+    float baseDensity = u_density * u_roleDensity;
+    float densityVariations = (u_densityVariation * 0.3 + (scrollDensityMod - 1.0) * 0.4 + (audioDensityMod - 1.0) * 0.2);
+    float roleDensity = baseDensity + densityVariations;
     
     float morphedGeometry = u_geometryType + u_morph * 3.0 + u_touchMorph * 2.0 + u_audioMorphBoost * 1.5;
     float lattice = getDynamicGeometry(p, roleDensity, morphedGeometry);
