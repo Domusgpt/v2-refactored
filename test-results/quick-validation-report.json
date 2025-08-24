@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-08-23T22:43:49.626Z",
+  "summary": {
+    "total": 3,
+    "passed": 2,
+    "failed": 1
+  },
+  "results": [
+    {
+      "test": "Speed Control",
+      "status": "FAIL",
+      "details": "locator.inputValue: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input[type=\"range\"]').filter({ hasText: /speed/i }).first()\u001b[22m\n"
+    },
+    {
+      "test": "Mouse Density",
+      "status": "PASS",
+      "details": "Mouse density interactions completed, visual smoothness observed",
+      "screenshots": [
+        "mouse-density-before.png",
+        "mouse-density-during.png",
+        "mouse-density-after.png"
+      ]
+    },
+    {
+      "test": "System Switching",
+      "status": "PASS",
+      "details": "All 4 systems switched successfully without errors",
+      "screenshots": [
+        "system-faceted.png",
+        "system-quantum.png",
+        "system-holographic.png",
+        "system-polychora.png"
+      ]
+    }
+  ],
+  "screenshots": []
+}

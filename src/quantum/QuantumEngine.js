@@ -227,27 +227,56 @@ export class QuantumEngine {
         // Calculate smoother average velocity
         const avgVelocity = this.velocityHistory.reduce((sum, v) => sum + v, 0) / this.velocityHistory.length;
         
-        // ENHANCED MULTI-PARAMETER MAPPING (5 parameters like holographic)
+        // EXPERIMENTAL QUANTUM MOUSE MAPPING: X-axis rotation + hemispheric colors
         
-        // 1. Chaos: Fast movement = more chaos (refined scaling)
-        const chaos = Math.min(1.0, avgVelocity * 30); // Smoother than 50
+        // X-AXIS: Direct rotation mapping (smooth 4D rotation)
+        // Map mouse X (0-1) to rotation angle (-π to π for full rotation range)
+        const rotationAngle = (x - 0.5) * Math.PI * 2; // -2π to 2π range
+        const rot4dXW = rotationAngle * 0.5; // Smooth XW rotation
+        const rot4dYW = rotationAngle * 0.3; // Complementary YW rotation
+        const rot4dZW = rotationAngle * 0.2; // Subtle ZW rotation
         
-        // 2. Speed: Movement affects animation speed
-        const speed = 0.5 + Math.min(2.5, avgVelocity * 15); // 0.5-3.0 range
+        // Y-AXIS: Maintains current behavior (density/complexity)
+        const gridDensity = 10 + (y * 90); // Y position: 10-100 range (unchanged)
         
-        // 3. Grid Density: Mouse position affects complexity  
-        const gridDensity = 10 + (y * 90); // Y position: 10-100 range
+        // HEMISPHERIC COLOR MAPPING: Distance from center affects color zones
+        const centerX = 0.5;
+        const centerY = 0.5;
+        const distanceFromCenter = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+        const normalizedDistance = Math.min(1.0, distanceFromCenter * Math.sqrt(2)); // 0-1 range
         
-        // 4. Intensity: Mouse X position controls brightness
-        const intensity = 0.4 + (x * 0.6); // X position: 0.4-1.0 range
+        // Color hemisphere mapping
+        const leftHemisphere = x < 0.5;
+        const topHemisphere = y < 0.5;
         
-        // 5. Hue: Velocity affects color shifts (quantum purple-cyan range)
-        const baseHue = 280; // Quantum purple-blue
-        const hueShift = avgVelocity * 80; // 0-80 degree shift  
-        const hue = (baseHue + hueShift) % 360;
+        let baseHue;
+        if (leftHemisphere && topHemisphere) {
+            baseHue = 240; // Blue quadrant
+        } else if (!leftHemisphere && topHemisphere) {
+            baseHue = 300; // Purple quadrant  
+        } else if (leftHemisphere && !topHemisphere) {
+            baseHue = 180; // Cyan quadrant
+        } else {
+            baseHue = 320; // Magenta quadrant
+        }
+        
+        // Distance affects hue variation (center = pure color, edges = shifted)
+        const hueVariation = normalizedDistance * 60; // 0-60 degree shift
+        const hue = (baseHue + hueVariation) % 360;
+        
+        // Other parameters influenced by movement
+        const chaos = Math.min(1.0, avgVelocity * 30); // Velocity affects chaos
+        const speed = 0.5 + Math.min(2.5, avgVelocity * 15); // Movement speed
+        const intensity = 0.3 + (normalizedDistance * 0.7); // Distance affects brightness
         
         // Update all parameters for rich visual feedback
         if (window.updateParameter) {
+            // Rotation parameters (new experimental mapping)
+            window.updateParameter('rot4dXW', rot4dXW.toFixed(3));
+            window.updateParameter('rot4dYW', rot4dYW.toFixed(3)); 
+            window.updateParameter('rot4dZW', rot4dZW.toFixed(3));
+            
+            // Traditional parameters
             window.updateParameter('chaos', chaos.toFixed(2));
             window.updateParameter('speed', speed.toFixed(2));
             window.updateParameter('gridDensity', Math.round(gridDensity));
@@ -259,7 +288,7 @@ export class QuantumEngine {
         this.lastMousePosition.x = x;
         this.lastMousePosition.y = y;
         
-        console.log(`🌌 Quantum Enhanced: Vel=${avgVelocity.toFixed(3)} → Chaos=${chaos.toFixed(2)}, Speed=${speed.toFixed(2)}, Density=${Math.round(gridDensity)}, Int=${intensity.toFixed(2)}, Hue=${Math.round(hue)}`);
+        console.log(`🌌 Quantum EXPERIMENTAL: X=${x.toFixed(2)}→Rot=${rotationAngle.toFixed(2)}, Y=${y.toFixed(2)}→Density=${Math.round(gridDensity)}, Dist=${normalizedDistance.toFixed(2)}→Hue=${Math.round(hue)}, Hemisphere=${leftHemisphere ? 'L' : 'R'}${topHemisphere ? 'T' : 'B'}`);
     }
     
     triggerQuantumClick() {

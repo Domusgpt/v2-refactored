@@ -473,13 +473,56 @@ void main() {
     // Apply user intensity control
     float finalIntensity = geometryIntensity * u_intensity;
     
-    // Enhanced HSV color system
-    float baseHue = u_hue / 360.0;
-    float hueShift = value * 0.2 + timeSpeed * 0.1; // Color shifts over time
-    float finalHue = baseHue + hueShift;
+    // EXPERIMENTAL: Hemispheric color mapping with fluid transitions
+    vec2 centerPos = vec2(0.0, 0.0); // Center of the screen in normalized coordinates
+    float distanceFromCenter = length(uv - centerPos);
+    float normalizedDistance = min(1.0, distanceFromCenter);
     
-    // Create rich holographic color
-    vec3 hsvColor = vec3(finalHue, u_saturation, finalIntensity);
+    // Determine hemisphere quadrants
+    bool leftHemisphere = uv.x < 0.0;
+    bool topHemisphere = uv.y > 0.0;
+    
+    // Base hue for each quadrant (fluid transitions)
+    float quadrantHue;
+    if (leftHemisphere && topHemisphere) {
+        quadrantHue = 240.0 / 360.0; // Blue quadrant
+    } else if (!leftHemisphere && topHemisphere) {
+        quadrantHue = 300.0 / 360.0; // Purple quadrant  
+    } else if (leftHemisphere && !topHemisphere) {
+        quadrantHue = 180.0 / 360.0; // Cyan quadrant
+    } else {
+        quadrantHue = 320.0 / 360.0; // Magenta quadrant
+    }
+    
+    // Smooth hue blending between quadrants based on position
+    float hueBlendX = smoothstep(-0.2, 0.2, uv.x); // Smooth transition across X
+    float hueBlendY = smoothstep(-0.2, 0.2, uv.y); // Smooth transition across Y
+    
+    // Create gradient between adjacent quadrants
+    float leftTopHue = 240.0 / 360.0;
+    float rightTopHue = 300.0 / 360.0; 
+    float leftBottomHue = 180.0 / 360.0;
+    float rightBottomHue = 320.0 / 360.0;
+    
+    float topHue = mix(leftTopHue, rightTopHue, hueBlendX);
+    float bottomHue = mix(leftBottomHue, rightBottomHue, hueBlendX);
+    float blendedHue = mix(bottomHue, topHue, hueBlendY);
+    
+    // Distance affects hue variation (center = pure color, edges = shifted)
+    float hueVariation = normalizedDistance * 0.15; // Fluid color shift toward edges
+    
+    // Combine user hue control with hemispheric mapping
+    float userHue = u_hue / 360.0;
+    float finalHue = mix(blendedHue + hueVariation, userHue, 0.3); // 70% hemispheric, 30% user control
+    
+    // Time-based color shifting for organic feel
+    finalHue += value * 0.1 + timeSpeed * 0.05;
+    
+    // Enhanced saturation based on distance (more saturated at edges)
+    float dynamicSaturation = mix(u_saturation * 0.7, u_saturation, normalizedDistance);
+    
+    // Create rich holographic color with hemispheric mapping
+    vec3 hsvColor = vec3(finalHue, dynamicSaturation, finalIntensity);
     vec3 baseColor = hsv2rgb(hsvColor);
     
     // Add holographic particles effect
