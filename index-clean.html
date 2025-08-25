@@ -46,7 +46,7 @@
 
     <!-- Main Canvas Container -->
     <div class="canvas-container" id="canvasContainer">
-        <!-- 4 System Canvas Layer Groups -->
+        <!-- Dynamic Canvas Containers - Canvases created/destroyed per system -->
         <div class="holographic-layers" id="vib34dLayers" style="display: block;"></div>
         <div class="holographic-layers" id="quantumLayers" style="display: none;"></div>
         <div class="holographic-layers" id="holographicLayers" style="display: none;"></div>
@@ -283,28 +283,19 @@
                 // Initialize VIB34D Application
                 const app = new VIB34DApp();
                 window.vib34dApp = app;
-
-                // Initialize the entire system
                 await app.initialize();
 
-                // CRITICAL: Initialize the default system (faceted)
+                // Initialize default system
                 const initialSystem = window.currentSystem || 'faceted';
-                console.log(`🎯 Initializing default system: ${initialSystem}`);
-                
-                // Force initial system switch to create the engine
                 if (window.switchSystem) {
                     await window.switchSystem(initialSystem);
                 }
                 
-                // CRITICAL: Set up geometry buttons for the initial system
                 if (window.setupGeometry) {
                     window.setupGeometry(initialSystem);
                 }
 
-                // CRITICAL: Mark modules as ready
                 window.moduleReady = true;
-
-                // Remove loading class to enable transitions
                 document.body.classList.remove('loading');
 
                 console.log('🚀 VIB34D Clean Architecture System Loaded');
