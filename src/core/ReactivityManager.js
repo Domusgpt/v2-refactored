@@ -26,7 +26,7 @@ export class ReactivityManager {
         
         // Current selected modes (default to system-appropriate)
         this.currentMouseMode = 'rotations';   // Start with Faceted default
-        this.currentClickMode = 'burst';       // Start with Faceted default  
+        this.currentClickMode = 'ripple';      // Start with Faceted default (SWAPPED: now uses ripple for geometry changes)  
         this.currentScrollMode = 'cycle';      // Start with Faceted default
         
         // Initialize modes after constructor completes
@@ -47,9 +47,9 @@ export class ReactivityManager {
             };
             
             this.clickModes = {
-                'burst': new BurstMode(),            // Faceted style
+                'burst': new BurstMode(),            // Holographic style (SWAPPED: chaos/speed effects)
                 'blast': new BlastMode(),            // Quantum style
-                'ripple': new RippleMode()           // Holographic style
+                'ripple': new RippleMode()           // Faceted style (SWAPPED: geometry morph effects)
             };
             
             this.scrollModes = {
@@ -81,9 +81,9 @@ export class ReactivityManager {
      */
     autoSelectDefaults(systemName) {
         const defaults = {
-            'faceted': { mouse: 'rotations', click: 'burst', scroll: 'cycle' },
+            'faceted': { mouse: 'rotations', click: 'ripple', scroll: 'cycle' },
             'quantum': { mouse: 'velocity', click: 'blast', scroll: 'wave' },
-            'holographic': { mouse: 'distance', click: 'ripple', scroll: 'sweep' },
+            'holographic': { mouse: 'distance', click: 'burst', scroll: 'sweep' },
             'polychora': { mouse: 'rotations', click: 'burst', scroll: 'cycle' }
         };
         
