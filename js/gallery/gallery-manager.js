@@ -8,10 +8,51 @@
 let unifiedSaveManager = null;
 
 /**
+ * CRITICAL FIX: Global Function Preservation System
+ * Prevents gallery operations from corrupting global scope
+ */
+const preserveCriticalFunctions = () => {
+    if (!window.vib34dPreservedFunctions) {
+        window.vib34dPreservedFunctions = {
+            switchSystem: window.switchSystem,
+            updateParameter: window.updateParameter,
+            currentSystem: window.currentSystem,
+            reactivityManager: window.reactivityManager,
+            engine: window.engine,
+            userParameterState: window.userParameterState,
+            selectGeometry: window.selectGeometry,
+            quantumEngine: window.quantumEngine,
+            holographicSystem: window.holographicSystem,
+            polychoraSystem: window.polychoraSystem
+        };
+        console.log('🛡️ Critical VIB34D functions preserved');
+    }
+};
+
+const restoreCriticalFunctions = () => {
+    if (window.vib34dPreservedFunctions) {
+        let restoredCount = 0;
+        Object.entries(window.vib34dPreservedFunctions).forEach(([key, value]) => {
+            if (!window[key] && value) {
+                window[key] = value;
+                restoredCount++;
+                console.log(`🔧 Restored ${key}`);
+            }
+        });
+        if (restoredCount > 0) {
+            console.log(`🛡️ Restored ${restoredCount} critical functions`);
+        }
+    }
+};
+
+/**
  * Save current visualization to gallery
  */
 window.saveToGallery = async function() {
     console.log('🔵 Save to Gallery button clicked');
+    
+    // CRITICAL FIX: Preserve functions before async operations
+    preserveCriticalFunctions();
     
     try {
         // Check if engine is initialized
@@ -76,6 +117,9 @@ window.saveToGallery = async function() {
     } catch (error) {
         console.error('❌ Failed to save to gallery:', error);
         showSaveError(error.message || 'Gallery save failed');
+    } finally {
+        // CRITICAL FIX: Always restore functions after async operations
+        setTimeout(restoreCriticalFunctions, 100);
     }
 };
 
@@ -84,6 +128,9 @@ window.saveToGallery = async function() {
  */
 window.createTradingCard = async function(format = 'classic') {
     console.log(`🎴 Creating ${format} trading card for ${window.currentSystem} system...`);
+    
+    // CRITICAL FIX: Preserve functions before async operations
+    preserveCriticalFunctions();
     
     try {
         // Dynamic import of TradingCardManager
@@ -161,6 +208,9 @@ window.createTradingCard = async function(format = 'classic') {
         
         document.body.appendChild(notification);
         setTimeout(() => notification.remove(), 3000);
+    } finally {
+        // CRITICAL FIX: Always restore functions after async operations
+        setTimeout(restoreCriticalFunctions, 100);
     }
 };
 
@@ -169,6 +219,10 @@ window.createTradingCard = async function(format = 'classic') {
  */
 window.showLLMInterface = async function() {
     console.log('🤖 Opening AI parameter interface');
+    
+    // CRITICAL FIX: Preserve functions before async operations
+    preserveCriticalFunctions();
+    
     try {
         // Import LLM modules dynamically
         const { LLMParameterInterface } = await import('../../src/llm/LLMParameterInterface.js');
@@ -224,6 +278,9 @@ window.showLLMInterface = async function() {
     } catch (error) {
         console.error('❌ Error loading LLM interface:', error);
         alert('Error loading AI parameter interface. Please check console for details.');
+    } finally {
+        // CRITICAL FIX: Always restore functions after async operations
+        setTimeout(restoreCriticalFunctions, 100);
     }
 };
 
