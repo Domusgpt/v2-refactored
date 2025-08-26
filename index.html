@@ -728,7 +728,15 @@
             if (window.canvasPool) {
                 try {
                     console.log(`🎯 Lazy loading ${system} system...`);
+                    console.log(`🔍 Canvas pool status:`, window.canvasPool.getStats());
+                    
                     const newEngine = await window.canvasPool.switchToSystem(system, null);
+                    
+                    console.log(`🔍 Switch result for ${system}:`, !!newEngine);
+                    if (newEngine) {
+                        console.log(`🔍 Engine type:`, newEngine.constructor.name);
+                        console.log(`🔍 Engine properties:`, Object.keys(newEngine));
+                    }
                     
                     if (newEngine) {
                         console.log(`✅ ${system} system ready with engine`);
@@ -758,11 +766,14 @@
                         console.log(`🔮 Polychora system not implemented yet`);
                         return; // Expected for polychora
                     } else {
-                        console.error(`❌ ${system} engine failed to create`);
+                        console.error(`❌ ${system} engine failed to create - newEngine is null/undefined`);
                     }
                 } catch (error) {
-                    console.error(`❌ Failed to switch to ${system}:`, error);
+                    console.error(`❌ Failed to switch to ${system} - DETAILED ERROR:`, error);
+                    console.error(`❌ Error stack:`, error.stack);
                 }
+            } else {
+                console.error(`❌ window.canvasPool is not available:`, !!window.canvasPool);
             }
             
             // If we get here, SmartCanvasPool failed - this is an error
@@ -1172,6 +1183,11 @@
                 
                 // CANVAS EXPLOSION FIX: SmartCanvasPool - Lazy load engines
                 console.log('🎯 Initializing SmartCanvasPool - Lazy loading engines on demand');
+                console.log('🔍 Engine classes check:', {
+                    VIB34DIntegratedEngine: !!VIB34DIntegratedEngine,
+                    QuantumEngine: !!QuantumEngine,
+                    RealHolographicSystem: !!RealHolographicSystem
+                });
                 window.canvasPool = new SmartCanvasPool({
                     VIB34DIntegratedEngine,
                     QuantumEngine,
@@ -1605,41 +1621,7 @@
             }, 10); // Immediate activation
         }
         
-        // Initialize Polychora when needed
-        async function initializePolychora() {
-            if (polychoraSystem) return true;
-            
-            try {
-                const { PolychoraSystem } = await import('./src/core/PolychoraSystem.js');
-                polychoraSystem = new PolychoraSystem();
-                
-                // Temporarily show polychora layers for WebGL initialization
-                const polychoraLayers = document.getElementById('polychoraLayers');
-                const wasHidden = polychoraLayers.style.display === 'none';
-                if (wasHidden) {
-                    polychoraLayers.style.display = 'block';
-                }
-                
-                const success = polychoraSystem.initialize();
-                
-                // Hide again if it was hidden
-                if (wasHidden) {
-                    polychoraLayers.style.display = 'none';
-                }
-                
-                if (success) {
-                    console.log('✅ Polychora System initialized');
-                    return true;
-                } else {
-                    console.error('❌ Polychora System initialization failed');
-                    polychoraSystem = null;
-                }
-            } catch (error) {
-                console.error('❌ Failed to initialize Polychora:', error);
-                polychoraSystem = null;
-            }
-            return false;
-        }
+        // REMOVED: Duplicate initializePolychora function - kept the first declaration in engine functions section
         
         // REMOVED: switchSystem function moved outside ES6 module for global access
         
