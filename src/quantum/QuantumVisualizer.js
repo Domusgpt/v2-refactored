@@ -425,20 +425,92 @@ float geometryFunction(vec4 p) {
     }
 }
 
-// HSV to RGB conversion for better color control
-vec3 hsv2rgb(vec3 c) {
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+// EXTREME LAYER-BY-LAYER COLOR SYSTEM
+// Each canvas layer gets completely different color behavior
+
+// Layer-specific color palettes with extreme juxtapositions
+vec3 getLayerColorPalette(int layerIndex, float t) {
+    if (layerIndex == 0) {
+        // BACKGROUND LAYER: Deep space colors - purple/black/deep blue
+        vec3 color1 = vec3(0.05, 0.0, 0.2);   // Deep purple
+        vec3 color2 = vec3(0.0, 0.0, 0.1);    // Near black
+        vec3 color3 = vec3(0.0, 0.05, 0.3);   // Deep blue
+        return mix(mix(color1, color2, sin(t * 3.0) * 0.5 + 0.5), color3, cos(t * 2.0) * 0.5 + 0.5);
+    }
+    else if (layerIndex == 1) {
+        // SHADOW LAYER: Toxic greens and sickly yellows - high contrast
+        vec3 color1 = vec3(0.0, 1.0, 0.0);    // Pure toxic green
+        vec3 color2 = vec3(0.8, 1.0, 0.0);    // Sickly yellow-green
+        vec3 color3 = vec3(0.0, 0.8, 0.3);    // Forest green
+        return mix(mix(color1, color2, sin(t * 7.0) * 0.5 + 0.5), color3, cos(t * 5.0) * 0.5 + 0.5);
+    }
+    else if (layerIndex == 2) {
+        // CONTENT LAYER: Blazing hot colors - red/orange/white hot
+        vec3 color1 = vec3(1.0, 0.0, 0.0);    // Pure red
+        vec3 color2 = vec3(1.0, 0.5, 0.0);    // Blazing orange
+        vec3 color3 = vec3(1.0, 1.0, 1.0);    // White hot
+        return mix(mix(color1, color2, sin(t * 11.0) * 0.5 + 0.5), color3, cos(t * 8.0) * 0.5 + 0.5);
+    }
+    else if (layerIndex == 3) {
+        // HIGHLIGHT LAYER: Electric blues and cyans - crackling energy
+        vec3 color1 = vec3(0.0, 1.0, 1.0);    // Electric cyan
+        vec3 color2 = vec3(0.0, 0.5, 1.0);    // Electric blue
+        vec3 color3 = vec3(0.5, 1.0, 1.0);    // Bright cyan
+        return mix(mix(color1, color2, sin(t * 13.0) * 0.5 + 0.5), color3, cos(t * 9.0) * 0.5 + 0.5);
+    }
+    else {
+        // ACCENT LAYER: Violent magentas and purples - chaotic
+        vec3 color1 = vec3(1.0, 0.0, 1.0);    // Pure magenta
+        vec3 color2 = vec3(0.8, 0.0, 1.0);    // Violet
+        vec3 color3 = vec3(1.0, 0.3, 1.0);    // Hot pink
+        return mix(mix(color1, color2, sin(t * 17.0) * 0.5 + 0.5), color3, cos(t * 12.0) * 0.5 + 0.5);
+    }
 }
 
-// RGB Glitch effect for holographic shimmer
-vec3 rgbGlitch(vec3 color, vec2 uv, float intensity) {
-    vec2 offset = vec2(intensity * 0.005, 0.0);
-    float r = color.r + sin(uv.y * 30.0 + u_time * 0.001) * intensity * 0.06;
-    float g = color.g + sin(uv.y * 28.0 + u_time * 0.0012) * intensity * 0.06;
-    float b = color.b + sin(uv.y * 32.0 + u_time * 0.0008) * intensity * 0.06;
-    return vec3(r, g, b);
+// Extreme RGB separation and distortion for each layer
+vec3 extremeRGBSeparation(vec3 baseColor, vec2 uv, float intensity, int layerIndex) {
+    vec2 offset = vec2(0.01, 0.005) * intensity;
+    
+    // Different separation patterns per layer
+    if (layerIndex == 0) {
+        // Background: Minimal separation, smooth
+        return baseColor + vec3(
+            sin(uv.x * 10.0 + u_time * 0.001) * 0.02,
+            cos(uv.y * 8.0 + u_time * 0.0015) * 0.02,
+            sin(uv.x * uv.y * 6.0 + u_time * 0.0008) * 0.02
+        ) * intensity;
+    }
+    else if (layerIndex == 1) {
+        // Shadow: Heavy vertical separation
+        float r = baseColor.r + sin(uv.y * 50.0 + u_time * 0.003) * intensity * 0.15;
+        float g = baseColor.g + sin((uv.y + 0.1) * 45.0 + u_time * 0.0025) * intensity * 0.12;
+        float b = baseColor.b + sin((uv.y - 0.1) * 55.0 + u_time * 0.0035) * intensity * 0.18;
+        return vec3(r, g, b);
+    }
+    else if (layerIndex == 2) {
+        // Content: Explosive radial separation
+        float dist = length(uv);
+        float angle = atan(uv.y, uv.x);
+        float r = baseColor.r + sin(dist * 30.0 + angle * 10.0 + u_time * 0.004) * intensity * 0.2;
+        float g = baseColor.g + cos(dist * 25.0 + angle * 8.0 + u_time * 0.0035) * intensity * 0.18;
+        float b = baseColor.b + sin(dist * 35.0 + angle * 12.0 + u_time * 0.0045) * intensity * 0.22;
+        return vec3(r, g, b);
+    }
+    else if (layerIndex == 3) {
+        // Highlight: Lightning-like separation
+        float lightning = sin(uv.x * 80.0 + u_time * 0.008) * cos(uv.y * 60.0 + u_time * 0.006);
+        float r = baseColor.r + lightning * intensity * 0.25;
+        float g = baseColor.g + sin(lightning * 40.0 + u_time * 0.005) * intensity * 0.2;
+        float b = baseColor.b + cos(lightning * 30.0 + u_time * 0.007) * intensity * 0.3;
+        return vec3(r, g, b);
+    }
+    else {
+        // Accent: Chaotic multi-directional separation
+        float chaos1 = sin(uv.x * 100.0 + uv.y * 80.0 + u_time * 0.01);
+        float chaos2 = cos(uv.x * 70.0 - uv.y * 90.0 + u_time * 0.008);
+        float chaos3 = sin(uv.x * uv.y * 150.0 + u_time * 0.012);
+        return baseColor + vec3(chaos1, chaos2, chaos3) * intensity * 0.3;
+    }
 }
 
 void main() {
@@ -473,80 +545,98 @@ void main() {
     // Apply user intensity control
     float finalIntensity = geometryIntensity * u_intensity;
     
-    // EXPERIMENTAL: Hemispheric color mapping with fluid transitions
-    vec2 centerPos = vec2(0.0, 0.0); // Center of the screen in normalized coordinates
-    float distanceFromCenter = length(uv - centerPos);
-    float normalizedDistance = min(1.0, distanceFromCenter);
+    // Old hemispheric color system completely removed - now using extreme layer-by-layer system
     
-    // Determine hemisphere quadrants
-    bool leftHemisphere = uv.x < 0.0;
-    bool topHemisphere = uv.y > 0.0;
+    // EXTREME LAYER-BY-LAYER COLOR SYSTEM
+    // Determine canvas layer from role/variant (0=background, 1=shadow, 2=content, 3=highlight, 4=accent)
+    int layerIndex = 0;
+    if (u_roleIntensity == 0.7) layerIndex = 1;      // shadow layer
+    else if (u_roleIntensity == 1.0) layerIndex = 2; // content layer  
+    else if (u_roleIntensity == 0.85) layerIndex = 3; // highlight layer
+    else if (u_roleIntensity == 0.6) layerIndex = 4;  // accent layer
     
-    // Base hue for each quadrant (fluid transitions)
-    float quadrantHue;
-    if (leftHemisphere && topHemisphere) {
-        quadrantHue = 240.0 / 360.0; // Blue quadrant
-    } else if (!leftHemisphere && topHemisphere) {
-        quadrantHue = 300.0 / 360.0; // Purple quadrant  
-    } else if (leftHemisphere && !topHemisphere) {
-        quadrantHue = 180.0 / 360.0; // Cyan quadrant
-    } else {
-        quadrantHue = 320.0 / 360.0; // Magenta quadrant
+    // Get layer-specific base color with extreme dynamics
+    // Use u_hue as global intensity modifier (0-1) affecting all layers
+    float globalIntensity = u_hue; // Now 0-1 from JavaScript
+    float colorTime = timeSpeed * 2.0 + value * 3.0 + globalIntensity * 5.0;
+    vec3 layerColor = getLayerColorPalette(layerIndex, colorTime) * (0.5 + globalIntensity * 1.5);
+    
+    // Apply geometry-based intensity modulation per layer
+    vec3 extremeBaseColor;
+    if (layerIndex == 0) {
+        // Background: Subtle, fills empty space
+        extremeBaseColor = layerColor * (0.3 + geometryIntensity * 0.4);
+    }
+    else if (layerIndex == 1) {
+        // Shadow: Aggressive, high contrast where geometry is weak
+        float shadowIntensity = pow(1.0 - geometryIntensity, 2.0); // Inverted for shadows
+        extremeBaseColor = layerColor * (shadowIntensity * 0.8 + 0.1);
+    }
+    else if (layerIndex == 2) {
+        // Content: Dominant, follows geometry strongly
+        extremeBaseColor = layerColor * (geometryIntensity * 1.2 + 0.2);
+    }
+    else if (layerIndex == 3) {
+        // Highlight: Electric, peaks only
+        float peakIntensity = pow(geometryIntensity, 3.0); // Cubic for sharp peaks
+        extremeBaseColor = layerColor * (peakIntensity * 1.5 + 0.1);
+    }
+    else {
+        // Accent: Chaotic, random bursts
+        float randomBurst = sin(value * 50.0 + timeSpeed * 10.0) * 0.5 + 0.5;
+        extremeBaseColor = layerColor * (randomBurst * geometryIntensity * 2.0 + 0.05);
     }
     
-    // Smooth hue blending between quadrants based on position
-    float hueBlendX = smoothstep(-0.2, 0.2, uv.x); // Smooth transition across X
-    float hueBlendY = smoothstep(-0.2, 0.2, uv.y); // Smooth transition across Y
+    // Apply extreme RGB separation per layer
+    vec3 extremeColor = extremeRGBSeparation(extremeBaseColor, uv, finalIntensity, layerIndex);
     
-    // Create gradient between adjacent quadrants
-    float leftTopHue = 240.0 / 360.0;
-    float rightTopHue = 300.0 / 360.0; 
-    float leftBottomHue = 180.0 / 360.0;
-    float rightBottomHue = 320.0 / 360.0;
+    // Layer-specific particle systems with extreme colors
+    float extremeParticles = 0.0;
+    if (layerIndex == 2 || layerIndex == 3) {
+        // Only content and highlight layers get particles
+        vec2 particleUV = uv * (layerIndex == 2 ? 12.0 : 20.0);
+        vec2 particleID = floor(particleUV);
+        vec2 particlePos = fract(particleUV) - 0.5;
+        float particleDist = length(particlePos);
+        
+        float particleTime = timeSpeed * (layerIndex == 2 ? 3.0 : 8.0) + dot(particleID, vec2(127.1, 311.7));
+        float particleAlpha = sin(particleTime) * 0.5 + 0.5;
+        float particleSize = layerIndex == 2 ? 0.2 : 0.1;
+        extremeParticles = (1.0 - smoothstep(0.05, particleSize, particleDist)) * particleAlpha * 0.4;
+    }
     
-    float topHue = mix(leftTopHue, rightTopHue, hueBlendX);
-    float bottomHue = mix(leftBottomHue, rightBottomHue, hueBlendX);
-    float blendedHue = mix(bottomHue, topHue, hueBlendY);
+    // Combine extreme color with particles based on layer
+    vec3 finalColor;
+    if (layerIndex == 0) {
+        // Background: Pure extreme color
+        finalColor = extremeColor;
+    }
+    else if (layerIndex == 1) {
+        // Shadow: Dark with toxic highlights
+        finalColor = extremeColor * 0.8;
+    }
+    else if (layerIndex == 2) {
+        // Content: Blazing with white-hot particles
+        finalColor = extremeColor + extremeParticles * vec3(1.0, 1.0, 1.0);
+    }
+    else if (layerIndex == 3) {
+        // Highlight: Electric with cyan particles
+        finalColor = extremeColor + extremeParticles * vec3(0.0, 1.0, 1.0);
+    }
+    else {
+        // Accent: Chaotic magenta madness
+        finalColor = extremeColor * (1.0 + sin(timeSpeed * 20.0) * 0.3);
+    }
     
-    // Distance affects hue variation (center = pure color, edges = shifted)
-    float hueVariation = normalizedDistance * 0.15; // Fluid color shift toward edges
+    // Layer-specific alpha intensity with extreme contrast
+    float layerAlpha;
+    if (layerIndex == 0) layerAlpha = 0.6;        // Background: Medium
+    else if (layerIndex == 1) layerAlpha = 0.4;   // Shadow: Lower
+    else if (layerIndex == 2) layerAlpha = 1.0;   // Content: Full intensity
+    else if (layerIndex == 3) layerAlpha = 0.8;   // Highlight: High
+    else layerAlpha = 0.3;                        // Accent: Subtle bursts
     
-    // Combine user hue control with hemispheric mapping
-    float userHue = u_hue / 360.0;
-    float finalHue = mix(blendedHue + hueVariation, userHue, 0.3); // 70% hemispheric, 30% user control
-    
-    // Time-based color shifting for organic feel
-    finalHue += value * 0.1 + timeSpeed * 0.05;
-    
-    // Enhanced saturation based on distance (more saturated at edges)
-    float dynamicSaturation = mix(u_saturation * 0.7, u_saturation, normalizedDistance);
-    
-    // Create rich holographic color with hemispheric mapping
-    vec3 hsvColor = vec3(finalHue, dynamicSaturation, finalIntensity);
-    vec3 baseColor = hsv2rgb(hsvColor);
-    
-    // Add holographic particles effect
-    float particles = 0.0;
-    vec2 particleUV = uv * 8.0;
-    vec2 particleID = floor(particleUV);
-    vec2 particlePos = fract(particleUV) - 0.5;
-    float particleDist = length(particlePos);
-    
-    // Animated particles
-    float particleTime = timeSpeed + dot(particleID, vec2(127.1, 311.7));
-    float particleAlpha = sin(particleTime) * 0.5 + 0.5;
-    particles = (1.0 - smoothstep(0.1, 0.3, particleDist)) * particleAlpha * 0.3;
-    
-    // Apply RGB glitch for holographic shimmer
-    vec3 glitchedColor = rgbGlitch(baseColor, uv, finalIntensity * 0.5);
-    
-    // Combine base color with particles
-    vec3 finalColor = glitchedColor + particles * vec3(1.0, 0.8, 1.0);
-    
-    // Enhanced role-based intensity
-    float roleIntensity = u_roleIntensity;
-    
-    gl_FragColor = vec4(finalColor, finalIntensity * roleIntensity);
+    gl_FragColor = vec4(finalColor, finalIntensity * layerAlpha);
 }`;
         
         this.program = this.createProgram(vertexShaderSource, fragmentShaderSource);
@@ -824,7 +914,8 @@ void main() {
         this.gl.uniform1f(this.uniforms.morphFactor, Math.min(2, morphFactor));
         this.gl.uniform1f(this.uniforms.chaos, Math.min(1, chaos));
         this.gl.uniform1f(this.uniforms.speed, this.params.speed);
-        this.gl.uniform1f(this.uniforms.hue, hue % 360);
+        // Hue now used as global intensity modifier for extreme layer system
+        this.gl.uniform1f(this.uniforms.hue, (hue % 360) / 360.0); // Normalize to 0-1
         this.gl.uniform1f(this.uniforms.intensity, this.params.intensity);
         this.gl.uniform1f(this.uniforms.saturation, this.params.saturation);
         this.gl.uniform1f(this.uniforms.dimension, this.params.dimension);
