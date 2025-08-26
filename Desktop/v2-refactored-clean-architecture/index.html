@@ -390,6 +390,7 @@
             <button class="action-btn" onclick="toggleAudio()" title="Audio">🎵</button>
             <button class="action-btn" onclick="showLLMInterface()" title="AI Parameters">🤖</button>
             <button class="action-btn" onclick="toggleInteractivity()" title="Interactivity Menu (Press I)">I</button>
+            <button class="action-btn" id="deviceTiltBtn" onclick="toggleDeviceTilt()" title="Device Tilt (Mobile)">📱</button>
         </div>
     </div>
     
@@ -917,6 +918,109 @@
         let unifiedSaveManager = null;
         let parameterMapper = null;
         let savedVariationsCount = 0;
+        
+        // =======================================
+        // 🚀 ENGINE INITIALIZATION FUNCTIONS
+        // =======================================
+        
+        async function initializeQuantumEngine() {
+            if (quantumEngine) return true;
+            
+            try {
+                const { QuantumEngine } = await import('./src/quantum/QuantumEngine.js');
+                quantumEngine = new QuantumEngine();
+                
+                // Temporarily show quantum layers for WebGL initialization
+                const quantumLayers = document.getElementById('quantumLayers');
+                const wasHidden = quantumLayers.style.display === 'none';
+                if (wasHidden) {
+                    quantumLayers.style.display = 'block';
+                }
+                
+                const success = quantumEngine.initialize();
+                
+                // Hide again if it was hidden
+                if (wasHidden) {
+                    quantumLayers.style.display = 'none';
+                }
+                
+                if (success) {
+                    console.log('🌌 Quantum engine initialized successfully');
+                    return true;
+                } else {
+                    throw new Error('Quantum engine initialization failed');
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize quantum engine:', error);
+                return false;
+            }
+        }
+        
+        async function initializeHolographicSystem() {
+            if (holographicSystem) return true;
+            
+            try {
+                const { RealHolographicSystem } = await import('./src/holograms/RealHolographicSystem.js');
+                holographicSystem = new RealHolographicSystem();
+                
+                // Temporarily show holographic layers for WebGL initialization
+                const holographicLayers = document.getElementById('holographicLayers');
+                const wasHidden = holographicLayers.style.display === 'none';
+                if (wasHidden) {
+                    holographicLayers.style.display = 'block';
+                }
+                
+                const success = holographicSystem.initialize();
+                
+                // Hide again if it was hidden
+                if (wasHidden) {
+                    holographicLayers.style.display = 'none';
+                }
+                
+                if (success) {
+                    console.log('✨ Holographic system initialized successfully');
+                    return true;
+                } else {
+                    throw new Error('Holographic system initialization failed');
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize holographic system:', error);
+                return false;
+            }
+        }
+        
+        async function initializePolychora() {
+            if (polychoraSystem) return true;
+            
+            try {
+                const { PolychoraSystem } = await import('./src/core/PolychoraSystem.js');
+                polychoraSystem = new PolychoraSystem();
+                
+                // Temporarily show polychora layers for WebGL initialization
+                const polychoraLayers = document.getElementById('polychoraLayers');
+                const wasHidden = polychoraLayers.style.display === 'none';
+                if (wasHidden) {
+                    polychoraLayers.style.display = 'block';
+                }
+                
+                const success = polychoraSystem.initialize();
+                
+                // Hide again if it was hidden
+                if (wasHidden) {
+                    polychoraLayers.style.display = 'none';
+                }
+                
+                if (success) {
+                    console.log('🔮 Polychora system initialized successfully');
+                    return true;
+                } else {
+                    throw new Error('Polychora system initialization failed');
+                }
+            } catch (error) {
+                console.error('❌ Failed to initialize polychora system:', error);
+                return false;
+            }
+        }
         
         // Geometry configurations
         const geometries = {
@@ -2568,6 +2672,258 @@
                 }
             }
         });
+        
+        // =======================================
+        // 🎯 SYSTEM SWITCHING FUNCTION
+        // =======================================
+        
+        window.switchSystem = async function(system) {
+            console.log(`🎯 switchSystem called with: ${system}`);
+            
+            // 🚀 INITIALIZE ENGINES ON DEMAND
+            try {
+                if (system === 'quantum') {
+                    console.log('🌌 Initializing quantum engine...');
+                    await initializeQuantumEngine();
+                    window.quantumEngine = quantumEngine;
+                } else if (system === 'holographic') {
+                    console.log('✨ Initializing holographic system...');
+                    await initializeHolographicSystem();
+                    window.holographicSystem = holographicSystem;
+                } else if (system === 'polychora') {
+                    console.log('🔮 Initializing polychora system...');
+                    await initializePolychora();
+                    window.polychoraSystem = polychoraSystem;
+                }
+            } catch (error) {
+                console.error(`❌ Failed to initialize ${system} engine:`, error);
+                return;
+            }
+            
+            // CANVAS EXPLOSION FIX: Use SmartCanvasPool ONLY
+            if (window.canvasPool) {
+                try {
+                    console.log(`🎯 Lazy loading ${system} system...`);
+                    const newEngine = await window.canvasPool.switchToSystem(system, null);
+                    
+                    if (newEngine) {
+                        console.log(`✅ ${system} system ready with engine`);
+                        console.log(`📊 Canvas stats: ${JSON.stringify(window.canvasPool.getStats())}`);
+                        
+                        // Update global state and UI
+                        window.currentSystem = system;
+                        
+                        // Update UI buttons
+                        document.querySelectorAll('.system-btn').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.system === system);
+                        });
+                        
+                        // Update panel header
+                        const headers = {
+                            faceted: 'FACETED SYSTEM',
+                            quantum: 'QUANTUM SYSTEM', 
+                            holographic: 'HOLOGRAPHIC SYSTEM',
+                            polychora: 'POLYCHORA SYSTEM'
+                        };
+                        const panelHeader = document.getElementById('panelHeader');
+                        if (panelHeader && headers[system]) {
+                            panelHeader.textContent = headers[system];
+                        }
+                        
+                        return;
+                    } else if (system === 'polychora') {
+                        console.log(`🔮 Polychora system not implemented yet`);
+                        return; // Expected for polychora
+                    } else {
+                        console.error(`❌ ${system} engine failed to create`);
+                    }
+                } catch (error) {
+                    console.error(`❌ Failed to switch to ${system}:`, error);
+                }
+            }
+            
+            // If we get here, SmartCanvasPool failed - this is an error
+            console.error(`💥 SmartCanvasPool failed for ${system} - system may not work properly`);
+        }
+        
+        // =======================================
+        // 📱 DEVICE TILT SYSTEM FOR 4D VISUALIZATION  
+        // =======================================
+        
+        class DeviceTilt4DSystem {
+            constructor() {
+                this.isActive = false;
+                this.smoothedX = 0;
+                this.smoothedY = 0;
+                this.smoothingFactor = 0.1;
+                
+                // 4D rotation mapping settings
+                this.tiltToRotationMultiplier = 2.0; // How much tilt affects 4D rotation
+                this.baseXW = 0; // Store original XW value
+                this.baseYW = 0; // Store original YW value
+                
+                // Button reference
+                this.button = null;
+                
+                console.log('📱 Device Tilt 4D System initialized');
+            }
+            
+            async init() {
+                // Only initialize on mobile devices
+                if (!this.isMobile()) {
+                    console.log('📱 Device Tilt: Desktop detected - hiding mobile button');
+                    const btn = document.getElementById('deviceTiltBtn');
+                    if (btn) btn.style.display = 'none';
+                    return;
+                }
+                
+                this.button = document.getElementById('deviceTiltBtn');
+                if (!this.button) return;
+                
+                try {
+                    // Request device motion permission on iOS 13+
+                    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                        const permission = await DeviceMotionEvent.requestPermission();
+                        if (permission !== 'granted') {
+                            console.log('📱 Device motion permission denied');
+                            this.button.style.opacity = '0.5';
+                            this.button.title = 'Device Tilt (Permission Required)';
+                            return;
+                        }
+                    }
+                    
+                    console.log('📱 Device Tilt: Ready for activation');
+                    this.button.style.opacity = '1.0';
+                    
+                } catch (error) {
+                    console.log('📱 Device Tilt not available:', error);
+                    this.button.style.display = 'none';
+                }
+            }
+            
+            isMobile() {
+                return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                       (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+            }
+            
+            toggle() {
+                if (!this.isMobile()) return;
+                
+                if (this.isActive) {
+                    this.stop();
+                } else {
+                    this.start();
+                }
+            }
+            
+            start() {
+                if (!this.isMobile() || this.isActive) return;
+                
+                // Store current 4D rotation values as base
+                const xwSlider = document.getElementById('rot4dXW');
+                const ywSlider = document.getElementById('rot4dYW');
+                
+                if (xwSlider && ywSlider) {
+                    this.baseXW = parseFloat(xwSlider.value) || 0;
+                    this.baseYW = parseFloat(ywSlider.value) || 0;
+                }
+                
+                // Start listening to device orientation
+                window.addEventListener('deviceorientation', this.handleDeviceOrientation.bind(this));
+                this.isActive = true;
+                
+                // Update button appearance
+                if (this.button) {
+                    this.button.style.background = 'rgba(0, 255, 0, 0.2)';
+                    this.button.style.borderColor = 'rgba(0, 255, 0, 0.5)';
+                    this.button.style.color = '#00ff00';
+                    this.button.title = 'Device Tilt (ACTIVE - Click to disable)';
+                }
+                
+                console.log('📱 Device Tilt: ACTIVATED - Phone tilt now controls 4D rotation');
+            }
+            
+            stop() {
+                window.removeEventListener('deviceorientation', this.handleDeviceOrientation.bind(this));
+                this.isActive = false;
+                
+                // Reset button appearance
+                if (this.button) {
+                    this.button.style.background = '';
+                    this.button.style.borderColor = '';
+                    this.button.style.color = '';
+                    this.button.title = 'Device Tilt (Mobile)';
+                }
+                
+                console.log('📱 Device Tilt: DEACTIVATED');
+            }
+            
+            handleDeviceOrientation(event) {
+                if (!this.isActive) return;
+                
+                // Get device orientation values
+                const beta = event.beta;   // X-axis rotation (-180 to 180)
+                const gamma = event.gamma; // Y-axis rotation (-90 to 90)
+                
+                if (beta === null || gamma === null) return;
+                
+                // Normalize values to -1 to 1 range
+                const normalizedX = Math.max(-1, Math.min(1, beta / 45));   // Tilt forward/back
+                const normalizedY = Math.max(-1, Math.min(1, gamma / 45));  // Tilt left/right
+                
+                // Apply smoothing to prevent jittery motion
+                this.smoothedX = this.smoothedX + (normalizedX - this.smoothedX) * this.smoothingFactor;
+                this.smoothedY = this.smoothedY + (normalizedY - this.smoothedY) * this.smoothingFactor;
+                
+                // Map device tilt to 4D rotation parameters
+                const newXW = this.baseXW + (this.smoothedX * this.tiltToRotationMultiplier);
+                const newYW = this.baseYW + (this.smoothedY * this.tiltToRotationMultiplier);
+                
+                // Constrain to slider limits (-6.28 to 6.28)
+                const constrainedXW = Math.max(-6.28, Math.min(6.28, newXW));
+                const constrainedYW = Math.max(-6.28, Math.min(6.28, newYW));
+                
+                // Update the 4D rotation parameters
+                if (window.updateParameter) {
+                    window.updateParameter('rot4dXW', constrainedXW);
+                    window.updateParameter('rot4dYW', constrainedYW);
+                }
+                
+                // Update UI sliders to reflect the change
+                const xwSlider = document.getElementById('rot4dXW');
+                const ywSlider = document.getElementById('rot4dYW');
+                
+                if (xwSlider) xwSlider.value = constrainedXW;
+                if (ywSlider) ywSlider.value = constrainedYW;
+                
+                // Update display values
+                const xwDisplay = document.getElementById('xwValue');
+                const ywDisplay = document.getElementById('ywValue');
+                
+                if (xwDisplay) xwDisplay.textContent = constrainedXW.toFixed(2);
+                if (ywDisplay) ywDisplay.textContent = constrainedYW.toFixed(2);
+            }
+        }
+        
+        // Initialize device tilt system
+        window.deviceTiltSystem = new DeviceTilt4DSystem();
+        
+        // Global function for device tilt button
+        window.toggleDeviceTilt = function() {
+            window.deviceTiltSystem.toggle();
+        }
+        
+        // Initialize device tilt after DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                window.deviceTiltSystem.init();
+            }, 100);
+        });
+        
+        console.log('🎯 SYSTEM SWITCHING: Ready for all 4 systems');
+        console.log('📱 DEVICE TILT 4D VISUALIZATION SYSTEM: Ready');
+        console.log('🚀 All engines will initialize on first system switch');
+        
     </script>
 </body>
 </html>
