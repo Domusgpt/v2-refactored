@@ -53,13 +53,12 @@ export class URLParameterHandler {
             
             this.isGalleryPreview = true;
             
-            // CRITICAL FIX: Set currentSystem immediately for gallery previews  
+            // Set currentSystem for gallery previews (CanvasManager will handle canvas layers)
             const previousSystem = window.currentSystem;
             window.currentSystem = targetSystem;
-            console.log(`🎯 Gallery preview: currentSystem changed from '${previousSystem}' to '${targetSystem}'`);
+            console.log(`🎯 Gallery preview: currentSystem set to '${targetSystem}' (was '${previousSystem}')`);
             
-            // CRITICAL FIX: Show correct system canvas layers immediately
-            this.showCorrectSystemLayers(targetSystem);
+            // Don't manipulate canvas layers early - let CanvasManager handle this during switchSystem
             
             // Store in window for global access
             window.galleryPreviewData = this.galleryPreviewData;

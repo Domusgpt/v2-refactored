@@ -11,7 +11,7 @@ export class GalleryPreviewFix {
     }
 
     /**
-     * Initialize gallery preview with proper system checking
+     * Initialize gallery preview - FAST & SIMPLE approach that works WITH CanvasManager
      */
     async initializeGalleryPreview() {
         // Check if this is a gallery preview
@@ -19,89 +19,62 @@ export class GalleryPreviewFix {
             return;
         }
 
-        console.log('🎨 GALLERY PREVIEW FIX: Initializing for', window.galleryPreviewData.system);
+        console.log('🚀 FAST GALLERY PREVIEW: Initializing for', window.galleryPreviewData.system);
         
-        // Wait for engine classes to be available
-        await this.waitForEngineClasses();
+        // Wait for critical systems to be ready
+        await this.waitForCriticalSystems();
         
-        // Try to initialize target system (more aggressive approach)
+        // SINGLE system switch - let CanvasManager handle the canvas lifecycle
         const targetSystem = window.galleryPreviewData.system;
-        let systemReady = false;
+        console.log(`🚀 FAST GALLERY PREVIEW: Switching to ${targetSystem} (ONCE)`);
         
-        console.log(`🎨 GALLERY PREVIEW FIX: Attempting to initialize ${targetSystem} system`);
-        
-        // First, try to switch to the target system
-        if (window.switchSystem && targetSystem !== 'faceted') {
-            try {
-                console.log(`🎨 Attempting to switch to ${targetSystem} system...`);
-                await window.switchSystem(targetSystem);
-                
-                // Wait a moment for system to initialize
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // Check if system is now available
-                const isSystemAvailable = this.checkSystemAvailability(targetSystem);
-                if (isSystemAvailable) {
-                    console.log(`✅ Successfully initialized ${targetSystem} system`);
-                    systemReady = true;
-                } else {
-                    console.warn(`⚠️ ${targetSystem} system switch completed but not fully available`);
-                }
-            } catch (e) {
-                console.warn(`❌ Failed to switch to ${targetSystem}: ${e.message}`);
-            }
-        } else if (targetSystem === 'faceted') {
-            // Faceted system should always be available
-            systemReady = true;
-        }
-        
-        // Only fall back to faceted if target system completely failed
-        if (!systemReady && targetSystem !== 'faceted') {
-            console.warn(`🎨 GALLERY PREVIEW FIX: ${targetSystem} system failed to initialize, falling back to faceted`);
-            window.galleryPreviewData.system = 'faceted';
-            window.currentSystem = 'faceted';
-            
-            if (window.switchSystem) {
+        try {
+            // Single switch call - CanvasManager will handle everything
+            await window.switchSystem(targetSystem);
+            console.log(`✅ FAST: ${targetSystem} system ready`);
+        } catch (e) {
+            console.warn(`❌ FAST: Switch to ${targetSystem} failed, using fallback:`, e.message);
+            // Only try fallback if the target system failed
+            if (targetSystem !== 'faceted') {
                 try {
                     await window.switchSystem('faceted');
-                    console.log('✅ Successfully switched to faceted as fallback');
-                } catch (e) {
-                    console.warn('❌ Fallback switch to faceted failed:', e.message);
+                    window.galleryPreviewData.system = 'faceted';
+                    console.log('✅ FAST: Fallback to faceted successful');
+                } catch (fallbackError) {
+                    console.error('❌ FAST: Even fallback failed:', fallbackError.message);
                 }
             }
         }
         
-        // Apply gallery preview with proper system
-        await this.applyGalleryPreview();
+        // Apply parameters ONCE after system is ready
+        await this.applyParametersFast();
     }
 
     /**
-     * Wait for ALL critical systems to be ready: engines AND global functions
+     * Wait for critical systems - FASTER version
      */
-    async waitForEngineClasses() {
+    async waitForCriticalSystems() {
         return new Promise((resolve) => {
             const checkCriticalSystems = () => {
-                const hasEngineClasses = window.engineClasses && Object.keys(window.engineClasses).length > 0;
-                const hasTargetSystemEngine = this.checkTargetSystemEngine(window.galleryPreviewData?.system);
-                const hasGlobalFunctions = typeof window.syncVisualizerToUI === 'function' && typeof window.getCurrentUIParameterState === 'function';
+                // Only check for the essentials needed for switchSystem to work
                 const hasSwitchSystem = typeof window.switchSystem === 'function';
+                const hasCanvasManager = !!window.canvasManager;
+                const hasEngineClasses = window.engineClasses && Object.keys(window.engineClasses).length > 0;
                 
-                const allReady = hasEngineClasses && hasTargetSystemEngine && hasGlobalFunctions && hasSwitchSystem;
+                const essentialsReady = hasSwitchSystem && hasCanvasManager && hasEngineClasses;
                 
-                if (allReady) {
-                    console.log('🎨 GALLERY PREVIEW FIX: ALL critical systems ready!');
+                if (essentialsReady) {
+                    console.log('🚀 FAST GALLERY PREVIEW: Essential systems ready!');
                     resolve();
-                } else if (this.initializationAttempts < this.maxAttempts) {
+                } else if (this.initializationAttempts < 5) { // Reduced max attempts
                     this.initializationAttempts++;
-                    console.log(`🎨 GALLERY PREVIEW FIX: Waiting for critical systems... (${this.initializationAttempts}/${this.maxAttempts})`);
-                    console.log(`  - Engine classes: ${hasEngineClasses ? '✅' : '❌'}`);
-                    console.log(`  - Target system (${window.galleryPreviewData?.system}): ${hasTargetSystemEngine ? '✅' : '❌'}`);
-                    console.log(`  - Global functions (syncVisualizerToUI, getCurrentUIParameterState): ${hasGlobalFunctions ? '✅' : '❌'}`);
-                    console.log(`  - switchSystem function: ${hasSwitchSystem ? '✅' : '❌'}`);
-                    setTimeout(checkCriticalSystems, this.retryDelay);
+                    console.log(`🚀 FAST: Waiting for essentials... (${this.initializationAttempts}/5)`);
+                    console.log(`  - switchSystem: ${hasSwitchSystem ? '✅' : '❌'}`);
+                    console.log(`  - canvasManager: ${hasCanvasManager ? '✅' : '❌'}`);
+                    console.log(`  - engineClasses: ${hasEngineClasses ? '✅' : '❌'}`);
+                    setTimeout(checkCriticalSystems, 500); // Reduced delay
                 } else {
-                    console.warn('🎨 GALLERY PREVIEW FIX: Timeout waiting for critical systems - proceeding anyway');
-                    console.log(`🎨 Final status: Engines: ${hasEngineClasses}, Target: ${hasTargetSystemEngine}, Functions: ${hasGlobalFunctions}, Switch: ${hasSwitchSystem}`);
+                    console.warn('🚀 FAST: Timeout waiting for essentials - proceeding anyway');
                     resolve();
                 }
             };
@@ -179,121 +152,45 @@ export class GalleryPreviewFix {
     }
 
     /**
-     * Apply gallery preview with proper error handling
+     * Apply parameters FAST - single application, let CanvasManager/switchSystem handle the rest
      */
-    async applyGalleryPreview() {
-        const { system, parameters } = window.galleryPreviewData;
+    async applyParametersFast() {
+        const { parameters } = window.galleryPreviewData;
         
-        console.log(`🎨 GALLERY PREVIEW FIX: Applying preview for ${system} system`);
-        console.log(`🎨 Gallery preview parameters:`, parameters);
+        console.log(`🚀 FAST GALLERY PREVIEW: Applying parameters ONCE`);
+        console.log(`🚀 Parameters:`, parameters);
+        
+        // Wait a moment for CanvasManager to finish canvas creation
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         try {
-            // ENHANCED: Always try to switch, even for faceted system (to ensure proper initialization)
-            if (window.switchSystem) {
-                console.log(`🎨 GALLERY PREVIEW FIX: Attempting to switch to ${system}`);
-                try {
-                    await window.switchSystem(system);
-                    console.log(`✅ Successfully switched to ${system}`);
-                } catch (switchError) {
-                    console.error(`❌ Switch to ${system} failed:`, switchError);
-                    
-                    // Try fallback system if not already faceted
-                    if (system !== 'faceted') {
-                        console.log('🎨 Trying faceted system as fallback...');
-                        try {
-                            await window.switchSystem('faceted');
-                            window.currentSystem = 'faceted';
-                            console.log('✅ Fallback to faceted successful');
-                        } catch (fallbackError) {
-                            console.error('❌ Even faceted fallback failed:', fallbackError);
-                        }
-                    }
-                }
-            } else {
-                console.warn('🎨 switchSystem not available - using direct currentSystem assignment');
-                window.currentSystem = system;
+            // SINGLE parameter application - trust that switchSystem already set up the engine correctly
+            if (window.userParameterState) {
+                Object.assign(window.userParameterState, parameters);
             }
             
-            // Apply parameters with balanced timing - not too early, not too late
-            console.log('🎨 BALANCED: Applying parameters with optimal timing');
+            // Apply each parameter once via updateParameter (this routes to the correct engine)
+            Object.entries(parameters).forEach(([param, value]) => {
+                try {
+                    if (window.updateParameter) {
+                        window.updateParameter(param, value);
+                        console.log(`🚀 FAST: ${param} = ${value}`);
+                    }
+                } catch (error) {
+                    console.warn(`🚀 FAST: Parameter ${param} failed:`, error.message);
+                }
+            });
             
-            // Immediate application to UI elements
-            this.applyGalleryParameters(parameters);
-            
-            // Follow-up applications for engine sync
-            setTimeout(() => {
-                this.applyGalleryParameters(parameters);
-                console.log('🎨 BALANCED: Follow-up parameter sync completed');
-            }, 200);
-            
-            setTimeout(() => {
-                this.applyGalleryParameters(parameters);
-                console.log('🎨 BALANCED: Final parameter sync completed');
-            }, 500);
+            console.log('🚀 FAST GALLERY PREVIEW: Parameter application complete');
             
         } catch (error) {
-            console.error('🎨 GALLERY PREVIEW FIX: Critical error in applyGalleryPreview:', error);
-            
-            // Emergency fallback - apply parameters anyway
-            console.log('🎨 Emergency fallback - applying parameters with current system');
-            setTimeout(() => {
-                this.applyGalleryParameters(parameters);
-            }, 500);
+            console.error('🚀 FAST: Parameter application error:', error);
         }
     }
 
     /**
-     * Apply gallery parameters with reduced spam
+     * Get current engine - simple helper
      */
-    applyGalleryParameters(parameters) {
-        console.log('🎨 GALLERY PREVIEW FIX: Applying parameters:', parameters);
-        
-        // ENHANCED: Multiple application methods for maximum compatibility
-        
-        // Method 1: Update global userParameterState immediately
-        if (window.userParameterState) {
-            Object.assign(window.userParameterState, parameters);
-            console.log('🎨 Updated global userParameterState with gallery parameters');
-        }
-        
-        // Method 2: Update sliders directly for immediate visual feedback
-        Object.entries(parameters).forEach(([param, value]) => {
-            const slider = document.getElementById(param);
-            if (slider) {
-                slider.value = value;
-                
-                // Update display value if it exists
-                const display = slider.parentElement?.querySelector('.control-value');
-                if (display) {
-                    display.textContent = value;
-                }
-                
-                console.log(`🎨 Updated slider ${param} = ${value}`);
-            }
-        });
-        
-        // Method 3: Apply via updateParameter function INSTANTLY (engines should read from global state)
-        Object.entries(parameters).forEach(([param, value]) => {
-            try {
-                if (window.updateParameter) {
-                    window.updateParameter(param, value);
-                }
-            } catch (error) {
-                console.warn(`🚀 INSTANT: Error setting ${param}:`, error.message);
-            }
-        });
-        
-        // Method 4: Force sync visualizer to UI immediately if available
-        setTimeout(() => {
-            if (window.syncVisualizerToUI && window.currentSystem) {
-                const currentEngine = this.getCurrentEngine();
-                if (currentEngine) {
-                    window.syncVisualizerToUI(window.currentSystem, currentEngine);
-                    console.log('🚀 INSTANT: syncVisualizerToUI called immediately');
-                }
-            }
-        }, 50); // Minimal delay
-    }
     
     getCurrentEngine() {
         const system = window.currentSystem;
@@ -350,13 +247,13 @@ if (typeof window !== 'undefined' && window.location.search.includes('system='))
     // Suppress warning spam immediately
     galleryPreviewFix.suppressWarningSpam();
     
-    // Initialize with balanced timing for gallery previews
+    // Initialize FAST for gallery previews - minimal delay
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 200);
+            setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 50);
         });
     } else {
-        setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 200);
+        setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 50);
     }
     
     window.galleryPreviewFix = galleryPreviewFix;
