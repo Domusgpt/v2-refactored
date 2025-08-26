@@ -55,11 +55,23 @@ window.updateParameter = function(param, value) {
         if (!engine) {
             console.warn(`⚠️ System ${activeSystem} not available - engines:`, Object.keys(engines).map(k => `${k}:${!!engines[k]}`).join(', '));
             
-            // RETRY: Gallery previews might call this before engines are ready
-            setTimeout(() => {
-                console.log(`🔄 Retrying parameter ${param} = ${value} for ${activeSystem} (attempt 2)`);
-                window.updateParameter(param, value);
-            }, 100); // Quick retry
+            // CRITICAL FIX: Track retry count to prevent infinite loops
+            if (!window.parameterRetryCount) window.parameterRetryCount = {};
+            const retryKey = `${param}_${value}_${activeSystem}`;
+            const currentRetries = window.parameterRetryCount[retryKey] || 0;
+            
+            // Only retry once, then give up to prevent infinite loops
+            if (currentRetries < 1) {
+                window.parameterRetryCount[retryKey] = currentRetries + 1;
+                console.log(`🔄 Retrying parameter ${param} = ${value} for ${activeSystem} (attempt ${currentRetries + 2})`);
+                setTimeout(() => {
+                    window.updateParameter(param, value);
+                }, 100);
+            } else {
+                console.warn(`❌ Parameter ${param} = ${value} failed for ${activeSystem} - system not available, giving up after 2 attempts`);
+                // Clean up retry tracking for this parameter
+                delete window.parameterRetryCount[retryKey];
+            }
             return;
         }
         
