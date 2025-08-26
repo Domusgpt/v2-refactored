@@ -359,13 +359,13 @@ if (typeof window !== 'undefined' && window.location.search.includes('system='))
     // Suppress warning spam immediately
     galleryPreviewFix.suppressWarningSpam();
     
-    // Initialize when DOM is ready
+    // Initialize when DOM is ready - FASTER for gallery previews
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 1000);
+            setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 100);
         });
     } else {
-        setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 1000);
+        setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 100);
     }
     
     window.galleryPreviewFix = galleryPreviewFix;

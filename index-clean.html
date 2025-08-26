@@ -6,7 +6,7 @@
     <title>VIB34D Engine - Clean Architecture</title>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" onerror="console.warn('Google Fonts failed to load - using fallback')">
     
     <!-- Organized CSS Architecture -->
     <link rel="stylesheet" href="styles/base.css">
@@ -198,7 +198,13 @@
     <script>
         // Initialize global state that modules need
         window.userParameterState = {};
-        window.currentSystem = 'faceted';
+        // CRITICAL FIX: Don't overwrite currentSystem if URL parameters already set it
+        if (!window.currentSystem) {
+            window.currentSystem = 'faceted';
+            console.log('🔧 Global: Set currentSystem to default faceted');
+        } else {
+            console.log(`🔧 Global: Preserving existing currentSystem = '${window.currentSystem}'`);
+        }
         window.moduleReady = false;
         
         // Initialize geometries data

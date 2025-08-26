@@ -55,17 +55,37 @@ window.saveToGallery = async function() {
     preserveCriticalFunctions();
     
     try {
-        // Check if engine is initialized
-        if (!window.engine) {
-            throw new Error('Engine not initialized yet - please wait a moment');
+        // Check if any system engine is initialized (flexible check for all 3 working systems)
+        const hasAnyEngine = !!(window.engine || window.quantumEngine || window.holographicSystem);
+        if (!hasAnyEngine) {
+            throw new Error('No engine system initialized yet - please wait a moment');
         }
+        
+        console.log('🔍 Engine check passed:', {
+            faceted: !!window.engine,
+            quantum: !!window.quantumEngine,
+            holographic: !!window.holographicSystem,
+            currentSystem: window.currentSystem
+        });
         
         // CRITICAL FIX: Initialize UnifiedSaveManager if needed
         if (!unifiedSaveManager) {
             console.log('🔧 Initializing UnifiedSaveManager...');
             // Dynamic import to avoid circular dependencies
             const { UnifiedSaveManager } = await import('../../src/core/UnifiedSaveManager.js');
-            unifiedSaveManager = new UnifiedSaveManager(window.engine);
+            
+            // Pass the appropriate engine based on current system, or null (it can handle null)
+            let currentEngine = null;
+            if (window.currentSystem === 'faceted' && window.engine) {
+                currentEngine = window.engine;
+            } else if (window.currentSystem === 'quantum' && window.quantumEngine) {
+                currentEngine = window.quantumEngine;
+            } else if (window.currentSystem === 'holographic' && window.holographicSystem) {
+                currentEngine = window.holographicSystem;
+            }
+            
+            console.log('🔧 Initializing UnifiedSaveManager with engine for:', window.currentSystem, !!currentEngine);
+            unifiedSaveManager = new UnifiedSaveManager(currentEngine);
         }
         
         // Ensure currentSystem is properly set

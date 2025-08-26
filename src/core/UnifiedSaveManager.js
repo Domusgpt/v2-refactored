@@ -59,6 +59,15 @@ export class UnifiedSaveManager {
         
         console.log('🔵 UnifiedSaveManager capturing state for system:', currentSys);
         
+        // DIAGNOSTIC: Check what's actually available (3 working systems only)
+        console.log('🔍 Available global objects:', {
+            engine: !!window.engine,
+            quantumEngine: !!window.quantumEngine,
+            holographicSystem: !!window.holographicSystem,
+            userParameterState: !!window.userParameterState,
+            currentSystem: window.currentSystem
+        });
+        
         const state = {
             system: currentSys,
             name: this.generateVariationName(),
@@ -66,55 +75,34 @@ export class UnifiedSaveManager {
             metadata: {}
         };
         
-        // Get parameters based on current system
-        if (currentSys === 'faceted') {
-            // Get parameters from VIB34D engine
-            if (this.engine?.parameterManager) {
-                state.parameters = this.engine.parameterManager.getAllParameters() || {};
-                console.log('🔵 Captured faceted parameters:', state.parameters);
-            } else {
-                console.warn('⚠️ VIB34D engine or parameterManager not available');
-                // Fallback to manual parameter capture
-                state.parameters = this.captureManualParameters();
-            }
-        } else if (currentSys === 'quantum') {
-            // Get parameters from quantum system
-            if (window.quantumEngine?.getParameters) {
-                state.parameters = window.quantumEngine.getParameters();
-                console.log('🔵 Captured quantum parameters:', state.parameters);
-            } else {
-                console.warn('⚠️ Quantum system not available');
-                state.parameters = this.captureManualParameters();
-            }
-        } else if (currentSys === 'holographic') {
-            // Get parameters from holographic system
-            if (window.holographicSystem?.getParameters) {
-                state.parameters = window.holographicSystem.getParameters();
-                console.log('🔵 Captured holographic parameters:', state.parameters);
-            } else {
-                console.warn('⚠️ Holographic system not available');
-                state.parameters = this.captureManualParameters();
-            }
-        } else if (currentSys === 'polychora') {
-            // Get parameters from polychora system
-            if (window.polychoraSystem?.parameters) {
-                state.parameters = { ...window.polychoraSystem.parameters };
-                console.log('🔵 Captured polychora parameters:', state.parameters);
-            } else if (window.polychoraSystem?.getParameters) {
-                state.parameters = window.polychoraSystem.getParameters();
-                console.log('🔵 Captured polychora parameters via getParameters:', state.parameters);
-            } else {
-                console.warn('⚠️ Polychora system not available');
-                state.parameters = this.captureManualParameters();
-            }
-        } else {
-            // Unknown system - try manual capture
-            console.warn('⚠️ Unknown system:', currentSys, '- using manual parameter capture');
+        // FIXED: Try multiple parameter capture methods for each system
+        state.parameters = this.getSystemParameters(currentSys);
+        
+        // Validate that we got some parameters
+        if (!state.parameters || Object.keys(state.parameters).length === 0) {
+            console.warn('⚠️ No parameters captured via system methods, using manual fallback');
             state.parameters = this.captureManualParameters();
+        } else {
+            // Even if we got some parameters, ensure we have all the core ones
+            const manualParams = this.captureManualParameters();
+            const coreParams = ['geometry', 'rot4dXW', 'rot4dYW', 'rot4dZW', 'gridDensity', 'morphFactor', 'chaos', 'speed', 'hue', 'intensity', 'saturation'];
+            
+            let missingCount = 0;
+            coreParams.forEach(param => {
+                if (state.parameters[param] === undefined && manualParams[param] !== undefined) {
+                    state.parameters[param] = manualParams[param];
+                    missingCount++;
+                }
+            });
+            
+            if (missingCount > 0) {
+                console.log(`🔍 Added ${missingCount} missing core parameters from manual capture`);
+            }
         }
         
         // Add metadata
         state.metadata = {
+            timestamp: Date.now(),
             engine: 'VIB34D Unified',
             version: '3.0',
             author: 'VIB34D User',
@@ -122,40 +110,299 @@ export class UnifiedSaveManager {
         };
         
         console.log('🔵 Final captured state:', state);
+        console.log(`🔍 Final parameter count: ${Object.keys(state.parameters).length} parameters`);
         return state;
     }
     
     /**
-     * Fallback method to capture parameters manually from UI elements
+     * ENHANCED: System-specific parameter capture with correct interfaces
+     */
+    getSystemParameters(system) {
+        let parameters = null;
+        let captureMethod = 'unknown';
+        
+        try {
+            switch (system) {
+                case 'faceted':
+                    // Faceted system uses ParameterManager.getAllParameters()
+                    if (this.engine?.parameterManager?.getAllParameters) {
+                        parameters = this.engine.parameterManager.getAllParameters();
+                        captureMethod = 'this.engine.parameterManager.getAllParameters()';
+                    } else if (window.engine?.parameterManager?.getAllParameters) {
+                        parameters = window.engine.parameterManager.getAllParameters();
+                        captureMethod = 'window.engine.parameterManager.getAllParameters()';
+                    } else if (window.facetedEngine?.parameterManager?.getAllParameters) {
+                        parameters = window.facetedEngine.parameterManager.getAllParameters();
+                        captureMethod = 'window.facetedEngine.parameterManager.getAllParameters()';
+                    }
+                    break;
+                    
+                case 'quantum':
+                    // Quantum system has getParameters() method that calls this.parameters.getAllParameters()
+                    if (window.quantumEngine?.getParameters) {
+                        parameters = window.quantumEngine.getParameters();
+                        captureMethod = 'window.quantumEngine.getParameters()';
+                    } else if (window.quantumEngine?.parameters?.getAllParameters) {
+                        parameters = window.quantumEngine.parameters.getAllParameters();
+                        captureMethod = 'window.quantumEngine.parameters.getAllParameters()';
+                    }
+                    break;
+                    
+                case 'holographic':
+                    // Holographic system has getParameters() method that reads from DOM
+                    if (window.holographicSystem?.getParameters) {
+                        parameters = window.holographicSystem.getParameters();
+                        captureMethod = 'window.holographicSystem.getParameters()';
+                    } else if (window.holographicEngine?.getParameters) {
+                        parameters = window.holographicEngine.getParameters();
+                        captureMethod = 'window.holographicEngine.getParameters()';
+                    } else if (window.holoEngine?.getParameters) {
+                        parameters = window.holoEngine.getParameters();
+                        captureMethod = 'window.holoEngine.getParameters()';
+                    }
+                    break;
+                    
+                case 'polychora':
+                    // EXCLUDED: User confirmed polychora is placeholder/not working
+                    console.warn('⚠️ Polychora system excluded - using manual parameter fallback');
+                    parameters = null; // Force fallback to manual parameters
+                    captureMethod = 'polychora-excluded-by-user';
+                    break;
+                    
+                default:
+                    console.warn(`⚠️ Unknown system: ${system}`);
+                    break;
+            }
+            
+        } catch (error) {
+            console.error(`❌ Error capturing ${system} parameters:`, error);
+            parameters = null;
+            captureMethod = 'error-occurred';
+        }
+        
+        // Enhanced validation and logging
+        if (parameters && typeof parameters === 'object') {
+            const paramCount = Object.keys(parameters).length;
+            if (paramCount > 0) {
+                console.log(`✅ Successfully captured ${paramCount} parameters for ${system} via ${captureMethod}`);
+                console.log(`🔍 ${system} parameters:`, parameters);
+                return parameters;
+            } else {
+                console.warn(`⚠️ ${system} returned empty parameters object via ${captureMethod}`);
+            }
+        } else {
+            console.warn(`⚠️ ${system} system parameters not available via ${captureMethod}`);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * ENHANCED: Robust manual parameter capture with multiple fallback methods
      */
     captureManualParameters() {
         const params = {};
+        let captureMethod = 'unknown';
         
-        // Get geometry selection
-        const activeGeomBtn = document.querySelector('.geom-btn.active');
-        if (activeGeomBtn) {
-            params.geometry = parseInt(activeGeomBtn.dataset.index);
-            params.geometryType = params.geometry;
+        try {
+            // FIRST PRIORITY: Use global userParameterState if available
+            if (window.userParameterState && typeof window.userParameterState === 'object') {
+                Object.assign(params, window.userParameterState);
+                captureMethod = 'global-userParameterState';
+                console.log('🔵 Using global userParameterState for parameter capture');
+            }
+            
+            // SECOND PRIORITY: DOM element capture as enhancement/fallback
+            
+            // Enhanced geometry selection with multiple selectors
+            let geometryValue = null;
+            const selectors = ['.geom-btn.active', '.geometry-btn.active', '[data-geometry].active'];
+            
+            for (const selector of selectors) {
+                const activeGeomBtn = document.querySelector(selector);
+                if (activeGeomBtn) {
+                    const index = activeGeomBtn.dataset.index || activeGeomBtn.dataset.geometry;
+                    if (index !== undefined) {
+                        geometryValue = parseInt(index);
+                        break;
+                    }
+                }
+            }
+            
+            if (geometryValue !== null) {
+                params.geometry = geometryValue;
+                params.geometryType = geometryValue;
+                captureMethod = captureMethod === 'unknown' ? 'DOM-geometry' : `${captureMethod}+DOM-geometry`;
+            }
+            
+            // Enhanced slider parameter capture with validation
+            const sliderIds = [
+                'rot4dXW', 'rot4dYW', 'rot4dZW', 'rot4dXY', 'rot4dXZ', 'rot4dYZ',
+                'gridDensity', 'morphFactor', 'chaos', 'speed', 'hue', 'intensity', 'saturation',
+                'dimension'
+            ];
+            
+            let domValuesFound = 0;
+            sliderIds.forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider && slider.value !== undefined) {
+                    const value = parseFloat(slider.value);
+                    // Only use DOM value if it's valid and we don't already have this parameter
+                    if (!isNaN(value) && (params[id] === undefined || captureMethod === 'unknown')) {
+                        params[id] = value;
+                        domValuesFound++;
+                    }
+                }
+            });
+            
+            if (domValuesFound > 0) {
+                captureMethod = captureMethod === 'unknown' ? 'DOM-sliders' : `${captureMethod}+DOM-sliders`;
+            }
+            
+            // THIRD PRIORITY: Apply reasonable defaults for missing critical parameters
+            const defaults = {
+                geometry: 0,
+                geometryType: 0,
+                rot4dXW: 0,
+                rot4dYW: 0,
+                rot4dZW: 0,
+                gridDensity: 20,
+                morphFactor: 1,
+                chaos: 0.2,
+                speed: 1,
+                hue: 200,
+                intensity: 0.7,
+                saturation: 0.8
+            };
+            
+            let defaultsApplied = 0;
+            Object.entries(defaults).forEach(([key, defaultValue]) => {
+                if (params[key] === undefined || isNaN(params[key])) {
+                    params[key] = defaultValue;
+                    defaultsApplied++;
+                }
+            });
+            
+            if (defaultsApplied > 0) {
+                captureMethod = `${captureMethod}+defaults(${defaultsApplied})`;
+            }
+            
+        } catch (error) {
+            console.error('❌ Error during manual parameter capture:', error);
+            captureMethod = 'error-fallback';
+            
+            // Emergency fallback with minimal viable parameters
+            Object.assign(params, {
+                geometry: 0,
+                geometryType: 0,
+                rot4dXW: 0,
+                rot4dYW: 0,
+                rot4dZW: 0,
+                gridDensity: 20,
+                morphFactor: 1,
+                chaos: 0.2,
+                speed: 1,
+                hue: 200,
+                intensity: 0.7,
+                saturation: 0.8
+            });
         }
         
-        // Get all slider parameters
-        const sliderIds = [
-            'rot4dXW', 'rot4dYW', 'rot4dZW', 'rot4dXY', 'rot4dXZ', 'rot4dYZ',
-            'gridDensity', 'morphFactor', 'chaos', 'speed', 'hue', 'intensity', 'saturation',
-            'dimension'
-        ];
+        const paramCount = Object.keys(params).length;
+        console.log(`🔵 Manual parameter capture complete: ${paramCount} parameters via ${captureMethod}`, params);
         
-        sliderIds.forEach(id => {
-            const slider = document.getElementById(id);
-            if (slider) {
-                params[id] = parseFloat(slider.value);
-            }
-        });
-        
-        console.log('🔵 Manual parameter capture:', params);
         return params;
     }
     
+    /**
+     * ENHANCED: Initialize system with proper parameter injection
+     */
+    initializeSystemWithParameters(systemName, parameters) {
+        console.log(`🔵 Initializing ${systemName} system with parameters:`, parameters);
+        
+        try {
+            // 1. Update global userParameterState first
+            if (window.userParameterState && parameters) {
+                Object.assign(window.userParameterState, parameters);
+                console.log('🔵 Updated global userParameterState');
+            }
+            
+            // 2. Sync UI sliders to reflect parameters
+            if (window.syncSlidersToStoredValues) {
+                setTimeout(() => {
+                    window.syncSlidersToStoredValues();
+                    console.log('🔵 Synced UI sliders to parameters');
+                }, 100);
+            }
+            
+            // 3. Update geometry selection if specified
+            if (parameters.geometry !== undefined) {
+                const geometryValue = parseInt(parameters.geometry);
+                if (!isNaN(geometryValue) && geometryValue >= 0 && geometryValue <= 7) {
+                    setTimeout(() => {
+                        if (window.selectGeometry) {
+                            window.selectGeometry(geometryValue);
+                            console.log(`🔵 Set geometry to ${geometryValue}`);
+                        }
+                    }, 150);
+                }
+            }
+            
+            // 4. Force system to update with new parameters
+            setTimeout(() => {
+                if (window.syncVisualizerToUI) {
+                    const currentEngine = this.getCurrentEngine(systemName);
+                    if (currentEngine) {
+                        window.syncVisualizerToUI(systemName, currentEngine);
+                        console.log(`🔵 Force-synced ${systemName} visualizer`);
+                    }
+                }
+            }, 200);
+            
+            // 5. Apply individual parameter updates for immediate effect
+            setTimeout(() => {
+                if (window.updateParameter && parameters) {
+                    Object.entries(parameters).forEach(([param, value]) => {
+                        if (typeof value === 'number' && !isNaN(value)) {
+                            window.updateParameter(param, value);
+                        }
+                    });
+                    console.log(`🔵 Applied ${Object.keys(parameters).length} parameters individually`);
+                }
+            }, 250);
+            
+            return true;
+            
+        } catch (error) {
+            console.error(`❌ Error initializing ${systemName} with parameters:`, error);
+            return false;
+        }
+    }
+    
+    /**
+     * Get current engine reference for a system
+     */
+    getCurrentEngine(systemName) {
+        try {
+            switch (systemName) {
+                case 'faceted':
+                    return window.engine || window.facetedEngine || this.engine;
+                case 'quantum':
+                    return window.quantumEngine;
+                case 'holographic':
+                    return window.holographicSystem || window.holographicEngine;
+                case 'polychora':
+                    console.warn('⚠️ Polychora system excluded - no engine available');
+                    return null;
+                default:
+                    return null;
+            }
+        } catch (error) {
+            console.error(`❌ Error getting ${systemName} engine:`, error);
+            return null;
+        }
+    }
+
     /**
      * Save to localStorage for persistence
      */

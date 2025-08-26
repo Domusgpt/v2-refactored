@@ -1176,7 +1176,7 @@
                 
                 // CRITICAL FIX: Put system parameter FIRST so it gets processed before other parameters
                 // Add alllayers=true to ensure all 5 canvas layers render with full fidelity
-                iframe.src = `index.html?system=${system}&hideui=true&alllayers=true&highquality=true&${params}`;
+                iframe.src = `index-clean.html?system=${system}&hideui=true&alllayers=true&highquality=true&${params}`;
                 console.log(`🎯 Loading preview: system=${system}, URL: ${iframe.src}`);
             }, 20); // ULTRA FAST: Immediate preview loading
             
