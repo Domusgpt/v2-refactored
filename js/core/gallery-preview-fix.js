@@ -208,19 +208,15 @@ export class GalleryPreviewFix {
                 window.currentSystem = system;
             }
             
-            // Apply parameters with multiple timing attempts
-            const applyWithRetries = (attempt = 1) => {
-                console.log(`🎨 Parameter application attempt ${attempt}/3`);
-                this.applyGalleryParameters(parameters);
-                
-                // Retry if needed
-                if (attempt < 3) {
-                    setTimeout(() => applyWithRetries(attempt + 1), 1000);
-                }
-            };
+            // Apply parameters IMMEDIATELY - no delays or retries needed since URL params already set global state
+            console.log('🚀 INSTANT: Applying parameters immediately (no delays)');
+            this.applyGalleryParameters(parameters);
             
-            // Start applying parameters after system switch
-            setTimeout(() => applyWithRetries(), 600);
+            // Quick follow-up to ensure engine picked up the parameters
+            setTimeout(() => {
+                this.applyGalleryParameters(parameters);
+                console.log('🚀 INSTANT: Quick follow-up parameter sync completed');
+            }, 100);
             
         } catch (error) {
             console.error('🎨 GALLERY PREVIEW FIX: Critical error in applyGalleryPreview:', error);
@@ -263,45 +259,27 @@ export class GalleryPreviewFix {
             }
         });
         
-        // Method 3: Apply via updateParameter function with delay for engine initialization
+        // Method 3: Apply via updateParameter function INSTANTLY (engines should read from global state)
+        Object.entries(parameters).forEach(([param, value]) => {
+            try {
+                if (window.updateParameter) {
+                    window.updateParameter(param, value);
+                }
+            } catch (error) {
+                console.warn(`🚀 INSTANT: Error setting ${param}:`, error.message);
+            }
+        });
+        
+        // Method 4: Force sync visualizer to UI immediately if available
         setTimeout(() => {
-            const parameterEntries = Object.entries(parameters);
-            let index = 0;
-            
-            const applyNextParameter = () => {
-                if (index >= parameterEntries.length) {
-                    console.log('🎨 GALLERY PREVIEW FIX: All parameters applied via updateParameter');
-                    
-                    // Method 4: Force sync visualizer to UI as final step
-                    setTimeout(() => {
-                        if (window.syncVisualizerToUI && window.currentSystem) {
-                            const currentEngine = this.getCurrentEngine();
-                            if (currentEngine) {
-                                window.syncVisualizerToUI(window.currentSystem, currentEngine);
-                                console.log('🎨 Final sync: syncVisualizerToUI called');
-                            }
-                        }
-                    }, 200);
-                    
-                    return;
+            if (window.syncVisualizerToUI && window.currentSystem) {
+                const currentEngine = this.getCurrentEngine();
+                if (currentEngine) {
+                    window.syncVisualizerToUI(window.currentSystem, currentEngine);
+                    console.log('🚀 INSTANT: syncVisualizerToUI called immediately');
                 }
-                
-                const [param, value] = parameterEntries[index];
-                
-                try {
-                    if (window.updateParameter) {
-                        window.updateParameter(param, value);
-                    }
-                } catch (error) {
-                    console.warn(`🎨 GALLERY PREVIEW FIX: Error setting ${param}:`, error.message);
-                }
-                
-                index++;
-                setTimeout(applyNextParameter, 50);
-            };
-            
-            applyNextParameter();
-        }, 1000); // Wait 1 second for engines to be ready
+            }
+        }, 50); // Minimal delay
     }
     
     getCurrentEngine() {
@@ -359,13 +337,13 @@ if (typeof window !== 'undefined' && window.location.search.includes('system='))
     // Suppress warning spam immediately
     galleryPreviewFix.suppressWarningSpam();
     
-    // Initialize when DOM is ready - FASTER for gallery previews
+    // Initialize IMMEDIATELY for gallery previews - no delays needed since URL params handle everything
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 100);
+            galleryPreviewFix.initializeGalleryPreview();
         });
     } else {
-        setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 100);
+        galleryPreviewFix.initializeGalleryPreview();
     }
     
     window.galleryPreviewFix = galleryPreviewFix;

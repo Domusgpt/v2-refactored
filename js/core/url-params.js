@@ -64,6 +64,14 @@ export class URLParameterHandler {
             // Store in window for global access
             window.galleryPreviewData = this.galleryPreviewData;
             window.isGalleryPreview = this.isGalleryPreview;
+            
+            // CRITICAL: Apply parameters IMMEDIATELY to global state before any engines load
+            if (parameters && Object.keys(parameters).length > 0) {
+                if (!window.userParameterState) window.userParameterState = {};
+                Object.assign(window.userParameterState, parameters);
+                console.log('🚀 INSTANT: Applied gallery parameters to global state BEFORE engine init');
+                console.log('🚀 INSTANT: Parameters set:', window.userParameterState);
+            }
         }
     }
 
