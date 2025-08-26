@@ -170,6 +170,15 @@ export class SmartCanvasPool {
           if (this.engineClasses.VIB34DIntegratedEngine) {
             newEngine = new this.engineClasses.VIB34DIntegratedEngine();
             window.engine = newEngine;
+            
+            // Initialize engine if method exists
+            if (newEngine.initialize) {
+              const success = newEngine.initialize();
+              if (!success) {
+                console.error('❌ VIB34DIntegratedEngine initialization failed');
+                newEngine = null;
+              }
+            }
           } else {
             console.error('❌ VIB34DIntegratedEngine class not available');
           }
@@ -180,6 +189,15 @@ export class SmartCanvasPool {
           if (this.engineClasses.QuantumEngine) {
             newEngine = new this.engineClasses.QuantumEngine();
             window.quantumEngine = newEngine;
+            
+            // Initialize engine if method exists
+            if (newEngine.initialize) {
+              const success = newEngine.initialize();
+              if (!success) {
+                console.error('❌ QuantumEngine initialization failed');
+                newEngine = null;
+              }
+            }
           } else {
             console.error('❌ QuantumEngine class not available');
           }
@@ -190,6 +208,15 @@ export class SmartCanvasPool {
           if (this.engineClasses.RealHolographicSystem) {
             newEngine = new this.engineClasses.RealHolographicSystem();
             window.holographicSystem = newEngine;
+            
+            // Initialize engine if method exists  
+            if (newEngine.initialize) {
+              const success = newEngine.initialize();
+              if (!success) {
+                console.error('❌ RealHolographicSystem initialization failed');
+                newEngine = null;
+              }
+            }
           } else {
             console.error('❌ RealHolographicSystem class not available');
           }
