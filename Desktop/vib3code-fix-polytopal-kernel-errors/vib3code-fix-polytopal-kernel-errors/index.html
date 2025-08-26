@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VIB3CODE - Where elegant code meets digital freedom. Modern development without vendor lock-in.">
+    <meta name="keywords" content="VIB3CODE, coding, development, digital freedom, parserator, no vendor lock-in">
+    
+    <title>VIB3CODE - Digital Magazine for EMA Movement - ENHANCED-HEADERS v1750369000</title>
+    
+    <!-- FORCE COMPLETE CACHE REFRESH -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- IMMEDIATE STYLE FIXES FOR TEXT VISIBILITY -->
+    <style>
+        /* EMERGENCY TEXT VISIBILITY FIXES */
+        body, * {
+            color: #ffffff !important;
+        }
+        
+        .article-title-expanded, 
+        .article-excerpt-expanded,
+        .article-meta-expanded {
+            color: #ffffff !important;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3) !important;
+        }
+        
+        /* SECTION HEADERS - PROMINENT STYLING */
+        .section-header-expanded {
+            background: rgba(0, 0, 0, 0.6) !important;
+            padding: 40px 30px !important;
+            margin: 0 0 40px 0 !important;
+            border-radius: 15px !important;
+            border: 2px solid rgba(255, 255, 255, 0.3) !important;
+            backdrop-filter: blur(10px) !important;
+        }
+        
+        .section-title-expanded {
+            color: #ffffff !important;
+            font-size: clamp(2.5rem, 5vw, 4rem) !important;
+            font-weight: 900 !important;
+            text-shadow: 0 0 20px currentColor !important;
+            margin: 0 0 15px 0 !important;
+            letter-spacing: 0.02em !important;
+            transition: all 0.6s ease !important;
+        }
+        
+        /* DYNAMIC SECTION COLORS TO MATCH PORTAL TRANSITIONS */
+        #section-home .section-title-expanded {
+            color: #ff00ff !important; /* Magenta - Hypercube */
+            text-shadow: 0 0 20px #ff00ff !important;
+        }
+        
+        #section-articles .section-title-expanded {
+            color: #00ffff !important; /* Cyan - Tetrahedron */
+            text-shadow: 0 0 20px #00ffff !important;
+        }
+        
+        #section-videos .section-title-expanded {
+            color: #ff3366 !important; /* Pink-red - Sphere */
+            text-shadow: 0 0 20px #ff3366 !important;
+        }
+        
+        #section-podcasts .section-title-expanded {
+            color: #ff7f00 !important; /* Orange - Torus */
+            text-shadow: 0 0 20px #ff7f00 !important;
+        }
+        
+        #section-ema .section-title-expanded {
+            color: #7f00ff !important; /* Purple - Fractal */
+            text-shadow: 0 0 20px #7f00ff !important;
+        }
+        
+        .section-subtitle-expanded {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem) !important;
+            font-weight: 400 !important;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.4) !important;
+            margin: 0 !important;
+            line-height: 1.4 !important;
+        }
+        
+        .article-card-expanded {
+            background: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            padding: 20px !important;
+            margin: 16px 0 !important;
+            border-radius: 12px !important;
+        }
+        
+        .section-expanded-content {
+            background: rgba(0, 0, 0, 0.3) !important;
+            padding: 40px 20px !important;
+            min-height: 80vh !important;
+        }
+        
+        .content-grid-expanded {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+            gap: 24px !important;
+            margin-top: 32px !important;
+        }
+        
+        /* PERSISTENT VISUALIZER LAYERS */
+        #persistent-header {
+            opacity: 0.25 !important;
+            z-index: 1 !important;
+        }
+        
+        #persistent-content {
+            opacity: 0.12 !important;
+            z-index: 0 !important;
+        }
+        
+        #persistent-ambient {
+            opacity: 0.06 !important;
+            z-index: -1 !important;
+        }
+        
+        .header-visualizer,
+        .content-visualizer,
+        .ambient-visualizer {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            pointer-events: none !important;
+        }
+        
+        .section-expanded-content {
+            position: relative !important;
+            z-index: 2 !important;
+        }
+    </style>
+    
+    <!-- Cyberpunk Dark Theme with Enhanced Parallax -->
+    <link rel="stylesheet" href="styles/dark-vib3.css">
+    <link rel="stylesheet" href="styles/parallax.css">
+    <link rel="stylesheet" href="styles/sections.css">
+    <link rel="stylesheet" href="styles/magazine.css">
+    <link rel="stylesheet" href="styles/magazine-enhanced.css">
+    <!-- Embedded Glassmorphic UI Styles -->
+    <style>
+        /* VIB3CODE Glassmorphic UI - Context-Aware Design */
+        .glass-element,
+        .nav-header,
+        .magazine-nav,
+        .content-card,
+        .interactive-card,
+        .section-header,
+        .filter-controls,
+        .announcement-card,
+        .parserator-card,
+        footer {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 8px 32px 0 rgba(0, 255, 255, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 -20px 40px -20px rgba(255, 0, 255, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-card:hover,
+        .interactive-card:hover {
+            backdrop-filter: blur(18px);
+            background: rgba(0, 0, 0, 0.12);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+        
+        /* Section-specific neon glows */
+        [data-section="home"] .glass-element {
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
+        }
+        
+        [data-section="articles"] .glass-element {
+            box-shadow: 0 0 30px rgba(51, 204, 255, 0.5);
+        }
+        
+        [data-section="videos"] .glass-element {
+            box-shadow: 0 0 30px rgba(255, 51, 127, 0.5);
+        }
+        
+        [data-section="podcasts"] .glass-element {
+            box-shadow: 0 0 30px rgba(255, 127, 0, 0.5);
+        }
+        
+        [data-section="ema"] .glass-element {
+            box-shadow: 0 0 30px rgba(127, 0, 255, 0.5);
+        }
+        
+        /* Enhanced visualizer canvas */
+        #visualizer-canvas {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Magazine content with glassmorphic backdrop */
+        .magazine-content {
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(2px);
+            min-height: 500vh; /* Ensure scrollable height for section transitions */
+        }
+        
+        /* ENHANCED ARTICLE STYLING */
+        .featured-article {
+            border: 2px solid rgba(255, 136, 0, 0.5) !important;
+            box-shadow: 
+                0 0 40px rgba(255, 136, 0, 0.3),
+                0 8px 32px 0 rgba(0, 255, 255, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+        }
+        
+        .featured-article .article-title-expanded {
+            font-size: 1.4rem !important;
+            background: linear-gradient(135deg, #ff8800, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .article-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .tag:hover {
+            background: rgba(0, 255, 255, 0.2);
+            border-color: rgba(0, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+        
+        .article-card-expanded {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        
+        .article-card-expanded:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .article-card-expanded:hover .article-title-expanded {
+            color: #00ffff;
+        }
+        
+        .article-meta-expanded span {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        /* VIDEO CARD STYLING */
+        .video-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .video-thumbnail video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8);
+            transition: all 0.4s ease;
+        }
+        
+        .video-card:hover .video-thumbnail video {
+            filter: brightness(1.0);
+            transform: scale(1.05);
+        }
+        
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 1;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .video-card:hover .play-overlay {
+            opacity: 0.9;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .play-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+        
+        .play-button:hover {
+            background: rgba(0, 255, 255, 0.3);
+            border-color: rgba(0, 255, 255, 0.6);
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+        
+        .featured-video {
+            border: 2px solid rgba(255, 136, 0, 0.5) !important;
+            box-shadow: 
+                0 0 40px rgba(255, 136, 0, 0.3),
+                0 8px 32px 0 rgba(0, 255, 255, 0.1) !important;
+        }
+        
+        .featured-video .video-thumbnail {
+            height: 240px;
+        }
+        
+        .featured-video .play-button {
+            width: 80px;
+            height: 80px;
+            font-size: 32px;
+        }
+        
+        .video-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        /* LIQUID GLASS HOLOGRAPHIC SYSTEM */
+        .parameter-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 280px;
+            height: auto;
+            z-index: 1000;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .liquid-glass-surface {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1),
+                rgba(255, 255, 255, 0.05),
+                rgba(0, 255, 255, 0.08)
+            );
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 32px rgba(0, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .liquid-glass-surface::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform 1.5s ease;
+            pointer-events: none;
+        }
+        
+        .liquid-glass-surface:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .holographic-data-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .data-node {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .data-node::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 255, 0.3), 
+                transparent
+            );
+            transition: left 0.6s ease;
+        }
+        
+        .data-node:hover::before {
+            left: 100%;
+        }
+        
+        .data-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            min-width: 60px;
+            text-align: right;
+            transition: all 0.3s ease;
+        }
+        
+        /* Reactive state colors */
+        .data-value.state-idle { color: #666; text-shadow: none; }
+        .data-value.state-scroll { color: #00ff80; text-shadow: 0 0 15px rgba(0, 255, 128, 0.6); }
+        .data-value.state-move { color: #ff7f00; text-shadow: 0 0 15px rgba(255, 127, 0, 0.6); }
+        .data-value.state-hold { color: #ff0080; text-shadow: 0 0 15px rgba(255, 0, 128, 0.6); }
+        .data-value.state-transition { color: #00ffff; text-shadow: 0 0 20px rgba(0, 255, 255, 0.8); }
+        
+        /* Holographic depth effect */
+        .parameter-indicator[data-depth="high"] {
+            transform: translateZ(20px) rotateY(5deg);
+        }
+        
+        .parameter-indicator[data-depth="medium"] {
+            transform: translateZ(10px) rotateY(2deg);
+        }
+        
+        /* Liquid morphing animation */
+        @keyframes liquidMorph {
+            0%, 100% { border-radius: 20px; }
+            33% { border-radius: 25px 15px 20px 18px; }
+            66% { border-radius: 15px 25px 18px 22px; }
+        }
+        
+        .liquid-glass-surface.morphing {
+            animation: liquidMorph 3s ease-in-out infinite;
+        }
+        
+        /* Engagement intensity visual */
+        .engagement-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .engagement-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0066ff, #00ffff, #ff0080);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        
+        /* REACTIVE LIQUID GLASS CONTENT SYSTEM */
+        .content-card,
+        .interactive-card,
+        .glass-element {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.08),
+                rgba(255, 255, 255, 0.03),
+                rgba(0, 255, 255, 0.05)
+            );
+            backdrop-filter: blur(15px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 
+                0 4px 24px rgba(0, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .content-card::before,
+        .interactive-card::before,
+        .glass-element::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                rgba(0, 255, 255, 0.2),
+                rgba(255, 0, 255, 0.2),
+                rgba(0, 255, 255, 0.2)
+            );
+            border-radius: 18px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .content-card:hover::before,
+        .interactive-card:hover::before,
+        .glass-element:hover::before {
+            opacity: 1;
+        }
+        
+        /* Reactive hover effects */
+        .content-card:hover,
+        .interactive-card:hover,
+        .glass-element:hover {
+            transform: translateY(-8px) translateZ(10px);
+            backdrop-filter: blur(25px) saturate(200%);
+            border-color: rgba(0, 255, 255, 0.4);
+            box-shadow: 
+                0 12px 40px rgba(0, 255, 255, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        /* HOLOGRAPHIC NAVIGATION */
+        .nav-cyber .nav-links a,
+        .magazine-nav a {
+            position: relative;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.05),
+                rgba(0, 255, 255, 0.03)
+            );
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 12px 20px;
+            transition: all 0.5s ease;
+            overflow: hidden;
+        }
+        
+        .nav-cyber .nav-links a::before,
+        .magazine-nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 255, 0.2), 
+                transparent
+            );
+            transition: left 0.8s ease;
+        }
+        
+        .nav-cyber .nav-links a:hover::before,
+        .magazine-nav a:hover::before {
+            left: 100%;
+        }
+        
+        .nav-cyber .nav-links a:hover,
+        .magazine-nav a:hover {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1),
+                rgba(0, 255, 255, 0.08)
+            );
+            border-color: rgba(0, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 255, 0.1);
+        }
+        
+        .nav-cyber .nav-links a.active {
+            background: linear-gradient(135deg, 
+                rgba(0, 255, 255, 0.15),
+                rgba(255, 0, 255, 0.1)
+            );
+            border-color: rgba(0, 255, 255, 0.4);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        /* MAGAZINE CONTENT LIQUID GLASS */
+        .magazine-content {
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(1px);
+            min-height: 500vh;
+        }
+        
+        .section-title {
+            background: linear-gradient(135deg, #00ffff, #ff0080, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 255, 0.8), 
+                transparent
+            );
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scaleX(0.8); }
+            50% { opacity: 1; transform: scaleX(1); }
+        }
+        
+        /* FOOTER LIQUID GLASS */
+        .footer-cyber {
+            background: linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.8),
+                rgba(0, 20, 40, 0.9)
+            );
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            position: relative;
+        }
+        
+        .footer-cyber::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 255, 0.8), 
+                transparent
+            );
+        }
+        
+        /* Legacy compatibility */
+        .parameter-indicator .param {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .parameter-indicator .param-value {
+            color: #00d9ff;
+            font-weight: bold;
+        }
+    </style>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="VIB3CODE - Code Without Chains">
+    <meta property="og:description" content="Where elegant code meets digital freedom. Modern development without vendor lock-in.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vib3code.com">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Home-Master Reactive System -->
+    <script src="shared-reactive-core/home-master-system.js"></script>
+    <script src="shared-reactive-core/vib3code-integration.js"></script>
+    
+    <!-- Polytopal Magazine Enhancement Styles -->
+    <style>
+        /* Polytopal Home-Master Control Panel */
+        .polytopal-controls {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 1rem;
+            z-index: 1000;
+            min-width: 280px;
+            max-height: 70vh;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+            display: none; /* Hidden by default */
+        }
+        
+        .polytopal-controls.active {
+            transform: translateX(0);
+        }
+        
+        .controls-toggle {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+        }
+        
+        /* Show controls when in editor mode */
+        body.editor-mode .controls-toggle {
+            display: flex;
+        }
+        
+        body.editor-mode .polytopal-controls {
+            display: block;
+        }
+        
+        .controls-toggle:hover {
+            background: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        }
+        
+        .control-section {
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-section:last-child {
+            border-bottom: none;
+        }
+        
+        .control-title {
+            color: #ff00ff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .control-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.25rem 0.5rem;
+            margin: 0.125rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            transition: all 0.3s ease;
+        }
+        
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ff00ff;
+        }
+        
+        .parameter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.25rem 0;
+        }
+        
+        .parameter-label {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .parameter-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: #ff00ff;
+            min-width: 30px;
+            text-align: right;
+        }
+        
+        .control-range {
+            width: 100%;
+            margin: 0.25rem 0;
+        }
+        
+        .control-select {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.25rem;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 0.65rem;
+        }
+        
+        /* Enhanced magazine sections */
+        .magazine-section {
+            min-height: 100vh !important;
+            padding: 6rem 2rem 4rem !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .section-expanded-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .section-header-expanded {
+            text-align: center;
+            margin-bottom: 3rem;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-title-expanded {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, currentColor, rgba(255, 255, 255, 0.8));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-subtitle-expanded {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 60ch;
+            margin: 0 auto;
+        }
+        
+        .content-grid-expanded {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .grid-articles {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        }
+        
+        .grid-showcase {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        
+        .article-card-expanded {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .article-card-expanded:hover {
+            background: rgba(0, 0, 0, 0.6);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        .article-category-expanded {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .article-title-expanded {
+            font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+        
+        .article-excerpt-expanded {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        
+        .article-meta-expanded {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-articles,
+            .grid-showcase {
+                grid-template-columns: 1fr;
+            }
+            
+            .magazine-section {
+                padding: 4rem 1rem 3rem !important;
+            }
+            
+            .polytopal-controls {
+                right: 10px;
+                min-width: 260px;
+            }
+            
+            .controls-toggle {
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Initializing VIB3CODE...</div>
+        </div>
+    </div>
+
+    <!-- 4D Visualizer Background -->
+    <!-- HyperAV will create its own canvas dynamically -->
+    
+    <!-- Parallax Layers -->
+    <div class="parallax-layer" data-speed="0.2" id="bg-layer-1"></div>
+    <div class="parallax-layer" data-speed="0.5" id="bg-layer-2"></div>
+    <div class="parallax-layer" data-speed="0.8" id="bg-layer-3"></div>
+    
+    <!-- Navigation -->
+    <nav class="nav-cyber" id="main-nav">
+        <div class="nav-content">
+            <a href="/" class="logo-cyber">
+                <span class="logo-text">VIB<a href="/ppp-alpha.html" style="color: inherit; text-decoration: none;" title=" ">3</a>CODE</span>
+                <span class="logo-pulse"></span>
+            </a>
+            
+            <div class="nav-links">
+                <!-- Navigation will be dynamically updated by magazine router -->
+                <a href="#home" class="nav-link active" data-section="home">Home</a>
+                <a href="#articles" class="nav-link" data-section="articles">Articles</a>
+                <a href="#videos" class="nav-link" data-section="videos">Videos</a>
+                <a href="#podcasts" class="nav-link" data-section="podcasts">Podcasts</a>
+                <a href="#ema" class="nav-link" data-section="ema">E.M.A</a>
+                <a href="https://parserator.com" class="nav-link" target="_blank">Parserator</a>
+            </div>
+            
+            <button class="nav-toggle" id="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hide ALL old static content and show only magazine content -->
+    <style>
+        /* Hide all static sections completely - magazine router takes over */
+        .hero-cyber,
+        .section-cyber,
+        .hero-content,
+        section:not(.magazine-section),
+        main,
+        .container-cyber,
+        .grid-cyber,
+        .ema-grid,
+        .newsletter-cyber,
+        .pattern-overlay,
+        .floating-elements {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        /* Ensure magazine content is visible and properly positioned */
+        .magazine-content {
+            display: block !important;
+            min-height: 100vh;
+            padding-top: 80px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .magazine-section {
+            display: block !important;
+            width: 100%;
+        }
+        
+        /* Force immediate visibility of home section */
+        .magazine-section#section-home {
+            display: block !important;
+            opacity: 1 !important;
+        }
+    </style>
+
+    <!-- Polytopal Home-Master Control Panel -->
+    <div class="controls-toggle" onclick="toggleControls()">⚙️</div>
+    <div class="polytopal-controls" id="polytopal-controls">
+        <div class="control-section">
+            <div class="control-title">Home Master Control</div>
+            <div class="control-button" onclick="randomizeHome()">🎲 Randomize Home</div>
+            <div class="control-button" onclick="resetToDefaults()">🔄 Reset Defaults</div>
+            <div class="control-button" onclick="exportConfig()">💾 Export Config</div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Home Parameters</div>
+            <div class="parameter-row">
+                <span class="parameter-label">Grid Density:</span>
+                <span class="parameter-value" id="home-grid-value">12.0</span>
+            </div>
+            <input type="range" class="control-range" min="8" max="20" step="0.5" value="12" id="home-grid-density" onchange="updateHomeParameter('gridDensity', this.value)">
+            
+            <div class="parameter-row">
+                <span class="parameter-label">Morph Factor:</span>
+                <span class="parameter-value" id="home-morph-value">0.5</span>
+            </div>
+            <input type="range" class="control-range" min="0.2" max="0.9" step="0.05" value="0.5" id="home-morph-factor" onchange="updateHomeParameter('morphFactor', this.value)">
+            
+            <div class="parameter-row">
+                <span class="parameter-label">Dimension:</span>
+                <span class="parameter-value" id="home-dimension-value">3.5</span>
+            </div>
+            <input type="range" class="control-range" min="3.1" max="3.9" step="0.1" value="3.5" id="home-dimension" onchange="updateHomeParameter('dimension', this.value)">
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Scroll Reactivity</div>
+            <select class="control-select" id="scroll-reactivity" onchange="setScrollReactivity(this.value)">
+                <option value="velocity">Velocity Effects</option>
+                <option value="grid-only">Grid Density Only</option>
+                <option value="combined">Combined Mapping</option>
+                <option value="custom">Custom Parameters</option>
+            </select>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Section States</div>
+            <div class="parameter-row">
+                <span class="parameter-label">Technology:</span>
+                <span class="parameter-value" id="tech-derived">Auto-Derived</span>
+            </div>
+            <div class="parameter-row">
+                <span class="parameter-label">EMA:</span>
+                <span class="parameter-value" id="ema-derived">Auto-Derived</span>
+            </div>
+            <div class="parameter-row">
+                <span class="parameter-label">Videos:</span>
+                <span class="parameter-value" id="videos-derived">Auto-Derived</span>
+            </div>
+            <div class="parameter-row">
+                <span class="parameter-label">Podcasts:</span>
+                <span class="parameter-value" id="podcasts-derived">Auto-Derived</span>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <div class="control-title">Geometry Presets</div>
+            <div class="control-button" onclick="loadPreset('hypercube')">🔮 Hypercube</div>
+            <div class="control-button" onclick="loadPreset('tetrahedron')">🔺 Tetrahedron</div>
+            <div class="control-button" onclick="loadPreset('sphere')">🌐 Sphere</div>
+            <div class="control-button" onclick="loadPreset('torus')">🍩 Torus</div>
+            <div class="control-button" onclick="loadPreset('fractal')">🌿 Fractal</div>
+            <div class="control-button" onclick="loadPreset('crystal')">💎 Crystal</div>
+        </div>
+    </div>
+    
+    <!-- Magazine Content Container with Expanded Sections -->
+    <div class="magazine-content">
+        
+        <!-- HOME SECTION -->
+        <section class="magazine-section" id="section-home" data-section="home">
+            <div class="section-expanded-content">
+                <div class="section-header-expanded">
+                    <h1 class="section-title-expanded" style="color: #ff00ff;">VIB3CODE</h1>
+                    <p class="section-subtitle-expanded">Where Technology Meets Editorial Excellence</p>
+                    <p class="section-subtitle-expanded">Pioneering the Exoditical Moral Architecture Movement Through Premium Digital Design</p>
+                </div>
+                
+                <div class="content-grid-expanded grid-showcase">
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 0, 255, 0.2);">Featured</div>
+                        <h3 class="article-title-expanded">The Digital Sovereignty Manifesto</h3>
+                        <p class="article-excerpt-expanded">Our comprehensive guide to implementing Exoditical Moral Architecture in modern software development. Learn the principles that are reshaping how we build technology.</p>
+                        <div class="article-meta-expanded">
+                            <span>Philosophy</span>
+                            <span>15 min read</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 0, 255, 0.2);">Movement</div>
+                        <h3 class="article-title-expanded">Building Bridges, Not Walls</h3>
+                        <p class="article-excerpt-expanded">How Parserator demonstrates that liberation-focused software wins both ethically and commercially. A practical case study in EMA implementation.</p>
+                        <div class="article-meta-expanded">
+                            <span>Case Study</span>
+                            <span>12 min read</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 0, 255, 0.2);">Innovation</div>
+                        <h3 class="article-title-expanded">The Home-Master Reactive System</h3>
+                        <p class="article-excerpt-expanded">Exploring the mathematical relationships that create our adaptive visual identity. How 4D geometry expresses digital philosophy.</p>
+                        <div class="article-meta-expanded">
+                            <span>Technology</span>
+                            <span>18 min read</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- ARTICLES SECTION -->
+        <section class="magazine-section" id="section-articles" data-section="articles">
+            <div class="section-expanded-content">
+                
+                <div class="section-header-expanded">
+                    <h1 class="section-title-expanded" style="color: #00ffff;">Articles</h1>
+                    <p class="section-subtitle-expanded">Deep Dives into Digital Philosophy and Technical Implementation</p>
+                </div>
+                
+                <div class="content-grid-expanded grid-articles">
+                    <!-- FEATURED TECHNICAL ARTICLE -->
+                    <div class="article-card-expanded featured-article">
+                        <div class="article-category-expanded" style="background: rgba(255, 136, 0, 0.3);">Featured Technical Deep Dive</div>
+                        <h3 class="article-title-expanded">How I Built an AI Parser That Actually Works in Production</h3>
+                        <p class="article-excerpt-expanded">After months of development and testing, I'm excited to share the technical story behind Parserator - an AI parsing service that achieves 95% accuracy across 16 different document types. The breakthrough: Architect-Extractor pattern with 70% cost reduction.</p>
+                        <div class="article-meta-expanded">
+                            <span>GEN-RL-MiLLz</span>
+                            <span>June 19, 2025</span>
+                            <span>5,200 words</span>
+                            <span>2.8K views</span>
+                        </div>
+                        <div class="article-tags">
+                            <span class="tag">#ai</span>
+                            <span class="tag">#machinelearning</span>
+                            <span class="tag">#parserator</span>
+                            <span class="tag">#production</span>
+                        </div>
+                    </div>
+                    
+                    <!-- ECONOMICS ANALYSIS -->
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(0, 255, 127, 0.2);">Economics & ROI</div>
+                        <h3 class="article-title-expanded">The Economics of AI Data Parsing: From $7.50 to $0.001</h3>
+                        <p class="article-excerpt-expanded">Three months ago, a medical practice was spending $7.50 per form in manual data entry. Today, they process forms in 6.8 seconds for $0.001 each with 95% accuracy. The complete business case for AI-powered document processing.</p>
+                        <div class="article-meta-expanded">
+                            <span>GEN-RL-MiLLz</span>
+                            <span>June 18, 2025</span>
+                            <span>4,100 words</span>
+                            <span>1.9K views</span>
+                        </div>
+                        <div class="article-tags">
+                            <span class="tag">#economics</span>
+                            <span class="tag">#roi</span>
+                            <span class="tag">#ai-business</span>
+                        </div>
+                    </div>
+                    
+                    <!-- OPEN SOURCE SPOTLIGHT -->
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(127, 255, 0, 0.2);">Open Source</div>
+                        <h3 class="article-title-expanded">Open Source Spotlight: The Core Algorithms Behind Parserator</h3>
+                        <p class="article-excerpt-expanded">Building Parserator taught me that the most valuable AI innovations often come from clever orchestration rather than novel models. Today I'm open-sourcing the core algorithms that make the Architect-Extractor pattern work.</p>
+                        <div class="article-meta-expanded">
+                            <span>GEN-RL-MiLLz</span>
+                            <span>June 17, 2025</span>
+                            <span>3,800 words</span>
+                            <span>3.1K views</span>
+                        </div>
+                        <div class="article-tags">
+                            <span class="tag">#opensource</span>
+                            <span class="tag">#algorithms</span>
+                            <span class="tag">#typescript</span>
+                        </div>
+                    </div>
+                    
+                    <!-- EMA PHILOSOPHY -->
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 51, 255, 0.2);">EMA Philosophy</div>
+                        <h3 class="article-title-expanded">The Exoditical Moral Architecture Manifesto</h3>
+                        <p class="article-excerpt-expanded">Introducing EMA - a new way of building software that respects user agency. Five core principles that prove ethical software design is also winning software design. The movement reshaping technology.</p>
+                        <div class="article-meta-expanded">
+                            <span>Paul Phillips</span>
+                            <span>June 15, 2025</span>
+                            <span>2,900 words</span>
+                            <span>4.7K views</span>
+                        </div>
+                        <div class="article-tags">
+                            <span class="tag">#ema</span>
+                            <span class="tag">#philosophy</span>
+                            <span class="tag">#ethics</span>
+                        </div>
+                    </div>
+                    
+                    <!-- AGENT DEVELOPMENT -->
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(0, 255, 255, 0.2);">Agent Development</div>
+                        <h3 class="article-title-expanded">Building Unbreakable Agent Workflows with EMA</h3>
+                        <p class="article-excerpt-expanded">Agent developers face unique challenges: data parsing brittleness, framework lock-in risks, and migration complexity. Here's how EMA principles solve these problems with template-based workflows that never break.</p>
+                        <div class="article-meta-expanded">
+                            <span>Engineering Team</span>
+                            <span>June 14, 2025</span>
+                            <span>3,200 words</span>
+                            <span>2.3K views</span>
+                        </div>
+                        <div class="article-tags">
+                            <span class="tag">#agents</span>
+                            <span class="tag">#mcp</span>
+                            <span class="tag">#adk</span>
+                        </div>
+                    </div>
+                    
+                    <!-- TECHNICAL IMPLEMENTATION -->
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 127, 0, 0.2);">Implementation Guide</div>
+                        <h3 class="article-title-expanded">Implementing Data Portability at Scale</h3>
+                        <p class="article-excerpt-expanded">A technical guide to building export-first architectures. Code examples, best practices, and real-world implementation strategies for creating systems that users can actually leave.</p>
+                        <div class="article-meta-expanded">
+                            <span>Technical Team</span>
+                            <span>June 12, 2025</span>
+                            <span>4,500 words</span>
+                            <span>1.8K views</span>
+                        </div>
+                        <div class="article-tags">
+                            <span class="tag">#implementation</span>
+                            <span class="tag">#portability</span>
+                            <span class="tag">#architecture</span>
+                        </div>
+                    </div>
+                    
+                    <!-- INDUSTRY ANALYSIS -->
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 0, 127, 0.2);">Industry Analysis</div>
+                        <h3 class="article-title-expanded">The Wall of Openness: Q2 2025 Industry Report</h3>
+                        <p class="article-excerpt-expanded">Our quarterly assessment of industry progress toward digital sovereignty. Which platforms are building bridges vs. walls? Green, yellow, and red zones mapped across the tech landscape.</p>
+                        <div class="article-meta-expanded">
+                            <span>Research Team</span>
+                            <span>June 10, 2025</span>
+                            <span>2,100 words</span>
+                            <span>5.4K views</span>
+                        </div>
+                        <div class="article-tags">
+                            <span class="tag">#industry</span>
+                            <span class="tag">#analysis</span>
+                            <span class="tag">#openness</span>
+                        </div>
+                    </div>
+                    
+                    <!-- MIGRATION SUCCESS STORY -->
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(127, 255, 212, 0.2);">Success Story</div>
+                        <h3 class="article-title-expanded">Case Study: $2M Startup's Complete Cloud Liberation</h3>
+                        <p class="article-excerpt-expanded">How a fast-growing fintech startup migrated from AWS lock-in to a portable, multi-cloud architecture using EMA principles. 6-month timeline, 40% cost reduction, zero downtime.</p>
+                        <div class="article-meta-expanded">
+                            <span>Guest Author</span>
+                            <span>June 8, 2025</span>
+                            <span>3,600 words</span>
+                            <span>4.1K views</span>
+                        </div>
+                        <div class="article-tags">
+                            <span class="tag">#migration</span>
+                            <span class="tag">#case-study</span>
+                            <span class="tag">#cloud</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(0, 255, 255, 0.2);">Framework Review</div>
+                        <h3 class="article-title-expanded">React vs. Vanilla: The Liberation Test</h3>
+                        <p class="article-excerpt-expanded">Evaluating frontend frameworks through the lens of digital sovereignty. Performance, portability, and long-term freedom analysis.</p>
+                        <div class="article-meta-expanded">
+                            <span>Technology Review</span>
+                            <span>March 5, 2024</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(0, 255, 255, 0.2);">Community</div>
+                        <h3 class="article-title-expanded">Building the EMA Developer Community</h3>
+                        <p class="article-excerpt-expanded">How to foster a community around ethical technology principles. Organizing, evangelism, and sustainable growth strategies.</p>
+                        <div class="article-meta-expanded">
+                            <span>Community Team</span>
+                            <span>March 3, 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- VIDEOS SECTION -->
+        <section class="magazine-section" id="section-videos" data-section="videos">
+            <div class="section-expanded-content">
+                <div class="section-header-expanded">
+                    <h1 class="section-title-expanded" style="color: #ff3366;">Videos</h1>
+                    <p class="section-subtitle-expanded">Visual Essays on Digital Philosophy and Technical Demonstrations</p>
+                </div>
+                
+                <div class="content-grid-expanded grid-showcase">
+                    <!-- FEATURED JACKSON DEMO -->
+                    <div class="article-card-expanded video-card featured-video">
+                        <div class="video-thumbnail">
+                            <video poster="/shared-assets/images/jackson-demo-thumb.jpg" preload="metadata">
+                                <source src="/shared-assets/videos/jackson-demo.mp4" type="video/mp4">
+                            </video>
+                            <div class="play-overlay">
+                                <div class="play-button">▶</div>
+                            </div>
+                        </div>
+                        <div class="article-category-expanded" style="background: rgba(255, 136, 0, 0.3);">Featured Demo</div>
+                        <h3 class="article-title-expanded">Jackson Explains Parserator: The Ultimate AI Data Parser</h3>
+                        <p class="article-excerpt-expanded">Watch Jackson demonstrate Parserator's AI-powered document parsing capabilities live. See the Architect-Extractor pattern in action with real documents and 95% accuracy results.</p>
+                        <div class="article-meta-expanded">
+                            <span>18:42 minutes</span>
+                            <span>12.4K views</span>
+                            <span>Featured</span>
+                        </div>
+                        <div class="video-tags">
+                            <span class="tag">#parserator</span>
+                            <span class="tag">#demo</span>
+                            <span class="tag">#ai</span>
+                            <span class="tag">#live</span>
+                        </div>
+                    </div>
+                    
+                    <!-- NEON LOGO ANIMATIONS -->
+                    <div class="article-card-expanded video-card">
+                        <div class="video-thumbnail">
+                            <video poster="/shared-assets/images/neon-logo-thumb.jpg" preload="metadata">
+                                <source src="/shared-assets/videos/20250612_2055_Neon Logo Animation_storyboard_01jxkch7wpf2sax78bxnj08a9v.mp4" type="video/mp4">
+                            </video>
+                            <div class="play-overlay">
+                                <div class="play-button">▶</div>
+                            </div>
+                        </div>
+                        <div class="article-category-expanded" style="background: rgba(255, 51, 255, 0.2);">Brand Motion</div>
+                        <h3 class="article-title-expanded">Neon Logo Animation Suite</h3>
+                        <p class="article-excerpt-expanded">Cyberpunk-inspired brand animations showcasing the VIB3CODE and Parserator visual identity. Holographic effects and neon aesthetics for digital sovereignty.</p>
+                        <div class="article-meta-expanded">
+                            <span>0:45 seconds</span>
+                            <span>3.8K views</span>
+                        </div>
+                        <div class="video-tags">
+                            <span class="tag">#branding</span>
+                            <span class="tag">#motion</span>
+                            <span class="tag">#neon</span>
+                        </div>
+                    </div>
+                    
+                    <!-- DATA VISUALIZATION SYMPHONY -->
+                    <div class="article-card-expanded video-card">
+                        <div class="video-thumbnail">
+                            <video poster="/shared-assets/images/data-symphony-thumb.jpg" preload="metadata">
+                                <source src="/shared-assets/videos/data-symphony.mp4" type="video/mp4">
+                            </video>
+                            <div class="play-overlay">
+                                <div class="play-button">▶</div>
+                            </div>
+                        </div>
+                        <div class="article-category-expanded" style="background: rgba(0, 255, 127, 0.2);">Data Visualization</div>
+                        <h3 class="article-title-expanded">Fragmented Data Symphony</h3>
+                        <p class="article-excerpt-expanded">Abstract visualization of data fragmentation and liberation. Watch as chaotic data transforms into structured, portable formats through EMA principles.</p>
+                        <div class="article-meta-expanded">
+                            <span>2:30 minutes</span>
+                            <span>7.2K views</span>
+                        </div>
+                        <div class="video-tags">
+                            <span class="tag">#visualization</span>
+                            <span class="tag">#data</span>
+                            <span class="tag">#abstract</span>
+                        </div>
+                    </div>
+                    
+                    <!-- HOLOGRAPHIC DATA PORTAL -->
+                    <div class="article-card-expanded video-card">
+                        <div class="video-thumbnail">
+                            <video poster="/shared-assets/images/data-portal-thumb.jpg" preload="metadata">
+                                <source src="/shared-assets/videos/20250612_2157_Digital Box Revelation_simple_compose_01jxkg2r1ded7rqd7np47dtmv0.mp4" type="video/mp4">
+                            </video>
+                            <div class="play-overlay">
+                                <div class="play-button">▶</div>
+                            </div>
+                        </div>
+                        <div class="article-category-expanded" style="background: rgba(127, 255, 0, 0.2);">Concept Art</div>
+                        <h3 class="article-title-expanded">Digital Box Revelation</h3>
+                        <p class="article-excerpt-expanded">Conceptual visualization of data liberation - watch as digital boxes transform from locked containers to open, accessible formats. The EMA philosophy in motion.</p>
+                        <div class="article-meta-expanded">
+                            <span>1:15 minutes</span>
+                            <span>5.9K views</span>
+                        </div>
+                        <div class="video-tags">
+                            <span class="tag">#concept</span>
+                            <span class="tag">#liberation</span>
+                            <span class="tag">#portal</span>
+                        </div>
+                    </div>
+                    
+                    <!-- FUTURISTIC TRANSITION -->
+                    <div class="article-card-expanded video-card">
+                        <div class="video-thumbnail">
+                            <video poster="/shared-assets/images/futuristic-transition-thumb.jpg" preload="metadata">
+                                <source src="/shared-assets/videos/20250612_1954_Futuristic Neon Transition_remix_01jxk91np1ejbr6r3jfry6eayw.mp4" type="video/mp4">
+                            </video>
+                            <div class="play-overlay">
+                                <div class="play-button">▶</div>
+                            </div>
+                        </div>
+                        <div class="article-category-expanded" style="background: rgba(255, 127, 0, 0.2);">Motion Graphics</div>
+                        <h3 class="article-title-expanded">Futuristic Neon Transition</h3>
+                        <p class="article-excerpt-expanded">Cutting-edge transition effects showing the evolution from legacy systems to EMA-compliant architectures. Cyberpunk aesthetics meet philosophical transformation.</p>
+                        <div class="article-meta-expanded">
+                            <span>1:45 minutes</span>
+                            <span>4.6K views</span>
+                        </div>
+                        <div class="video-tags">
+                            <span class="tag">#transitions</span>
+                            <span class="tag">#cyberpunk</span>
+                            <span class="tag">#evolution</span>
+                        </div>
+                    </div>
+                    
+                    <!-- MECHA UNVEILING -->
+                    <div class="article-card-expanded video-card">
+                        <div class="video-thumbnail">
+                            <video poster="/shared-assets/images/mecha-unveiling-thumb.jpg" preload="metadata">
+                                <source src="/shared-assets/videos/20250612_2336_Futuristic Mecha Unveiling_storyboard_01jxkns2zdfe0tdj5nfhy82epq.mp4" type="video/mp4">
+                            </video>
+                            <div class="play-overlay">
+                                <div class="play-button">▶</div>
+                            </div>
+                        </div>
+                        <div class="article-category-expanded" style="background: rgba(0, 255, 255, 0.2);">Sci-Fi</div>
+                        <h3 class="article-title-expanded">Futuristic Mecha Unveiling</h3>
+                        <p class="article-excerpt-expanded">Science fiction inspired visualization representing the power and sophistication of EMA-compliant systems. The future of digital sovereignty.</p>
+                        <div class="article-meta-expanded">
+                            <span>2:05 minutes</span>
+                            <span>8.3K views</span>
+                        </div>
+                        <div class="video-tags">
+                            <span class="tag">#sci-fi</span>
+                            <span class="tag">#mecha</span>
+                            <span class="tag">#future</span>
+                        </div>
+                    </div>
+                    
+                    <!-- IMAGE COMPILATION REVIEW -->
+                    <div class="article-card-expanded video-card">
+                        <div class="video-thumbnail">
+                            <video poster="/shared-assets/images/imagery-focus-thumb.jpg" preload="metadata">
+                                <source src="/shared-assets/videos/imagery-focus.mp4" type="video/mp4">
+                            </video>
+                            <div class="play-overlay">
+                                <div class="play-button">▶</div>
+                            </div>
+                        </div>
+                        <div class="article-category-expanded" style="background: rgba(255, 0, 127, 0.2);">Compilation</div>
+                        <h3 class="article-title-expanded">Imagery Focus: Visual Identity Showcase</h3>
+                        <p class="article-excerpt-expanded">Comprehensive showcase of VIB3CODE's visual identity elements. Logo variations, color palettes, and design system components in dynamic presentation.</p>
+                        <div class="article-meta-expanded">
+                            <span>3:22 minutes</span>
+                            <span>6.1K views</span>
+                        </div>
+                        <div class="video-tags">
+                            <span class="tag">#identity</span>
+                            <span class="tag">#showcase</span>
+                            <span class="tag">#design</span>
+                        </div>
+                    </div>
+                    
+                    <!-- DATA SHARDS TRANSFORMATION -->
+                    <div class="article-card-expanded video-card">
+                        <div class="video-thumbnail">
+                            <video poster="/shared-assets/images/data-shards-thumb.jpg" preload="metadata">
+                                <source src="/shared-assets/videos/data-shards.mp4" type="video/mp4">
+                            </video>
+                            <div class="play-overlay">
+                                <div class="play-button">▶</div>
+                            </div>
+                        </div>
+                        <div class="article-category-expanded" style="background: rgba(127, 255, 212, 0.2);">Philosophy</div>
+                        <h3 class="article-title-expanded">Data Shards to 'P': The Liberation Journey</h3>
+                        <p class="article-excerpt-expanded">Artistic representation of data liberation - fragmented information coalescing into the powerful 'P' of Parserator. The journey from chaos to sovereignty.</p>
+                        <div class="article-meta-expanded">
+                            <span>1:55 minutes</span>
+                            <span>9.4K views</span>
+                        </div>
+                        <div class="video-tags">
+                            <span class="tag">#philosophy</span>
+                            <span class="tag">#transformation</span>
+                            <span class="tag">#parserator</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 51, 102, 0.2);">Tutorial</div>
+                        <h3 class="article-title-expanded">Self-Hosting Your Development Stack</h3>
+                        <p class="article-excerpt-expanded">Complete guide to setting up a self-hosted development environment. From version control to CI/CD, achieving total independence.</p>
+                        <div class="article-meta-expanded">
+                            <span>89:10 minutes</span>
+                            <span>4.8K views</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 51, 102, 0.2);">Analysis</div>
+                        <h3 class="article-title-expanded">The Real Cost of Vendor Lock-in</h3>
+                        <p class="article-excerpt-expanded">Data-driven analysis of hidden costs in modern development stacks. Calculating the true price of convenience.</p>
+                        <div class="article-meta-expanded">
+                            <span>28:55 minutes</span>
+                            <span>6.2K views</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- PODCASTS SECTION -->
+        <section class="magazine-section" id="section-podcasts" data-section="podcasts">
+            <div class="section-expanded-content">
+                <div class="section-header-expanded">
+                    <h1 class="section-title-expanded" style="color: #ff7f00;">Podcasts</h1>
+                    <p class="section-subtitle-expanded">Digital Liberation Conversations with Industry Leaders</p>
+                </div>
+                
+                <div class="content-grid-expanded grid-articles">
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 127, 0, 0.2);">Episode 12</div>
+                        <h3 class="article-title-expanded">The Future of Open Source with DHH</h3>
+                        <p class="article-excerpt-expanded">David Heinemeier Hansson discusses Rails, Hey, and the philosophy of building software that respects users. Deep dive into practical EMA implementation.</p>
+                        <div class="article-meta-expanded">
+                            <span>March 18, 2024</span>
+                            <span>52:30 minutes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 127, 0, 0.2);">Episode 11</div>
+                        <h3 class="article-title-expanded">Building Ethical AI with Hugging Face</h3>
+                        <p class="article-excerpt-expanded">Conversation with Hugging Face leadership about democratizing AI and building platforms that empower rather than entrap developers.</p>
+                        <div class="article-meta-expanded">
+                            <span>March 11, 2024</span>
+                            <span>64:15 minutes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 127, 0, 0.2);">Episode 10</div>
+                        <h3 class="article-title-expanded">Database Freedom with PostgreSQL Core Team</h3>
+                        <p class="article-excerpt-expanded">Why PostgreSQL represents the gold standard for database sovereignty. Technical deep dive into extensibility and vendor independence.</p>
+                        <div class="article-meta-expanded">
+                            <span>March 4, 2024</span>
+                            <span>48:20 minutes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 127, 0, 0.2);">Episode 9</div>
+                        <h3 class="article-title-expanded">Decentralizing the Web with Protocol Labs</h3>
+                        <p class="article-excerpt-expanded">Exploring IPFS, Filecoin, and the vision of a truly decentralized internet. How blockchain technology enables data sovereignty.</p>
+                        <div class="article-meta-expanded">
+                            <span>February 26, 2024</span>
+                            <span>71:45 minutes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 127, 0, 0.2);">Episode 8</div>
+                        <h3 class="article-title-expanded">The Economics of Digital Freedom</h3>
+                        <p class="article-excerpt-expanded">How businesses can thrive by embracing user sovereignty. Economic models, competitive advantages, and market opportunities in ethical tech.</p>
+                        <div class="article-meta-expanded">
+                            <span>February 19, 2024</span>
+                            <span>56:30 minutes</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(255, 127, 0, 0.2);">Episode 7</div>
+                        <h3 class="article-title-expanded">Rust and Systems Programming Ethics</h3>
+                        <p class="article-excerpt-expanded">Why Rust represents a new paradigm in systems programming ethics. Memory safety, performance, and empowering developers to build better software.</p>
+                        <div class="article-meta-expanded">
+                            <span>February 12, 2024</span>
+                            <span>43:25 minutes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- EMA SECTION -->
+        <section class="magazine-section" id="section-ema" data-section="ema">
+            <div class="section-expanded-content">
+                <div class="section-header-expanded">
+                    <h1 class="section-title-expanded" style="color: #7f00ff;">E.M.A</h1>
+                    <p class="section-subtitle-expanded">Exoditical Moral Architecture - The Philosophy Reshaping Technology</p>
+                </div>
+                
+                <div class="content-grid-expanded grid-showcase">
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(127, 0, 255, 0.2);">Core Principle</div>
+                        <h3 class="article-title-expanded">Digital Sovereignty</h3>
+                        <p class="article-excerpt-expanded">User data, logic, and intellectual property ownership is sacred and non-negotiable. The foundation of all ethical technology decisions.</p>
+                        <div class="article-meta-expanded">
+                            <span>Fundamental</span>
+                            <span>Always Active</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(127, 0, 255, 0.2);">Core Principle</div>
+                        <h3 class="article-title-expanded">Portability-First Design</h3>
+                        <p class="article-excerpt-expanded">Export and migration capabilities are first-class features, not afterthoughts. Freedom to leave is the ultimate empowerment.</p>
+                        <div class="article-meta-expanded">
+                            <span>Architecture</span>
+                            <span>Design Pattern</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(127, 0, 255, 0.2);">Core Principle</div>
+                        <h3 class="article-title-expanded">Standards Agnosticism</h3>
+                        <p class="article-excerpt-expanded">Universal formats over proprietary lock-in mechanisms. Open standards enable freedom and prevent technological entrapment.</p>
+                        <div class="article-meta-expanded">
+                            <span>Technical</span>
+                            <span>Implementation</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(127, 0, 255, 0.2);">Core Principle</div>
+                        <h3 class="article-title-expanded">Transparent Competition</h3>
+                        <p class="article-excerpt-expanded">Expose walls, celebrate bridges, compete on merit alone. The Wall of Openness shows who builds freedom vs. entrapment.</p>
+                        <div class="article-meta-expanded">
+                            <span>Market Ethics</span>
+                            <span>Competitive Strategy</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(127, 0, 255, 0.2);">Core Principle</div>
+                        <h3 class="article-title-expanded">The Sacred Departure</h3>
+                        <p class="article-excerpt-expanded">Treat user migration with respect and ceremony, not hostility. The Honorable Butcher Shop experience makes leaving elegant.</p>
+                        <div class="article-meta-expanded">
+                            <span>User Experience</span>
+                            <span>Business Philosophy</span>
+                        </div>
+                    </div>
+                    
+                    <div class="article-card-expanded">
+                        <div class="article-category-expanded" style="background: rgba(127, 0, 255, 0.2);">Movement</div>
+                        <h3 class="article-title-expanded">Join the EMA Movement</h3>
+                        <p class="article-excerpt-expanded">Become part of the community reshaping technology through ethical architecture. Resources, community, and implementation guides.</p>
+                        <div class="article-meta-expanded">
+                            <span>Community</span>
+                            <span>Get Involved</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-cyber">
+        <div class="container-cyber">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>💡 Development</h3>
+                    <div class="footer-links">
+                        <a href="/articles" class="footer-link">Articles</a>
+                        <a href="/patterns" class="footer-link">Design Patterns</a>
+                        <a href="/apis" class="footer-link">API Design</a>
+                        <a href="/migration" class="footer-link">Migration Guides</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>📚 Content</h3>
+                    <div class="footer-links">
+                        <a href="/tutorials" class="footer-link">Tutorials</a>
+                        <a href="/videos" class="footer-link">Video Content</a>
+                        <a href="/podcasts" class="footer-link">Podcasts</a>
+                        <a href="/case-studies" class="footer-link">Case Studies</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>⚡ Parserator</h3>
+                    <div class="footer-links">
+                        <a href="/parserator" class="footer-link">Platform</a>
+                        <a href="/parserator/docs" class="footer-link">Documentation</a>
+                        <a href="/parserator/examples" class="footer-link">Examples</a>
+                        <a href="/parserator/export" class="footer-link">Export Tools</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>🌐 Community</h3>
+                    <div class="footer-links">
+                        <a href="/discord" class="footer-link">Discord</a>
+                        <a href="/github" class="footer-link">GitHub</a>
+                        <a href="/contribute" class="footer-link">Contribute</a>
+                        <a href="/newsletter" class="footer-link">Newsletter Archive</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p class="footer-brand">
+                    <strong class="brand-text">VIB3CODE</strong> - Code Without Chains
+                </p>
+                <p class="footer-description">
+                    We build technology that respects developers and users. This site has full data portability, 
+                    open source components, and clear migration paths. 
+                    <a href="/philosophy" class="footer-link-inline">View our development philosophy</a>.
+                </p>
+                
+                <div class="footer-legal">
+                    <a href="/legal" class="footer-link">Legal</a>
+                    <a href="/privacy" class="footer-link">Privacy</a>
+                    <a href="/export-data" class="footer-link">Export Data</a>
+                    <a href="/source-code" class="footer-link">Source Code</a>
+                    <button onclick="regenerateTheme()" class="footer-link theme-regenerate" style="background: none; border: none; color: inherit; cursor: pointer; text-decoration: underline;">🎨 New Publication</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Core Scripts - FORCE CACHE REFRESH - 2025-06-19 14:30 -->
+    <!-- PERSISTENT MULTI-VISUALIZER SYSTEM (3-4 instances, parameter morphing) -->
+    <script src="js/persistent-multi-visualizer.js?v=1750368900"></script>
+    <script src="js/theme-engine-clean.js?v=1749968723"></script>
+    <script src="js/content-templates.js?v=1750014474"></script>
+    <script src="js/magazine-router.js?v=1749968723"></script>
+    <script src="js/editorial-ai-clean.js?v=1749968723"></script>
+    <script src="js/interactive-features.js?v=1749968723"></script>
+    <script src="js/main-fixed.js?v=1749968723"></script>
+    <script src="js/parallax-fixed.js?v=1749968723"></script>
+    
+    <!-- REACTIVE HYPERAV CORE - Complete VIB3CODE Visualization System -->
+    
+    <!-- VIB3 Visualizer Parameter Display -->
+    <!-- LIQUID GLASS HOLOGRAPHIC PARAMETER DISPLAY -->
+    <div class="parameter-indicator" id="vib3-param-display" data-depth="medium">
+        <div class="liquid-glass-surface morphing">
+            <div class="holographic-data-stream">
+                <!-- Section Data Node -->
+                <div class="data-node" id="section-node">
+                    <span class="data-label">Neural Sector</span>
+                    <span class="data-value state-idle" id="param-section">home</span>
+                </div>
+                
+                <!-- Scroll Data Node -->
+                <div class="data-node" id="scroll-node">
+                    <span class="data-label">Motion Vector</span>
+                    <span class="data-value state-idle" id="param-scroll">0%</span>
+                </div>
+                
+                <!-- Mouse Data Node -->
+                <div class="data-node" id="mouse-node">
+                    <span class="data-label">Spatial Vector</span>
+                    <span class="data-value state-idle" id="param-mouse">Q1:TR D0.00</span>
+                </div>
+                
+                <!-- Activity Data Node -->
+                <div class="data-node" id="activity-node">
+                    <span class="data-label">State Engine</span>
+                    <span class="data-value state-idle" id="param-activity">idle</span>
+                </div>
+                
+                <!-- Engagement Data Node with Visual Bar -->
+                <div class="data-node" id="engagement-node">
+                    <span class="data-label">Neural Sync</span>
+                    <span class="data-value state-idle" id="param-engagement">50%</span>
+                </div>
+                <div class="engagement-bar">
+                    <div class="engagement-fill" id="engagement-fill" style="width: 50%;"></div>
+                </div>
+                
+                <!-- Randomization Control -->
+                <div class="data-node" id="randomize-node" style="cursor: pointer; margin-top: 10px;" onclick="window.randomizeVisualizer()">
+                    <span class="data-label">Randomize</span>
+                    <span class="data-value" style="color: #ff8800;">🎲 ROLL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Context Warning for Safari -->
+    <div id="audio-warning" class="audio-warning" style="display: none;">
+        <div class="warning-content">
+            <p>🎵 Click anywhere to enable audio visualization</p>
+            <button id="enable-audio" class="btn-cyber btn-small">Enable Audio</button>
+        </div>
+    </div>
+    
+    <!-- PERSISTENT MULTI-VISUALIZER INTEGRATION -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎨 Initializing Persistent Multi-Visualizer System...');
+            
+            // The persistent multi-visualizer automatically initializes
+            // 3 canvas layers: header, content, ambient
+            // Parameters morph smoothly on navigation events
+            
+            // Integration with existing navigation system
+            if (window.persistentMultiVisualizer) {
+                console.log('✅ Persistent Multi-Visualizer ready');
+                console.log('- 3 persistent layers with smooth parameter morphing');
+                console.log('- Portal transitions between geometries');
+                console.log('- Velocity-based effects (1/10th intensity)');
+                console.log('- Ready for text animation integration');
+            } else {
+                console.error('❌ Persistent Multi-Visualizer not found');
+            }
+        });
+    </script>
+</body>
+</html>

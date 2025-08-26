@@ -1,0 +1,29 @@
+{
+    "title": "My First Article",
+    "author": "AI Agent",
+    "date": "2023-10-26",
+    "tags": [
+        "image",
+        "heading",
+        "item",
+        "subheading",
+        "list"
+    ],
+    "description": "A sample article for testing the processing pipeline.",
+    "ai_suggestions": {
+        "suggested_excerpt": "main heading this is the first paragraph of the article. subheading this is a second paragraph, following a subheading.",
+        "suggested_categories": [
+            "current visualizers & engine integration",
+            "guidelines for new s & s"
+        ],
+        "suggested_tags": [
+            "image",
+            "heading",
+            "item",
+            "subheading",
+            "list"
+        ]
+    },
+    "excerpt": "main heading this is the first paragraph of the article. subheading this is a second paragraph, following a subheading.",
+    "category": "current visualizers & engine integration"
+}

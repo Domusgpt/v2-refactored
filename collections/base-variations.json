@@ -1,0 +1,491 @@
+{
+  "name": "Base Multi-System Variations",
+  "description": "30 default variations across 8 geometric forms and 4 visualization systems",
+  "version": "1.0",
+  "type": "holographic-collection",
+  "profileName": "Active Holographic Systems",
+  "totalVariations": 30,
+  "created": "2025-07-08T00:00:00.000Z",
+  "variations": [
+    {
+      "id": 0,
+      "name": "TETRAHEDRON LATTICE",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 0,
+        "gridDensity": 15.0,
+        "speed": 0.5,
+        "chaos": 0.0,
+        "morphFactor": 0.0,
+        "hue": 15,
+        "saturation": 0.8,
+        "intensity": 0.5
+      }
+    },
+    {
+      "id": 1,
+      "name": "TETRAHEDRON FIELD",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 0,
+        "gridDensity": 19.5,
+        "speed": 0.7,
+        "chaos": 0.25,
+        "morphFactor": 0.3,
+        "hue": 75,
+        "saturation": 0.8,
+        "intensity": 0.6
+      }
+    },
+    {
+      "id": 2,
+      "name": "TETRAHEDRON MATRIX",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 0,
+        "gridDensity": 24.0,
+        "speed": 0.9,
+        "chaos": 0.5,
+        "morphFactor": 0.6,
+        "hue": 75,
+        "saturation": 0.8,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": 3,
+      "name": "TETRAHEDRON RESONANCE",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 0,
+        "gridDensity": 28.5,
+        "speed": 1.1,
+        "chaos": 0.75,
+        "morphFactor": 0.9,
+        "hue": 75,
+        "saturation": 0.8,
+        "intensity": 0.8
+      }
+    },
+    {
+      "id": 4,
+      "name": "HYPERCUBE LATTICE",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 1,
+        "gridDensity": 15.0,
+        "speed": 0.5,
+        "chaos": 0.0,
+        "morphFactor": 0.0,
+        "hue": 130,
+        "saturation": 0.8,
+        "intensity": 0.5
+      }
+    },
+    {
+      "id": 5,
+      "name": "HYPERCUBE FIELD",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 1,
+        "gridDensity": 19.5,
+        "speed": 0.7,
+        "chaos": 0.25,
+        "morphFactor": 0.3,
+        "hue": 130,
+        "saturation": 0.8,
+        "intensity": 0.6
+      }
+    },
+    {
+      "id": 6,
+      "name": "HYPERCUBE MATRIX",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 1,
+        "gridDensity": 24.0,
+        "speed": 0.9,
+        "chaos": 0.5,
+        "morphFactor": 0.6,
+        "hue": 130,
+        "saturation": 0.8,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": 7,
+      "name": "HYPERCUBE QUANTUM",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 1,
+        "gridDensity": 28.5,
+        "speed": 1.1,
+        "chaos": 0.75,
+        "morphFactor": 0.9,
+        "hue": 130,
+        "saturation": 0.8,
+        "intensity": 0.8
+      }
+    },
+    {
+      "id": 8,
+      "name": "SPHERE LATTICE",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 2,
+        "gridDensity": 15.0,
+        "speed": 0.5,
+        "chaos": 0.0,
+        "morphFactor": 0.0,
+        "hue": 200,
+        "saturation": 0.8,
+        "intensity": 0.5
+      }
+    },
+    {
+      "id": 9,
+      "name": "SPHERE FIELD",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 2,
+        "gridDensity": 19.5,
+        "speed": 0.7,
+        "chaos": 0.25,
+        "morphFactor": 0.3,
+        "hue": 200,
+        "saturation": 0.8,
+        "intensity": 0.6
+      }
+    },
+    {
+      "id": 10,
+      "name": "SPHERE MATRIX",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 2,
+        "gridDensity": 24.0,
+        "speed": 0.9,
+        "chaos": 0.5,
+        "morphFactor": 0.6,
+        "hue": 200,
+        "saturation": 0.8,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": 11,
+      "name": "SPHERE RESONANCE",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 2,
+        "gridDensity": 28.5,
+        "speed": 1.1,
+        "chaos": 0.75,
+        "morphFactor": 0.9,
+        "hue": 200,
+        "saturation": 0.8,
+        "intensity": 0.8
+      }
+    },
+    {
+      "id": 12,
+      "name": "TORUS LATTICE",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 3,
+        "gridDensity": 15,
+        "speed": 0.5,
+        "chaos": 0.0,
+        "morphFactor": 0.0,
+        "hue": 290,
+        "saturation": 0.8,
+        "intensity": 0.5
+      }
+    },
+    {
+      "id": 13,
+      "name": "TORUS FIELD",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 3,
+        "gridDensity": 20,
+        "speed": 0.7,
+        "chaos": 0.25,
+        "morphFactor": 0.3,
+        "hue": 290,
+        "saturation": 0.8,
+        "intensity": 0.6
+      }
+    },
+    {
+      "id": 14,
+      "name": "TORUS MATRIX",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 3,
+        "gridDensity": 25,
+        "speed": 0.9,
+        "chaos": 0.5,
+        "morphFactor": 0.6,
+        "hue": 290,
+        "saturation": 0.8,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": 15,
+      "name": "TORUS QUANTUM",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 3,
+        "gridDensity": 30,
+        "speed": 1.1,
+        "chaos": 0.75,
+        "morphFactor": 0.9,
+        "hue": 290,
+        "saturation": 0.8,
+        "intensity": 0.8
+      }
+    },
+    {
+      "id": 16,
+      "name": "KLEIN BOTTLE LATTICE",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 4,
+        "gridDensity": 15,
+        "speed": 0.5,
+        "chaos": 0.0,
+        "morphFactor": 0.0,
+        "hue": 340,
+        "saturation": 0.8,
+        "intensity": 0.5
+      }
+    },
+    {
+      "id": 17,
+      "name": "KLEIN BOTTLE FIELD",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 4,
+        "gridDensity": 20,
+        "speed": 0.7,
+        "chaos": 0.25,
+        "morphFactor": 0.3,
+        "hue": 340,
+        "saturation": 0.8,
+        "intensity": 0.6
+      }
+    },
+    {
+      "id": 18,
+      "name": "KLEIN BOTTLE MATRIX",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 4,
+        "gridDensity": 25,
+        "speed": 0.9,
+        "chaos": 0.5,
+        "morphFactor": 0.6,
+        "hue": 340,
+        "saturation": 0.8,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": 19,
+      "name": "KLEIN BOTTLE QUANTUM",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 4,
+        "gridDensity": 30,
+        "speed": 1.1,
+        "chaos": 0.75,
+        "morphFactor": 0.9,
+        "hue": 340,
+        "saturation": 0.8,
+        "intensity": 0.8
+      }
+    },
+    {
+      "id": 20,
+      "name": "FRACTAL LATTICE",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 5,
+        "gridDensity": 15,
+        "speed": 0.5,
+        "chaos": 0.0,
+        "morphFactor": 0.0,
+        "hue": 45,
+        "saturation": 0.8,
+        "intensity": 0.5
+      }
+    },
+    {
+      "id": 21,
+      "name": "FRACTAL FIELD",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 5,
+        "gridDensity": 20,
+        "speed": 0.7,
+        "chaos": 0.25,
+        "morphFactor": 0.3,
+        "hue": 45,
+        "saturation": 0.8,
+        "intensity": 0.6
+      }
+    },
+    {
+      "id": 22,
+      "name": "FRACTAL QUANTUM",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 5,
+        "gridDensity": 25,
+        "speed": 0.9,
+        "chaos": 0.5,
+        "morphFactor": 0.6,
+        "hue": 45,
+        "saturation": 0.8,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": 23,
+      "name": "WAVE LATTICE",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 6,
+        "gridDensity": 15,
+        "speed": 0.5,
+        "chaos": 0.0,
+        "morphFactor": 0.0,
+        "hue": 160,
+        "saturation": 0.8,
+        "intensity": 0.5
+      }
+    },
+    {
+      "id": 24,
+      "name": "WAVE FIELD",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 6,
+        "gridDensity": 20,
+        "speed": 0.7,
+        "chaos": 0.25,
+        "morphFactor": 0.3,
+        "hue": 160,
+        "saturation": 0.8,
+        "intensity": 0.6
+      }
+    },
+    {
+      "id": 25,
+      "name": "WAVE QUANTUM",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 6,
+        "gridDensity": 25,
+        "speed": 0.9,
+        "chaos": 0.5,
+        "morphFactor": 0.6,
+        "hue": 160,
+        "saturation": 0.8,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": 26,
+      "name": "CRYSTAL LATTICE",
+      "system": "faceted",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 7,
+        "gridDensity": 15,
+        "speed": 0.5,
+        "chaos": 0.0,
+        "morphFactor": 0.0,
+        "hue": 240,
+        "saturation": 0.8,
+        "intensity": 0.5
+      }
+    },
+    {
+      "id": 27,
+      "name": "CRYSTAL FIELD",
+      "system": "quantum",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 7,
+        "gridDensity": 20,
+        "speed": 0.7,
+        "chaos": 0.25,
+        "morphFactor": 0.3,
+        "hue": 240,
+        "saturation": 0.8,
+        "intensity": 0.6
+      }
+    },
+    {
+      "id": 28,
+      "name": "CRYSTAL MATRIX",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 7,
+        "gridDensity": 25,
+        "speed": 0.9,
+        "chaos": 0.5,
+        "morphFactor": 0.6,
+        "hue": 240,
+        "saturation": 0.8,
+        "intensity": 0.7
+      }
+    },
+    {
+      "id": 29,
+      "name": "CRYSTAL QUANTUM",
+      "system": "holographic",
+      "isCustom": false,
+      "parameters": {
+        "geometry": 7,
+        "gridDensity": 30,
+        "speed": 1.1,
+        "chaos": 0.75,
+        "morphFactor": 0.9,
+        "hue": 240,
+        "saturation": 0.8,
+        "intensity": 0.8
+      }
+    }
+  ]
+}
