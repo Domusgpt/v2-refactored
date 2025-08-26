@@ -171,14 +171,8 @@ export class SmartCanvasPool {
             newEngine = new this.engineClasses.VIB34DIntegratedEngine();
             window.engine = newEngine;
             
-            // Initialize engine if method exists
-            if (newEngine.initialize) {
-              const success = newEngine.initialize();
-              if (!success) {
-                console.error('❌ VIB34DIntegratedEngine initialization failed');
-                newEngine = null;
-              }
-            }
+            // VIB34DIntegratedEngine calls init() in constructor, so no additional initialization needed
+            console.log('✅ VIB34DIntegratedEngine auto-initialized in constructor');
           } else {
             console.error('❌ VIB34DIntegratedEngine class not available');
           }
@@ -190,14 +184,8 @@ export class SmartCanvasPool {
             newEngine = new this.engineClasses.QuantumEngine();
             window.quantumEngine = newEngine;
             
-            // Initialize engine if method exists
-            if (newEngine.initialize) {
-              const success = newEngine.initialize();
-              if (!success) {
-                console.error('❌ QuantumEngine initialization failed');
-                newEngine = null;
-              }
-            }
+            // QuantumEngine calls init() in constructor, so no additional initialization needed
+            console.log('✨ QuantumEngine auto-initialized in constructor');
           } else {
             console.error('❌ QuantumEngine class not available');
           }
@@ -209,14 +197,8 @@ export class SmartCanvasPool {
             newEngine = new this.engineClasses.RealHolographicSystem();
             window.holographicSystem = newEngine;
             
-            // Initialize engine if method exists  
-            if (newEngine.initialize) {
-              const success = newEngine.initialize();
-              if (!success) {
-                console.error('❌ RealHolographicSystem initialization failed');
-                newEngine = null;
-              }
-            }
+            // RealHolographicSystem calls initialize() in constructor, so no additional initialization needed
+            console.log('✨ RealHolographicSystem auto-initialized in constructor');
           } else {
             console.error('❌ RealHolographicSystem class not available');
           }
@@ -246,27 +228,16 @@ export class SmartCanvasPool {
     const configs = this.canvasConfigs[systemName];
     if (!configs) return;
     
-    console.log(`🧽 Cleaning up ${configs.length} WebGL contexts for ${systemName}`);
+    console.log(`🧹 Resetting ${configs.length} canvases for ${systemName} (engines manage their own contexts)`);
     
     configs.forEach(config => {
       const canvas = document.getElementById(config.id);
       if (canvas) {
-        // Get WebGL context to clean up
-        const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-        if (gl) {
-          // DON'T call loseContext() - it permanently breaks canvas elements!
-          // const ext = gl.getExtension('WEBGL_lose_context');
-          // if (ext) {
-          //   ext.loseContext(); // THIS BREAKS WEBGL PERMANENTLY!
-          // }
-          console.log(`🚫 Skipping loseContext() to preserve canvas element`);
-        }
-        
-        // Clear canvas
+        // Simply reset canvas dimensions - engines will handle WebGL context cleanup
         canvas.width = 1;
         canvas.height = 1;
         
-        console.log(`✨ Cleaned context: ${config.id} (canvas preserved)`);
+        console.log(`📐 Canvas ${config.id} reset to 1x1`);
       }
     });
   }
@@ -290,55 +261,14 @@ export class SmartCanvasPool {
     configs.forEach(config => {
       const canvas = document.getElementById(config.id);
       if (canvas) {
-        // Set proper canvas dimensions
+        // Set proper canvas dimensions - let engines create their own WebGL contexts
         const rect = canvas.getBoundingClientRect();
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         
-        // CRITICAL FIX: Use UNIFIED context options that match ALL visualizers
-        const contextOptions = {
-          alpha: true,
-          depth: true,
-          stencil: false,
-          antialias: false,  // Disable antialiasing on mobile for performance
-          premultipliedAlpha: true,
-          preserveDrawingBuffer: false,
-          powerPreference: 'high-performance',
-          failIfMajorPerformanceCaveat: false  // Don't fail on mobile
-        };
-        
-        const gl = canvas.getContext('webgl2', contextOptions) || 
-                   canvas.getContext('webgl', contextOptions) ||
-                   canvas.getContext('experimental-webgl', contextOptions);
-        
-        if (gl) {
-          // CRITICAL FIX: Add proper WebGL context validation
-          if (gl.isContextLost()) {
-            console.error(`❌ Context lost immediately: ${config.id}`);
-            return;
-          }
-          
-          // Test basic WebGL functionality
-          try {
-            const version = gl.getParameter(gl.VERSION);
-            const renderer = gl.getParameter(gl.RENDERER);
-            console.log(`✨ Created context: ${config.id} (${canvas.width}x${canvas.height}) - ${version}`);
-            
-            // Test shader creation capability
-            const testShader = gl.createShader(gl.VERTEX_SHADER);
-            if (!testShader) {
-              console.warn(`⚠️ Context may be invalid: ${config.id} - cannot create shaders`);
-            } else {
-              gl.deleteShader(testShader);
-            }
-          } catch (error) {
-            console.error(`❌ Context validation failed: ${config.id} -`, error);
-          }
-        } else {
-          console.error(`❌ Failed to create context: ${config.id} - WebGL not supported`);
-        }
+        console.log(`📐 Canvas ${config.id} sized: ${canvas.width}x${canvas.height} (${rect.width}x${rect.height} * ${dpr})`);
       }
     });
   }
