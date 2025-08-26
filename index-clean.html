@@ -292,7 +292,16 @@
                 // Initialize VIB34D Application
                 const app = new VIB34DApp();
                 window.vib34dApp = app;
+                
+                // CRITICAL FIX: Ensure global functions are available IMMEDIATELY for gallery previews
                 await app.initialize();
+                
+                // Force check that essential functions are global
+                if (!window.syncVisualizerToUI) {
+                    console.error('🚨 CRITICAL: syncVisualizerToUI not available globally after app init');
+                } else {
+                    console.log('✅ Essential functions available globally');
+                }
 
                 // Initialize default system
                 const initialSystem = window.currentSystem || 'faceted';

@@ -76,31 +76,37 @@ export class GalleryPreviewFix {
     }
 
     /**
-     * Wait for engine classes to be loaded AND for target system to be available
+     * Wait for ALL critical systems to be ready: engines AND global functions
      */
     async waitForEngineClasses() {
         return new Promise((resolve) => {
-            const checkEngineClasses = () => {
+            const checkCriticalSystems = () => {
                 const hasEngineClasses = window.engineClasses && Object.keys(window.engineClasses).length > 0;
                 const hasTargetSystemEngine = this.checkTargetSystemEngine(window.galleryPreviewData?.system);
+                const hasGlobalFunctions = typeof window.syncVisualizerToUI === 'function' && typeof window.getCurrentUIParameterState === 'function';
+                const hasSwitchSystem = typeof window.switchSystem === 'function';
                 
-                if (hasEngineClasses && hasTargetSystemEngine) {
-                    console.log('🎨 GALLERY PREVIEW FIX: Engine classes AND target system available');
+                const allReady = hasEngineClasses && hasTargetSystemEngine && hasGlobalFunctions && hasSwitchSystem;
+                
+                if (allReady) {
+                    console.log('🎨 GALLERY PREVIEW FIX: ALL critical systems ready!');
                     resolve();
                 } else if (this.initializationAttempts < this.maxAttempts) {
                     this.initializationAttempts++;
-                    console.log(`🎨 GALLERY PREVIEW FIX: Waiting for engines... (${this.initializationAttempts}/${this.maxAttempts})`);
+                    console.log(`🎨 GALLERY PREVIEW FIX: Waiting for critical systems... (${this.initializationAttempts}/${this.maxAttempts})`);
                     console.log(`  - Engine classes: ${hasEngineClasses ? '✅' : '❌'}`);
                     console.log(`  - Target system (${window.galleryPreviewData?.system}): ${hasTargetSystemEngine ? '✅' : '❌'}`);
-                    setTimeout(checkEngineClasses, this.retryDelay);
+                    console.log(`  - Global functions (syncVisualizerToUI, getCurrentUIParameterState): ${hasGlobalFunctions ? '✅' : '❌'}`);
+                    console.log(`  - switchSystem function: ${hasSwitchSystem ? '✅' : '❌'}`);
+                    setTimeout(checkCriticalSystems, this.retryDelay);
                 } else {
-                    console.warn('🎨 GALLERY PREVIEW FIX: Timeout waiting for engines - will attempt to continue');
-                    console.log(`🎨 Final status: Engine classes: ${hasEngineClasses}, Target system: ${hasTargetSystemEngine}`);
+                    console.warn('🎨 GALLERY PREVIEW FIX: Timeout waiting for critical systems - proceeding anyway');
+                    console.log(`🎨 Final status: Engines: ${hasEngineClasses}, Target: ${hasTargetSystemEngine}, Functions: ${hasGlobalFunctions}, Switch: ${hasSwitchSystem}`);
                     resolve();
                 }
             };
             
-            checkEngineClasses();
+            checkCriticalSystems();
         });
     }
     
@@ -208,15 +214,22 @@ export class GalleryPreviewFix {
                 window.currentSystem = system;
             }
             
-            // Apply parameters IMMEDIATELY - no delays or retries needed since URL params already set global state
-            console.log('🚀 INSTANT: Applying parameters immediately (no delays)');
+            // Apply parameters with balanced timing - not too early, not too late
+            console.log('🎨 BALANCED: Applying parameters with optimal timing');
+            
+            // Immediate application to UI elements
             this.applyGalleryParameters(parameters);
             
-            // Quick follow-up to ensure engine picked up the parameters
+            // Follow-up applications for engine sync
             setTimeout(() => {
                 this.applyGalleryParameters(parameters);
-                console.log('🚀 INSTANT: Quick follow-up parameter sync completed');
-            }, 100);
+                console.log('🎨 BALANCED: Follow-up parameter sync completed');
+            }, 200);
+            
+            setTimeout(() => {
+                this.applyGalleryParameters(parameters);
+                console.log('🎨 BALANCED: Final parameter sync completed');
+            }, 500);
             
         } catch (error) {
             console.error('🎨 GALLERY PREVIEW FIX: Critical error in applyGalleryPreview:', error);
@@ -337,13 +350,13 @@ if (typeof window !== 'undefined' && window.location.search.includes('system='))
     // Suppress warning spam immediately
     galleryPreviewFix.suppressWarningSpam();
     
-    // Initialize IMMEDIATELY for gallery previews - no delays needed since URL params handle everything
+    // Initialize with balanced timing for gallery previews
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            galleryPreviewFix.initializeGalleryPreview();
+            setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 200);
         });
     } else {
-        galleryPreviewFix.initializeGalleryPreview();
+        setTimeout(() => galleryPreviewFix.initializeGalleryPreview(), 200);
     }
     
     window.galleryPreviewFix = galleryPreviewFix;
