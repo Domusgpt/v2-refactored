@@ -62,6 +62,7 @@ export class QuantumHolographicVisualizer {
             hue: 200,
             intensity: 0.5,
             saturation: 0.8,
+            colorMode: 1.0,  // 0.0 = CLASSIC, 1.0 = EXTREME (default to EXTREME)
             dimension: 3.5,
             rot4dXW: 0.0,
             rot4dYW: 0.0,
@@ -242,6 +243,7 @@ uniform float u_speed;
 uniform float u_hue;
 uniform float u_intensity;
 uniform float u_saturation;
+uniform float u_colorMode;  // 0.0 = CLASSIC, 1.0 = EXTREME
 uniform float u_dimension;
 uniform float u_rot4dXW;
 uniform float u_rot4dYW;
@@ -425,6 +427,16 @@ float geometryFunction(vec4 p) {
     }
 }
 
+// DUAL COLOR SYSTEM: EXTREME vs CLASSIC modes
+// Users can toggle between extreme layer-by-layer colors and traditional HSV
+
+// HSV to RGB conversion for classic mode
+vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
 // EXTREME LAYER-BY-LAYER COLOR SYSTEM
 // Each canvas layer gets completely different color behavior
 
@@ -545,96 +557,124 @@ void main() {
     // Apply user intensity control
     float finalIntensity = geometryIntensity * u_intensity;
     
-    // Old hemispheric color system completely removed - now using extreme layer-by-layer system
+    // DUAL COLOR MODE SYSTEM - Choose between EXTREME and CLASSIC
+    vec3 finalColor;
+    float layerAlpha;
     
-    // EXTREME LAYER-BY-LAYER COLOR SYSTEM
-    // Determine canvas layer from role/variant (0=background, 1=shadow, 2=content, 3=highlight, 4=accent)
-    int layerIndex = 0;
-    if (u_roleIntensity == 0.7) layerIndex = 1;      // shadow layer
-    else if (u_roleIntensity == 1.0) layerIndex = 2; // content layer  
-    else if (u_roleIntensity == 0.85) layerIndex = 3; // highlight layer
-    else if (u_roleIntensity == 0.6) layerIndex = 4;  // accent layer
-    
-    // Get layer-specific base color with extreme dynamics
-    // Use u_hue as global intensity modifier (0-1) affecting all layers
-    float globalIntensity = u_hue; // Now 0-1 from JavaScript
-    float colorTime = timeSpeed * 2.0 + value * 3.0 + globalIntensity * 5.0;
-    vec3 layerColor = getLayerColorPalette(layerIndex, colorTime) * (0.5 + globalIntensity * 1.5);
-    
-    // Apply geometry-based intensity modulation per layer
-    vec3 extremeBaseColor;
-    if (layerIndex == 0) {
-        // Background: Subtle, fills empty space
-        extremeBaseColor = layerColor * (0.3 + geometryIntensity * 0.4);
-    }
-    else if (layerIndex == 1) {
-        // Shadow: Aggressive, high contrast where geometry is weak
-        float shadowIntensity = pow(1.0 - geometryIntensity, 2.0); // Inverted for shadows
-        extremeBaseColor = layerColor * (shadowIntensity * 0.8 + 0.1);
-    }
-    else if (layerIndex == 2) {
-        // Content: Dominant, follows geometry strongly
-        extremeBaseColor = layerColor * (geometryIntensity * 1.2 + 0.2);
-    }
-    else if (layerIndex == 3) {
-        // Highlight: Electric, peaks only
-        float peakIntensity = pow(geometryIntensity, 3.0); // Cubic for sharp peaks
-        extremeBaseColor = layerColor * (peakIntensity * 1.5 + 0.1);
-    }
-    else {
-        // Accent: Chaotic, random bursts
-        float randomBurst = sin(value * 50.0 + timeSpeed * 10.0) * 0.5 + 0.5;
-        extremeBaseColor = layerColor * (randomBurst * geometryIntensity * 2.0 + 0.05);
-    }
-    
-    // Apply extreme RGB separation per layer
-    vec3 extremeColor = extremeRGBSeparation(extremeBaseColor, uv, finalIntensity, layerIndex);
-    
-    // Layer-specific particle systems with extreme colors
-    float extremeParticles = 0.0;
-    if (layerIndex == 2 || layerIndex == 3) {
-        // Only content and highlight layers get particles
-        vec2 particleUV = uv * (layerIndex == 2 ? 12.0 : 20.0);
+    if (u_colorMode > 0.5) {
+        // EXTREME MODE - Layer-by-layer extreme colors
+        // Determine canvas layer from role/variant (0=background, 1=shadow, 2=content, 3=highlight, 4=accent)
+        int layerIndex = 0;
+        if (u_roleIntensity == 0.7) layerIndex = 1;      // shadow layer
+        else if (u_roleIntensity == 1.0) layerIndex = 2; // content layer  
+        else if (u_roleIntensity == 0.85) layerIndex = 3; // highlight layer
+        else if (u_roleIntensity == 0.6) layerIndex = 4;  // accent layer
+        
+        // Get layer-specific base color with extreme dynamics
+        // Use u_hue as global intensity modifier (0-1) affecting all layers
+        float globalIntensity = u_hue; // Now 0-1 from JavaScript
+        float colorTime = timeSpeed * 2.0 + value * 3.0 + globalIntensity * 5.0;
+        vec3 layerColor = getLayerColorPalette(layerIndex, colorTime) * (0.5 + globalIntensity * 1.5);
+        
+        // Apply geometry-based intensity modulation per layer
+        vec3 extremeBaseColor;
+        if (layerIndex == 0) {
+            // Background: Subtle, fills empty space
+            extremeBaseColor = layerColor * (0.3 + geometryIntensity * 0.4);
+        }
+        else if (layerIndex == 1) {
+            // Shadow: Aggressive, high contrast where geometry is weak
+            float shadowIntensity = pow(1.0 - geometryIntensity, 2.0); // Inverted for shadows
+            extremeBaseColor = layerColor * (shadowIntensity * 0.8 + 0.1);
+        }
+        else if (layerIndex == 2) {
+            // Content: Dominant, follows geometry strongly
+            extremeBaseColor = layerColor * (geometryIntensity * 1.2 + 0.2);
+        }
+        else if (layerIndex == 3) {
+            // Highlight: Electric, peaks only
+            float peakIntensity = pow(geometryIntensity, 3.0); // Cubic for sharp peaks
+            extremeBaseColor = layerColor * (peakIntensity * 1.5 + 0.1);
+        }
+        else {
+            // Accent: Chaotic, random bursts
+            float randomBurst = sin(value * 50.0 + timeSpeed * 10.0) * 0.5 + 0.5;
+            extremeBaseColor = layerColor * (randomBurst * geometryIntensity * 2.0 + 0.05);
+        }
+        
+        // Apply extreme RGB separation per layer
+        vec3 extremeColor = extremeRGBSeparation(extremeBaseColor, uv, finalIntensity, layerIndex);
+        
+        // Layer-specific particle systems with extreme colors
+        float extremeParticles = 0.0;
+        if (layerIndex == 2 || layerIndex == 3) {
+            // Only content and highlight layers get particles
+            vec2 particleUV = uv * (layerIndex == 2 ? 12.0 : 20.0);
+            vec2 particleID = floor(particleUV);
+            vec2 particlePos = fract(particleUV) - 0.5;
+            float particleDist = length(particlePos);
+            
+            float particleTime = timeSpeed * (layerIndex == 2 ? 3.0 : 8.0) + dot(particleID, vec2(127.1, 311.7));
+            float particleAlpha = sin(particleTime) * 0.5 + 0.5;
+            float particleSize = layerIndex == 2 ? 0.2 : 0.1;
+            extremeParticles = (1.0 - smoothstep(0.05, particleSize, particleDist)) * particleAlpha * 0.4;
+        }
+        
+        // Combine extreme color with particles based on layer
+        if (layerIndex == 0) {
+            // Background: Pure extreme color
+            finalColor = extremeColor;
+        }
+        else if (layerIndex == 1) {
+            // Shadow: Dark with toxic highlights
+            finalColor = extremeColor * 0.8;
+        }
+        else if (layerIndex == 2) {
+            // Content: Blazing with white-hot particles
+            finalColor = extremeColor + extremeParticles * vec3(1.0, 1.0, 1.0);
+        }
+        else if (layerIndex == 3) {
+            // Highlight: Electric with cyan particles
+            finalColor = extremeColor + extremeParticles * vec3(0.0, 1.0, 1.0);
+        }
+        else {
+            // Accent: Chaotic magenta madness
+            finalColor = extremeColor * (1.0 + sin(timeSpeed * 20.0) * 0.3);
+        }
+        
+        // Layer-specific alpha intensity with extreme contrast
+        if (layerIndex == 0) layerAlpha = 0.6;        // Background: Medium
+        else if (layerIndex == 1) layerAlpha = 0.4;   // Shadow: Lower
+        else if (layerIndex == 2) layerAlpha = 1.0;   // Content: Full intensity
+        else if (layerIndex == 3) layerAlpha = 0.8;   // Highlight: High
+        else layerAlpha = 0.3;                        // Accent: Subtle bursts
+        
+    } else {
+        // CLASSIC MODE - Traditional HSV colors like other systems
+        vec3 hsvColor = vec3(u_hue, u_saturation, finalIntensity);
+        vec3 baseColor = hsv2rgb(hsvColor);
+        
+        // Add simple particles like original system
+        float particles = 0.0;
+        vec2 particleUV = uv * 8.0;
         vec2 particleID = floor(particleUV);
         vec2 particlePos = fract(particleUV) - 0.5;
         float particleDist = length(particlePos);
         
-        float particleTime = timeSpeed * (layerIndex == 2 ? 3.0 : 8.0) + dot(particleID, vec2(127.1, 311.7));
+        float particleTime = timeSpeed + dot(particleID, vec2(127.1, 311.7));
         float particleAlpha = sin(particleTime) * 0.5 + 0.5;
-        float particleSize = layerIndex == 2 ? 0.2 : 0.1;
-        extremeParticles = (1.0 - smoothstep(0.05, particleSize, particleDist)) * particleAlpha * 0.4;
+        particles = (1.0 - smoothstep(0.1, 0.3, particleDist)) * particleAlpha * 0.3;
+        
+        // Simple RGB glitch like original
+        vec3 glitchColor = baseColor + vec3(
+            sin(uv.y * 30.0 + timeSpeed) * finalIntensity * 0.03,
+            sin(uv.y * 28.0 + timeSpeed) * finalIntensity * 0.03,
+            sin(uv.y * 32.0 + timeSpeed) * finalIntensity * 0.03
+        );
+        
+        finalColor = glitchColor + particles * vec3(1.0, 0.8, 1.0);
+        layerAlpha = u_roleIntensity; // Use standard role intensity
     }
-    
-    // Combine extreme color with particles based on layer
-    vec3 finalColor;
-    if (layerIndex == 0) {
-        // Background: Pure extreme color
-        finalColor = extremeColor;
-    }
-    else if (layerIndex == 1) {
-        // Shadow: Dark with toxic highlights
-        finalColor = extremeColor * 0.8;
-    }
-    else if (layerIndex == 2) {
-        // Content: Blazing with white-hot particles
-        finalColor = extremeColor + extremeParticles * vec3(1.0, 1.0, 1.0);
-    }
-    else if (layerIndex == 3) {
-        // Highlight: Electric with cyan particles
-        finalColor = extremeColor + extremeParticles * vec3(0.0, 1.0, 1.0);
-    }
-    else {
-        // Accent: Chaotic magenta madness
-        finalColor = extremeColor * (1.0 + sin(timeSpeed * 20.0) * 0.3);
-    }
-    
-    // Layer-specific alpha intensity with extreme contrast
-    float layerAlpha;
-    if (layerIndex == 0) layerAlpha = 0.6;        // Background: Medium
-    else if (layerIndex == 1) layerAlpha = 0.4;   // Shadow: Lower
-    else if (layerIndex == 2) layerAlpha = 1.0;   // Content: Full intensity
-    else if (layerIndex == 3) layerAlpha = 0.8;   // Highlight: High
-    else layerAlpha = 0.3;                        // Accent: Subtle bursts
     
     gl_FragColor = vec4(finalColor, finalIntensity * layerAlpha);
 }`;
@@ -652,6 +692,7 @@ void main() {
             hue: this.gl.getUniformLocation(this.program, 'u_hue'),
             intensity: this.gl.getUniformLocation(this.program, 'u_intensity'),
             saturation: this.gl.getUniformLocation(this.program, 'u_saturation'),
+            colorMode: this.gl.getUniformLocation(this.program, 'u_colorMode'),
             dimension: this.gl.getUniformLocation(this.program, 'u_dimension'),
             rot4dXW: this.gl.getUniformLocation(this.program, 'u_rot4dXW'),
             rot4dYW: this.gl.getUniformLocation(this.program, 'u_rot4dYW'),
@@ -918,6 +959,7 @@ void main() {
         this.gl.uniform1f(this.uniforms.hue, (hue % 360) / 360.0); // Normalize to 0-1
         this.gl.uniform1f(this.uniforms.intensity, this.params.intensity);
         this.gl.uniform1f(this.uniforms.saturation, this.params.saturation);
+        this.gl.uniform1f(this.uniforms.colorMode, this.params.colorMode);
         this.gl.uniform1f(this.uniforms.dimension, this.params.dimension);
         this.gl.uniform1f(this.uniforms.rot4dXW, this.params.rot4dXW);
         this.gl.uniform1f(this.uniforms.rot4dYW, this.params.rot4dYW);

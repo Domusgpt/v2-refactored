@@ -215,6 +215,45 @@ export class VIB34DApp {
                 );
             }
         };
+        
+        // Quantum Color Mode Toggle Function
+        window.toggleQuantumColorMode = () => {
+            if (window.currentSystem === 'quantum') {
+                // Toggle between 0.0 (CLASSIC) and 1.0 (EXTREME)
+                const currentMode = window.userParameterState.colorMode || 1.0;
+                const newMode = currentMode > 0.5 ? 0.0 : 1.0;
+                
+                // Update parameter state
+                window.userParameterState.colorMode = newMode;
+                
+                // Apply the parameter change
+                if (window.updateParameter) {
+                    window.updateParameter('colorMode', newMode);
+                }
+                
+                // Update UI button
+                const colorBtn = document.getElementById('quantumColorBtn');
+                if (colorBtn) {
+                    if (newMode > 0.5) {
+                        colorBtn.textContent = '💥 EXTREME';
+                        colorBtn.style.background = 'linear-gradient(45deg, #ff0000, #ff8000, #00ff00, #00ffff, #ff00ff)';
+                        colorBtn.style.color = '#000';
+                        colorBtn.title = 'Quantum: EXTREME Mode - Violent layer-by-layer colors!';
+                    } else {
+                        colorBtn.textContent = '🎨 CLASSIC';
+                        colorBtn.style.background = 'linear-gradient(45deg, #666, #999)';
+                        colorBtn.style.color = '#fff';
+                        colorBtn.title = 'Quantum: CLASSIC Mode - Traditional HSV colors';
+                    }
+                }
+                
+                console.log(`🎨 Quantum color mode: ${newMode > 0.5 ? 'EXTREME' : 'CLASSIC'}`);
+                return newMode > 0.5;
+            } else {
+                console.warn('🎨 Color mode toggle only available in quantum system');
+                return false;
+            }
+        };
     }
 
     // Initialize the application
