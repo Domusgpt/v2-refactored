@@ -152,39 +152,121 @@ export class GalleryPreviewFix {
     }
 
     /**
-     * Apply parameters FAST - single application, let CanvasManager/switchSystem handle the rest
+     * Apply parameters ENHANCED - handles all 13 parameters including 4D rotations
      */
     async applyParametersFast() {
         const { parameters } = window.galleryPreviewData;
         
-        console.log(`🚀 FAST GALLERY PREVIEW: Applying parameters ONCE`);
-        console.log(`🚀 Parameters:`, parameters);
+        console.log(`🚀 ENHANCED GALLERY PREVIEW: Applying full parameter set`);
+        console.log(`🚀 Parameters (${Object.keys(parameters).length}):`, parameters);
         
-        // Wait a moment for CanvasManager to finish canvas creation
+        // Wait for CanvasManager to finish canvas creation
         await new Promise(resolve => setTimeout(resolve, 100));
         
         try {
-            // SINGLE parameter application - trust that switchSystem already set up the engine correctly
+            // Update global parameter state with all 13 parameters
             if (window.userParameterState) {
-                Object.assign(window.userParameterState, parameters);
+                // Ensure all 13 parameters are included with defaults if missing
+                const fullParameters = {
+                    variation: 0,
+                    geometry: 0,
+                    gridDensity: 15,
+                    speed: 0.5,
+                    chaos: 0.0,
+                    morphFactor: 0.0,
+                    hue: 0,
+                    saturation: 0.8,
+                    intensity: 0.5,
+                    rot4dXW: 0.0,
+                    rot4dYW: 0.0,
+                    rot4dZW: 0.0,
+                    dimension: 3.2,
+                    ...parameters // Override defaults with actual values
+                };
+                
+                Object.assign(window.userParameterState, fullParameters);
+                console.log(`🚀 ENHANCED: Global state updated with ${Object.keys(fullParameters).length} parameters`);
             }
             
-            // Apply each parameter once via updateParameter (this routes to the correct engine)
-            Object.entries(parameters).forEach(([param, value]) => {
-                try {
-                    if (window.updateParameter) {
-                        window.updateParameter(param, value);
-                        console.log(`🚀 FAST: ${param} = ${value}`);
+            // Apply 4D rotation parameters first (critical for spatial positioning)
+            const rotationParams = ['rot4dXW', 'rot4dYW', 'rot4dZW'];
+            rotationParams.forEach(param => {
+                if (parameters[param] !== undefined) {
+                    try {
+                        if (window.updateParameter) {
+                            window.updateParameter(param, parameters[param]);
+                            console.log(`🚀 4D ROTATION: ${param} = ${parameters[param].toFixed(4)}`);
+                        }
+                    } catch (error) {
+                        console.warn(`🚀 4D ROTATION ${param} failed:`, error.message);
                     }
-                } catch (error) {
-                    console.warn(`🚀 FAST: Parameter ${param} failed:`, error.message);
                 }
             });
             
-            console.log('🚀 FAST GALLERY PREVIEW: Parameter application complete');
+            // Apply dimensional parameter (affects projection)
+            if (parameters.dimension !== undefined) {
+                try {
+                    if (window.updateParameter) {
+                        window.updateParameter('dimension', parameters.dimension);
+                        console.log(`🚀 DIMENSION: dimension = ${parameters.dimension}`);
+                    }
+                } catch (error) {
+                    console.warn(`🚀 DIMENSION failed:`, error.message);
+                }
+            }
+            
+            // Apply core visual parameters
+            const visualParams = ['geometry', 'gridDensity', 'morphFactor', 'chaos', 'speed'];
+            visualParams.forEach(param => {
+                if (parameters[param] !== undefined) {
+                    try {
+                        if (window.updateParameter) {
+                            window.updateParameter(param, parameters[param]);
+                            console.log(`🚀 VISUAL: ${param} = ${parameters[param]}`);
+                        }
+                    } catch (error) {
+                        console.warn(`🚀 VISUAL ${param} failed:`, error.message);
+                    }
+                }
+            });
+            
+            // Apply color parameters last (visual finalization)
+            const colorParams = ['hue', 'saturation', 'intensity'];
+            colorParams.forEach(param => {
+                if (parameters[param] !== undefined) {
+                    try {
+                        if (window.updateParameter) {
+                            window.updateParameter(param, parameters[param]);
+                            console.log(`🚀 COLOR: ${param} = ${parameters[param]}`);
+                        }
+                    } catch (error) {
+                        console.warn(`🚀 COLOR ${param} failed:`, error.message);
+                    }
+                }
+            });
+            
+            // Apply variation if specified (preset index)
+            if (parameters.variation !== undefined) {
+                try {
+                    if (window.updateParameter) {
+                        window.updateParameter('variation', parameters.variation);
+                        console.log(`🚀 VARIATION: variation = ${parameters.variation}`);
+                    }
+                } catch (error) {
+                    console.warn(`🚀 VARIATION failed:`, error.message);
+                }
+            }
+            
+            console.log('🚀 ENHANCED GALLERY PREVIEW: All parameters applied successfully');
+            
+            // Update device tilt base rotations if tilt is enabled
+            if (window.updateTiltBaseRotations) {
+                window.updateTiltBaseRotations();
+                console.log('🚀 ENHANCED: Updated device tilt base rotations');
+            }
             
         } catch (error) {
-            console.error('🚀 FAST: Parameter application error:', error);
+            console.error('🚀 ENHANCED: Parameter application error:', error);
         }
     }
 

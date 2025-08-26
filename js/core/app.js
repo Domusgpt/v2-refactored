@@ -168,6 +168,53 @@ export class VIB34DApp {
             
             console.log(`✅ ${systemName} visualizer synced to UI`);
         };
+        
+        // Device Tilt Functions for 4D Rotation Control
+        window.toggleDeviceTilt = async () => {
+            if (!window.deviceTiltHandler) {
+                console.warn('🎯 Device tilt handler not available');
+                return false;
+            }
+            
+            const tiltBtn = document.getElementById('tiltBtn');
+            
+            if (window.deviceTiltHandler.isEnabled) {
+                // Disable tilt
+                window.deviceTiltHandler.disable();
+                if (tiltBtn) {
+                    tiltBtn.style.background = '';
+                    tiltBtn.title = 'Device Tilt (4D Rotation)';
+                }
+                console.log('🎯 Device tilt disabled');
+                return false;
+            } else {
+                // Enable tilt
+                const enabled = await window.deviceTiltHandler.enable();
+                if (enabled) {
+                    if (tiltBtn) {
+                        tiltBtn.style.background = 'linear-gradient(45deg, #00ffff, #0099ff)';
+                        tiltBtn.style.color = '#000';
+                        tiltBtn.title = 'Device Tilt Active - Tilt device to control 4D rotation!';
+                    }
+                    console.log('🎯 Device tilt enabled');
+                    return true;
+                } else {
+                    console.warn('🎯 Device tilt failed to enable');
+                    return false;
+                }
+            }
+        };
+        
+        // Update base rotations for tilt system when parameters change
+        window.updateTiltBaseRotations = () => {
+            if (window.deviceTiltHandler && this.userParameterState) {
+                window.deviceTiltHandler.updateBaseRotation(
+                    this.userParameterState.rot4dXW || 0,
+                    this.userParameterState.rot4dYW || 0,
+                    this.userParameterState.rot4dZW || 0
+                );
+            }
+        };
     }
 
     // Initialize the application

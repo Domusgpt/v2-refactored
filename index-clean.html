@@ -39,6 +39,7 @@
         <div class="action-buttons">
             <button class="action-btn" onclick="openGallery()" title="Gallery">🖼️</button>
             <button class="action-btn" onclick="toggleAudio()" title="Audio">🎵</button>
+            <button class="action-btn" onclick="toggleDeviceTilt()" title="Device Tilt (4D Rotation)" id="tiltBtn">📱</button>
             <button class="action-btn" onclick="showLLMInterface()" title="AI Parameters">🤖</button>
             <button class="action-btn" onclick="toggleInteractivity()" title="Interactivity Menu (Press I)">I</button>
         </div>
@@ -193,6 +194,7 @@
     <script type="module" src="js/audio/audio-engine.js"></script>
     <script type="module" src="js/controls/ui-handlers.js"></script>
     <script type="module" src="js/gallery/gallery-manager.js"></script>
+    <script type="module" src="js/interactions/device-tilt.js"></script>
     
     <!-- Initialize globals and user parameter state BEFORE main app -->
     <script>
