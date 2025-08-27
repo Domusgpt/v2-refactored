@@ -66,51 +66,36 @@ export class UnifiedSaveManager {
             metadata: {}
         };
         
-        // Get parameters based on current system
-        if (currentSys === 'faceted') {
-            // Get parameters from VIB34D engine
-            if (this.engine?.parameterManager) {
-                state.parameters = this.engine.parameterManager.getAllParameters() || {};
-                console.log('🔵 Captured faceted parameters:', state.parameters);
-            } else {
-                console.warn('⚠️ VIB34D engine or parameterManager not available');
-                // Fallback to manual parameter capture
-                state.parameters = this.captureManualParameters();
-            }
-        } else if (currentSys === 'quantum') {
-            // Get parameters from quantum system
-            if (window.quantumEngine?.getParameters) {
-                state.parameters = window.quantumEngine.getParameters();
-                console.log('🔵 Captured quantum parameters:', state.parameters);
-            } else {
-                console.warn('⚠️ Quantum system not available');
-                state.parameters = this.captureManualParameters();
-            }
-        } else if (currentSys === 'holographic') {
-            // Get parameters from holographic system
-            if (window.holographicSystem?.getParameters) {
-                state.parameters = window.holographicSystem.getParameters();
-                console.log('🔵 Captured holographic parameters:', state.parameters);
-            } else {
-                console.warn('⚠️ Holographic system not available');
-                state.parameters = this.captureManualParameters();
-            }
+        // CRITICAL FIX: Always capture parameters from UI sliders directly
+        // This ensures parameters are saved even when engines haven't been created yet by SmartCanvasPool
+        console.log('🔵 Using direct UI parameter capture (SmartCanvasPool compatibility)');
+        state.parameters = this.captureManualParameters();
+        
+        // Try to get additional parameters from engine if available (but don't rely on it)
+        if (currentSys === 'faceted' && this.engine?.parameterManager) {
+            const engineParams = this.engine.parameterManager.getAllParameters() || {};
+            console.log('🔵 Found additional faceted engine parameters:', Object.keys(engineParams));
+            // Merge with UI parameters (UI takes priority)
+            state.parameters = { ...engineParams, ...state.parameters };
+        } else if (currentSys === 'quantum' && window.quantumEngine?.getParameters) {
+            const engineParams = window.quantumEngine.getParameters() || {};
+            console.log('🔵 Found additional quantum engine parameters:', Object.keys(engineParams));
+            state.parameters = { ...engineParams, ...state.parameters };
+        } else if (currentSys === 'holographic' && window.holographicSystem?.getParameters) {
+            const engineParams = window.holographicSystem.getParameters() || {};
+            console.log('🔵 Found additional holographic engine parameters:', Object.keys(engineParams));
+            state.parameters = { ...engineParams, ...state.parameters };
         } else if (currentSys === 'polychora') {
-            // Get parameters from polychora system
+            let engineParams = {};
             if (window.polychoraSystem?.parameters) {
-                state.parameters = { ...window.polychoraSystem.parameters };
-                console.log('🔵 Captured polychora parameters:', state.parameters);
+                engineParams = { ...window.polychoraSystem.parameters };
             } else if (window.polychoraSystem?.getParameters) {
-                state.parameters = window.polychoraSystem.getParameters();
-                console.log('🔵 Captured polychora parameters via getParameters:', state.parameters);
-            } else {
-                console.warn('⚠️ Polychora system not available');
-                state.parameters = this.captureManualParameters();
+                engineParams = window.polychoraSystem.getParameters() || {};
             }
-        } else {
-            // Unknown system - try manual capture
-            console.warn('⚠️ Unknown system:', currentSys, '- using manual parameter capture');
-            state.parameters = this.captureManualParameters();
+            if (Object.keys(engineParams).length > 0) {
+                console.log('🔵 Found additional polychora engine parameters:', Object.keys(engineParams));
+                state.parameters = { ...engineParams, ...state.parameters };
+            }
         }
         
         // Add metadata
