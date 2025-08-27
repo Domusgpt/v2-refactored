@@ -2751,11 +2751,15 @@
             }
             
             async init() {
-                // Only initialize on mobile devices
+                this.button = document.getElementById('deviceTiltBtn');
+                if (!this.button) return;
+                
+                // Show button on all devices for testing
                 if (!this.isMobile()) {
-                    console.log('📱 Device Tilt: Desktop detected - hiding mobile button');
-                    const btn = document.getElementById('deviceTiltBtn');
-                    if (btn) btn.style.display = 'none';
+                    console.log('📱 Device Tilt: Desktop detected - enabling for testing');
+                    this.button.style.opacity = '0.7';
+                    this.button.title = 'Device Tilt (Desktop Testing - simulates tilt with mouse)';
+                    this.setupDesktopSimulation();
                     return;
                 }
                 
@@ -2789,8 +2793,6 @@
             }
             
             toggle() {
-                if (!this.isMobile()) return;
-                
                 if (this.isActive) {
                     this.stop();
                 } else {
@@ -2798,8 +2800,43 @@
                 }
             }
             
+            setupDesktopSimulation() {
+                // Desktop testing: Use mouse movement as tilt simulation
+                console.log('📱 Setting up desktop simulation for device tilt');
+                
+                this.desktopMouseHandler = (event) => {
+                    if (!this.isActive) return;
+                    
+                    // Map mouse position to tilt angles (-90 to 90 degrees)
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    const beta = ((event.clientY - centerY) / centerY) * 90;  // X-axis rotation
+                    const gamma = ((event.clientX - centerX) / centerX) * 90; // Y-axis rotation
+                    
+                    this.handleDeviceOrientation({ beta, gamma });
+                };
+                
+                document.addEventListener('mousemove', this.desktopMouseHandler);
+            }
+            
             start() {
-                if (!this.isMobile() || this.isActive) return;
+                if (this.isActive) return;
+                
+                if (!this.isMobile()) {
+                    // Desktop testing mode
+                    console.log('📱 Device Tilt: DESKTOP TESTING MODE - Use mouse to simulate phone tilt');
+                    this.isActive = true;
+                    this.baseXW = window.updateParameter ? (window.updateParameter('rot4dXW') || 0) : 0;
+                    this.baseYW = window.updateParameter ? (window.updateParameter('rot4dYW') || 0) : 0;
+                    
+                    if (this.button) {
+                        this.button.style.background = 'rgba(0, 255, 0, 0.2)';
+                        this.button.style.borderColor = 'rgba(0, 255, 0, 0.5)';
+                        this.button.style.color = '#00ff00';
+                        this.button.title = 'Device Tilt ACTIVE (Desktop Testing - Move mouse to simulate tilt)';
+                    }
+                    return;
+                }
                 
                 // Store current 4D rotation values as base
                 const xwSlider = document.getElementById('rot4dXW');
@@ -2826,7 +2863,18 @@
             }
             
             stop() {
-                window.removeEventListener('deviceorientation', this.handleDeviceOrientation.bind(this));
+                if (!this.isMobile()) {
+                    // Desktop cleanup
+                    if (this.desktopMouseHandler) {
+                        document.removeEventListener('mousemove', this.desktopMouseHandler);
+                    }
+                    console.log('📱 Device Tilt: DESKTOP TESTING MODE DEACTIVATED');
+                } else {
+                    // Mobile cleanup
+                    window.removeEventListener('deviceorientation', this.handleDeviceOrientation.bind(this));
+                    console.log('📱 Device Tilt: DEACTIVATED');
+                }
+                
                 this.isActive = false;
                 
                 // Reset button appearance
@@ -2834,10 +2882,8 @@
                     this.button.style.background = '';
                     this.button.style.borderColor = '';
                     this.button.style.color = '';
-                    this.button.title = 'Device Tilt (Mobile)';
+                    this.button.title = this.isMobile() ? 'Device Tilt (Mobile)' : 'Device Tilt (Desktop Testing)';
                 }
-                
-                console.log('📱 Device Tilt: DEACTIVATED');
             }
             
             handleDeviceOrientation(event) {
