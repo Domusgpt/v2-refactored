@@ -205,8 +205,16 @@ export class SmartCanvasPool {
           break;
           
         case 'polychora':
-          console.log('🔮 Polychora system not implemented yet');
-          // TODO: Add polychora when implemented
+          console.log('🔮 Creating PolychoraSystem...');
+          if (this.engineClasses.PolychoraSystem) {
+            newEngine = new this.engineClasses.PolychoraSystem();
+            window.polychoraSystem = newEngine;
+            
+            // PolychoraSystem calls initialize() in constructor, so no additional initialization needed
+            console.log('🔮 PolychoraSystem auto-initialized in constructor');
+          } else {
+            console.error('❌ PolychoraSystem class not available');
+          }
           break;
           
         default:

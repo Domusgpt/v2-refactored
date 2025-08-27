@@ -908,6 +908,7 @@
         import { VIB34DIntegratedEngine } from './src/core/Engine.js';
         import { QuantumEngine } from './src/quantum/QuantumEngine.js';
         import { RealHolographicSystem } from './src/holograms/RealHolographicSystem.js';
+        import { PolychoraSystem } from './src/core/PolychoraSystem.js';
         import { CollectionManager } from './src/features/CollectionManager.js';
         import { UnifiedSaveManager } from './src/core/UnifiedSaveManager.js';
         import { ParameterMapper } from './src/core/ParameterMapper.js';
@@ -934,104 +935,11 @@
         // 🚀 ENGINE INITIALIZATION FUNCTIONS
         // =======================================
         
-        async function initializeQuantumEngine() {
-            if (quantumEngine) return true;
-            
-            try {
-                const { QuantumEngine } = await import('./src/quantum/QuantumEngine.js');
-                quantumEngine = new QuantumEngine();
-                
-                // Temporarily show quantum layers for WebGL initialization
-                const quantumLayers = document.getElementById('quantumLayers');
-                const wasHidden = quantumLayers.style.display === 'none';
-                if (wasHidden) {
-                    quantumLayers.style.display = 'block';
-                }
-                
-                const success = quantumEngine.initialize();
-                
-                // Hide again if it was hidden
-                if (wasHidden) {
-                    quantumLayers.style.display = 'none';
-                }
-                
-                if (success) {
-                    console.log('🌌 Quantum engine initialized successfully');
-                    return true;
-                } else {
-                    throw new Error('Quantum engine initialization failed');
-                }
-            } catch (error) {
-                console.error('❌ Failed to initialize quantum engine:', error);
-                return false;
-            }
-        }
+        // REMOVED: initializeQuantumEngine - SmartCanvasPool now handles quantum engine initialization
         
-        async function initializeHolographicSystem() {
-            if (holographicSystem) return true;
-            
-            try {
-                const { RealHolographicSystem } = await import('./src/holograms/RealHolographicSystem.js');
-                holographicSystem = new RealHolographicSystem();
-                
-                // Temporarily show holographic layers for WebGL initialization
-                const holographicLayers = document.getElementById('holographicLayers');
-                const wasHidden = holographicLayers.style.display === 'none';
-                if (wasHidden) {
-                    holographicLayers.style.display = 'block';
-                }
-                
-                const success = holographicSystem.initialize();
-                
-                // Hide again if it was hidden
-                if (wasHidden) {
-                    holographicLayers.style.display = 'none';
-                }
-                
-                if (success) {
-                    console.log('✨ Holographic system initialized successfully');
-                    return true;
-                } else {
-                    throw new Error('Holographic system initialization failed');
-                }
-            } catch (error) {
-                console.error('❌ Failed to initialize holographic system:', error);
-                return false;
-            }
-        }
+        // REMOVED: initializeHolographicSystem - SmartCanvasPool now handles holographic engine initialization
         
-        async function initializePolychora() {
-            if (polychoraSystem) return true;
-            
-            try {
-                const { PolychoraSystem } = await import('./src/core/PolychoraSystem.js');
-                polychoraSystem = new PolychoraSystem();
-                
-                // Temporarily show polychora layers for WebGL initialization
-                const polychoraLayers = document.getElementById('polychoraLayers');
-                const wasHidden = polychoraLayers.style.display === 'none';
-                if (wasHidden) {
-                    polychoraLayers.style.display = 'block';
-                }
-                
-                const success = polychoraSystem.initialize();
-                
-                // Hide again if it was hidden
-                if (wasHidden) {
-                    polychoraLayers.style.display = 'none';
-                }
-                
-                if (success) {
-                    console.log('🔮 Polychora system initialized successfully');
-                    return true;
-                } else {
-                    throw new Error('Polychora system initialization failed');
-                }
-            } catch (error) {
-                console.error('❌ Failed to initialize polychora system:', error);
-                return false;
-            }
-        }
+        // REMOVED: initializePolychora - SmartCanvasPool now handles polychora engine initialization
         
         // Geometry configurations
         const geometries = {
@@ -1074,7 +982,7 @@
             window.unifiedSaveManager = unifiedSaveManager;
             window.parameterMapper = parameterMapper;
             window.geometries = geometries;
-            window.initializePolychora = initializePolychora;
+            // REMOVED: window.initializePolychora reference - function no longer exists
             window.updateParameter = updateParameter;
             
             // Module ready flag already set earlier for performance
@@ -1186,12 +1094,14 @@
                 console.log('🔍 Engine classes check:', {
                     VIB34DIntegratedEngine: !!VIB34DIntegratedEngine,
                     QuantumEngine: !!QuantumEngine,
-                    RealHolographicSystem: !!RealHolographicSystem
+                    RealHolographicSystem: !!RealHolographicSystem,
+                    PolychoraSystem: !!PolychoraSystem
                 });
                 window.canvasPool = new SmartCanvasPool({
                     VIB34DIntegratedEngine,
                     QuantumEngine,
-                    RealHolographicSystem
+                    RealHolographicSystem,
+                    PolychoraSystem
                 });
                 
                 // Don't create engines yet - they'll be created when system is activated
@@ -2658,55 +2568,8 @@
         // =======================================
         // 🎯 SYSTEM SWITCHING FUNCTION
         // =======================================
-        
-        window.switchSystem = async function(system) {
-            console.log(`🎯 switchSystem called with: ${system}`);
-            
-            // 🚀 INITIALIZE ENGINES ON DEMAND
-            try {
-                if (system === 'quantum') {
-                    console.log('🌌 Initializing quantum engine...');
-                    await initializeQuantumEngine();
-                    window.quantumEngine = quantumEngine;
-                } else if (system === 'holographic') {
-                    console.log('✨ Initializing holographic system...');
-                    await initializeHolographicSystem();
-                    window.holographicSystem = holographicSystem;
-                } else if (system === 'polychora') {
-                    console.log('🔮 Initializing polychora system...');
-                    await initializePolychora();
-                    window.polychoraSystem = polychoraSystem;
-                }
-            } catch (error) {
-                console.error(`❌ Failed to initialize ${system} engine:`, error);
-                return;
-            }
-            
-            // CANVAS EXPLOSION FIX: Use SmartCanvasPool ONLY
-            if (window.canvasPool) {
-                try {
-                    console.log(`🎯 Lazy loading ${system} system...`);
-                    const newEngine = await window.canvasPool.switchToSystem(system, null);
-                    
-                    if (newEngine) {
-                        console.log(`✅ ${system} system ready with engine`);
-                        console.log(`📊 Canvas stats: ${JSON.stringify(window.canvasPool.getStats())}`);
-                        
-                        // Update global state and UI
-                        window.currentSystem = system;
-                        
-                        // Update UI buttons
-                        document.querySelectorAll('.system-btn').forEach(btn => {
-                            btn.classList.toggle('active', btn.dataset.system === system);
-                        });
-                        
-                        // Update panel header
-                        const headers = {
-                            faceted: 'FACETED SYSTEM',
-                            quantum: 'QUANTUM SYSTEM', 
-                            holographic: 'HOLOGRAPHIC SYSTEM',
-                            polychora: 'POLYCHORA SYSTEM'
-                        };
+        // REMOVED: Duplicate window.switchSystem function that was overriding the correct one at line 724
+        // The correct switchSystem function (line 724) uses ONLY SmartCanvasPool without redundant init calls
                         const panelHeader = document.getElementById('panelHeader');
                         if (panelHeader && headers[system]) {
                             panelHeader.textContent = headers[system];
