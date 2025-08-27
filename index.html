@@ -1734,10 +1734,62 @@
         }
         
         window.toggleAudio = async function() {
-            audioEnabled = !audioEnabled;
+            console.log('🎵 Audio toggle requested...');
             
-            if (audioEnabled && holographicSystem) {
-                await holographicSystem.initAudio();
+            audioEnabled = !audioEnabled;
+            const audioBtn = document.querySelector('button[onclick="toggleAudio()"]');
+            
+            if (audioEnabled) {
+                // Initialize audio for current system
+                if (window.currentSystem === 'holographic' && holographicSystem) {
+                    console.log('🎵 Initializing holographic audio system...');
+                    await holographicSystem.initAudio();
+                } else if (window.currentSystem === 'quantum' && quantumEngine) {
+                    console.log('🎵 Initializing quantum audio system...');
+                    // Simple audio setup for quantum - no overcomplicated approach
+                    if (!window.globalAudioContext) {
+                        window.globalAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        window.globalAnalyser = window.globalAudioContext.createAnalyser();
+                        window.globalAnalyser.fftSize = 256;
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            const source = window.globalAudioContext.createMediaStreamSource(stream);
+                            source.connect(window.globalAnalyser);
+                            console.log('🎵 Global audio context ready for quantum system');
+                        } catch (error) {
+                            console.error('🎵 Audio access denied:', error);
+                        }
+                    }
+                } else {
+                    console.log('🎵 Universal audio initialization - current system:', window.currentSystem);
+                    // Simple universal audio for faceted and other systems
+                    if (!window.globalAudioContext) {
+                        window.globalAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        window.globalAnalyser = window.globalAudioContext.createAnalyser();
+                        window.globalAnalyser.fftSize = 256;
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            const source = window.globalAudioContext.createMediaStreamSource(stream);
+                            source.connect(window.globalAnalyser);
+                            console.log('🎵 Global audio context ready');
+                        } catch (error) {
+                            console.error('🎵 Audio access denied:', error);
+                        }
+                    }
+                }
+                
+                if (audioBtn) {
+                    audioBtn.style.background = 'rgba(0, 255, 77, 0.3)';
+                    audioBtn.style.borderColor = '#00ff4d';
+                    audioBtn.style.color = '#00ff4d';
+                }
+            } else {
+                console.log('🎵 Disabling audio...');
+                if (audioBtn) {
+                    audioBtn.style.background = 'rgba(255, 0, 77, 0.3)';
+                    audioBtn.style.borderColor = '#ff004d'; 
+                    audioBtn.style.color = '#ff004d';
+                }
             }
             
             console.log(`🎵 Audio: ${audioEnabled ? 'ON' : 'OFF'}`);
