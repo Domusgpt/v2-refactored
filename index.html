@@ -773,7 +773,37 @@
                     console.error(`❌ Error stack:`, error.stack);
                 }
             } else {
-                console.error(`❌ window.canvasPool is not available:`, !!window.canvasPool);
+                // TIMING FIX: If canvasPool isn't ready, wait and retry
+                console.warn(`⏳ SmartCanvasPool not ready yet, waiting...`);
+                let retries = 0;
+                const maxRetries = 20;
+                
+                const waitForCanvasPool = () => {
+                    return new Promise((resolve) => {
+                        const checkInterval = setInterval(() => {
+                            retries++;
+                            if (window.canvasPool) {
+                                clearInterval(checkInterval);
+                                console.log(`✅ SmartCanvasPool ready after ${retries * 100}ms`);
+                                resolve(true);
+                            } else if (retries >= maxRetries) {
+                                clearInterval(checkInterval);
+                                console.error(`❌ SmartCanvasPool failed to initialize after ${retries * 100}ms`);
+                                resolve(false);
+                            }
+                        }, 100);
+                    });
+                };
+                
+                const canvasPoolReady = await waitForCanvasPool();
+                if (canvasPoolReady) {
+                    // Retry the system switch now that canvasPool is ready
+                    console.log(`🔄 Retrying system switch to ${system}...`);
+                    return await window.switchSystem(system);
+                } else {
+                    console.error(`💥 SmartCanvasPool failed to initialize - ${system} system unavailable`);
+                    return;
+                }
             }
             
             // If we get here, SmartCanvasPool failed - this is an error
@@ -2878,7 +2908,6 @@
             }, 100);
         });
         
-        // Touch event handlers for interactivity system\n        window.handleTouchStart = function(e) {\n            e.preventDefault();\n            const touch = e.touches[0];\n            const rect = e.target.getBoundingClientRect();\n            const x = (touch.clientX - rect.left) / rect.width;\n            const y = 1.0 - ((touch.clientY - rect.top) / rect.height);\n            \n            if (window.updateParameter) {\n                window.updateParameter('intensity', x);\n                window.updateParameter('morphFactor', y * 2);\n            }\n            console.log('👆 Touch start:', x, y);\n        };\n        \n        window.handleTouchMove = function(e) {\n            e.preventDefault();\n            const touch = e.touches[0];\n            const rect = e.target.getBoundingClientRect();\n            const x = (touch.clientX - rect.left) / rect.width;\n            const y = 1.0 - ((touch.clientY - rect.top) / rect.height);\n            \n            if (window.updateParameter) {\n                window.updateParameter('hue', x * 360);\n                window.updateParameter('chaos', y);\n            }\n        };\n        \n        window.handleTouchEnd = function(e) {\n            e.preventDefault();\n            console.log('👆 Touch end');\n        };\n        \n        // Initialize touch interactions as disabled\n        window.touchInteractionsEnabled = false;\n        \n        console.log('🎯 SYSTEM SWITCHING: Ready for all 4 systems');\n        console.log('👆 Touch handlers: Ready for interactivity button');
         console.log('📱 DEVICE TILT 4D VISUALIZATION SYSTEM: Ready');
         console.log('🚀 All engines will initialize on first system switch');
         
