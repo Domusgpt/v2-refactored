@@ -1646,11 +1646,39 @@
         window.toggleAudio = async function() {
             audioEnabled = !audioEnabled;
             
-            if (audioEnabled && holographicSystem) {
-                await holographicSystem.initAudio();
+            // SMARTCANVASPOOL FIX: Enable audio for current system or create holographic system if needed
+            if (audioEnabled) {
+                // If we're on holographic system, enable audio
+                if (window.currentSystem === 'holographic' && window.holographicSystem) {
+                    await window.holographicSystem.initAudio();
+                    console.log('✨ Audio enabled for holographic system');
+                } else if (window.currentSystem === 'holographic' && !window.holographicSystem) {
+                    // Switch to holographic to enable audio
+                    console.log('🎵 Switching to holographic system for audio...');
+                    await switchSystem('holographic');
+                    if (window.holographicSystem) {
+                        await window.holographicSystem.initAudio();
+                        console.log('✨ Audio enabled after switching to holographic');
+                    }
+                } else {
+                    // On other systems, switch to holographic for full audio experience
+                    console.log('🎵 Audio works best with holographic system. Switching...');
+                    await switchSystem('holographic');
+                    if (window.holographicSystem) {
+                        await window.holographicSystem.initAudio();
+                        console.log('✨ Switched to holographic system with audio');
+                    }
+                }
             }
             
             console.log(`🎵 Audio: ${audioEnabled ? 'ON' : 'OFF'}`);
+            
+            // Update UI button state
+            const audioBtn = document.querySelector('button[onclick="toggleAudio()"]');
+            if (audioBtn) {
+                audioBtn.style.backgroundColor = audioEnabled ? 'rgba(0, 255, 0, 0.2)' : '';
+                audioBtn.style.color = audioEnabled ? '#00ff00' : '';
+            }
         }
         
         window.showLLMInterface = async function() {
@@ -1903,11 +1931,50 @@
         }
         
         window.toggleInteractivity = function() {
-            console.log('🎛️ Clean interaction architecture: System-specific interactions always active');
-            console.log('🔷 Faceted: Elegant mouse tracking');
-            console.log('🌌 Quantum: Enhanced mouse + touch'); 
-            console.log('✨ Holographic: Full audio-reactive system (unchanged)');
-            console.log('🔮 Polychora: 4D-optimized precision tracking');
+            // SMARTCANVASPOOL FIX: Actually toggle touch and interaction features
+            window.touchInteractionsEnabled = !window.touchInteractionsEnabled;
+            
+            if (window.touchInteractionsEnabled) {
+                console.log('👆 Touch interactions: ENABLED');
+                // Enable touch events on all current system canvases
+                const currentSystem = window.currentSystem || 'faceted';
+                const layerId = currentSystem === 'faceted' ? 'vib34dLayers' : `${currentSystem}Layers`;
+                const layerContainer = document.getElementById(layerId);
+                
+                if (layerContainer) {
+                    const canvases = layerContainer.querySelectorAll('canvas');
+                    canvases.forEach(canvas => {
+                        // Add touch event listeners
+                        canvas.addEventListener('touchstart', window.handleTouchStart, { passive: false });
+                        canvas.addEventListener('touchmove', window.handleTouchMove, { passive: false });
+                        canvas.addEventListener('touchend', window.handleTouchEnd, { passive: false });
+                        canvas.style.touchAction = 'none'; // Prevent default touch behaviors
+                        console.log(`👆 Touch enabled on ${canvas.id}`);
+                    });
+                }
+            } else {
+                console.log('👆 Touch interactions: DISABLED');
+                // Remove touch events from all canvases
+                document.querySelectorAll('canvas').forEach(canvas => {
+                    canvas.removeEventListener('touchstart', window.handleTouchStart);
+                    canvas.removeEventListener('touchmove', window.handleTouchMove);
+                    canvas.removeEventListener('touchend', window.handleTouchEnd);
+                    canvas.style.touchAction = 'auto';
+                });
+            }
+            
+            // Update UI button state
+            const interactivityBtn = document.querySelector('button[onclick="toggleInteractivity()"]');
+            if (interactivityBtn) {
+                interactivityBtn.style.backgroundColor = window.touchInteractionsEnabled ? 'rgba(0, 255, 0, 0.2)' : '';
+                interactivityBtn.style.color = window.touchInteractionsEnabled ? '#00ff00' : '';
+                interactivityBtn.title = `Touch Interactions: ${window.touchInteractionsEnabled ? 'ON' : 'OFF'}`;
+            }
+            
+            console.log('🎛️ Interaction status:');
+            console.log(`👆 Touch: ${window.touchInteractionsEnabled ? 'ON' : 'OFF'}`);
+            console.log(`🎵 Audio: ${audioEnabled ? 'ON' : 'OFF'}`);
+            console.log(`📱 Device Tilt: ${window.deviceTiltManager?.isActive ? 'ON' : 'OFF'}`);
         }
         
         // Helper function to update UI sliders when LLM sets parameters
