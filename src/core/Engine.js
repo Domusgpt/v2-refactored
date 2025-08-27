@@ -50,7 +50,7 @@ export class VIB34DIntegratedEngine {
         try {
             this.createVisualizers();
             this.setupControls();
-            this.setupInteractions();
+            // setupInteractions() removed - handled by main system now
             this.loadCustomVariations();
             this.populateVariationGrid();
             this.startRenderLoop();
@@ -138,13 +138,9 @@ export class VIB34DIntegratedEngine {
     }
     
     /**
-     * Set up mouse/touch interactions
+     * Set up mouse/touch interactions - REMOVED
+     * Interactions now handled by main system in index.html
      */
-    setupInteractions() {
-        this.interactionHandler.setupMouseTracking();
-        this.interactionHandler.setupClickHandling();
-        this.interactionHandler.setupTouchSupport();
-    }
     
     /**
      * Load custom variations from storage
