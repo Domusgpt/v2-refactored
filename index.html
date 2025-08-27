@@ -1063,6 +1063,9 @@
             
             // URL parameters already parsed outside the module
             
+            // CRITICAL FIX: Make geometries available BEFORE setupGeometry call
+            window.geometries = geometries;
+            
             setupGeometry('faceted');
             const success = await initializeEngine();
             
@@ -1073,7 +1076,6 @@
             window.polychoraSystem = polychoraSystem;
             window.unifiedSaveManager = unifiedSaveManager;
             window.parameterMapper = parameterMapper;
-            window.geometries = geometries;
             window.initializePolychora = initializePolychora;
             window.updateParameter = updateParameter;
             
