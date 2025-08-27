@@ -913,6 +913,7 @@
         import { ParameterMapper } from './src/core/ParameterMapper.js';
         import { SmartCanvasPool } from './src/core/SmartCanvasPool.js';
         import { TradingCardGenerator } from './src/export/TradingCardGenerator.js';
+        import { InteractivityMenu } from './src/ui/InteractivityMenu.js';
         // Universal reactivity system removed - implementing clean system-specific interactions
         
         // Global state - CRITICAL FIX: Check for gallery preview data FIRST
@@ -1078,6 +1079,25 @@
             window.parameterMapper = parameterMapper;
             window.initializePolychora = initializePolychora;
             window.updateParameter = updateParameter;
+            
+            // PHASE 1: Initialize InteractivityMenu (UI only, no engine integration)
+            // Create minimal mock engine to prevent crashes
+            const mockEngine = {
+                getReactiveBands: () => ({
+                    movement: { smoothed: 0 },
+                    velocity: { smoothed: 0 },
+                    precision: { smoothed: 0 },
+                    gamepad: { pressure: 0, axes: [0, 0, 0, 0] },
+                    wearable: { tilt: { x: 0, y: 0 }, motion: 0 },
+                    ui: { scroll: 0, click: 0, hover: 0, typing: { velocity: 0, rhythm: 0 } }
+                }),
+                activeInputs: new Set(['mouse/touch', 'keyboard', 'ui']),
+                getParameterValue: () => 0,
+                getPerformanceStats: () => ({ fps: 60, memoryUsage: 50, activeSources: 3 }),
+                parameterMappings: {}
+            };
+            
+            window.interactivityMenu = new InteractivityMenu(mockEngine);
             
             // Module ready flag already set earlier for performance
             
@@ -2047,11 +2067,19 @@
         }
         
         window.toggleInteractivity = function() {
-            console.log('🎛️ Clean interaction architecture: System-specific interactions always active');
-            console.log('🔷 Faceted: Elegant mouse tracking');
-            console.log('🌌 Quantum: Enhanced mouse + touch'); 
-            console.log('✨ Holographic: Full audio-reactive system (unchanged)');
-            console.log('🔮 Polychora: 4D-optimized precision tracking');
+            console.log('🎛️ Toggling Interactivity Menu...');
+            
+            // PHASE 1: Safe menu toggle without engine integration
+            if (window.interactivityMenu) {
+                window.interactivityMenu.toggle();
+            } else {
+                console.warn('🎛️ InteractivityMenu not initialized yet');
+                // Fallback to old behavior
+                console.log('🔷 Faceted: Elegant mouse tracking');
+                console.log('🌌 Quantum: Enhanced mouse + touch'); 
+                console.log('✨ Holographic: Full audio-reactive system (unchanged)');
+                console.log('🔮 Polychora: 4D-optimized precision tracking');
+            }
         }
         
         // Helper function to update UI sliders when LLM sets parameters

@@ -242,18 +242,12 @@ export class InteractivityMenu {
     }
     
     /**
-     * Bind keyboard events
+     * Bind events - KEYBOARD DISABLED to prevent conflicts
      */
     bindEvents() {
-        document.addEventListener('keydown', (e) => {
-            // Toggle with I key (when not typing in inputs)
-            if (e.key === 'i' || e.key === 'I') {
-                if (!['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-                    e.preventDefault();
-                    this.toggle();
-                }
-            }
-        });
+        // DISABLED: Keyboard shortcuts removed to prevent conflicts with main system
+        // Menu is controlled only via toggleInteractivity() button and touch interactions
+        console.log('🎛️ InteractivityMenu: Keyboard shortcuts disabled - touch/button only');
     }
     
     /**
