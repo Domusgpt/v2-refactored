@@ -277,11 +277,19 @@ vec3 project4Dto3D(vec4 p) {
 // Complex 3D Lattice Functions - Superior Quantum Shaders
 float tetrahedronLattice(vec3 p, float gridSize) {
     vec3 q = fract(p * gridSize) - 0.5;
+    
+    // Subtle 4D-based orb animation - vertices "breathe" in 4D hyperspace
+    float time4d = u_time * 0.0005 * u_speed;
+    float orbPulse = 0.005 * (sin(time4d * 2.0) + sin(time4d * 1.7) * 0.3);
+    
     float d1 = length(q);
     float d2 = length(q - vec3(0.4, 0.0, 0.0));
     float d3 = length(q - vec3(0.0, 0.4, 0.0));
     float d4 = length(q - vec3(0.0, 0.0, 0.4));
-    float vertices = 1.0 - smoothstep(0.0, 0.04, min(min(d1, d2), min(d3, d4)));
+    
+    // Apply 4D breathing to vertex sizes - very subtle
+    float vertices = 1.0 - smoothstep(0.0, 0.04 + orbPulse, min(min(d1, d2), min(d3, d4)));
+    
     float edges = 0.0;
     edges = max(edges, 1.0 - smoothstep(0.0, 0.02, abs(length(q.xy) - 0.2)));
     edges = max(edges, 1.0 - smoothstep(0.0, 0.02, abs(length(q.yz) - 0.2)));
@@ -295,16 +303,26 @@ float hypercubeLattice(vec3 p, float gridSize) {
     float minEdge = min(min(edges.x, edges.y), edges.z);
     float lattice = 1.0 - smoothstep(0.0, 0.03, minEdge);
     
+    // Subtle 4D-based hypercube vertex pulsing
+    float time4d = u_time * 0.0005 * u_speed;
+    float hypercubePulse = 0.02 * sin(time4d * 1.5 + dot(grid, vec3(127.1, 311.7, 74.7)));
+    
     vec3 centers = abs(grid - 0.5);
     float maxCenter = max(max(centers.x, centers.y), centers.z);
-    float vertices = 1.0 - smoothstep(0.45, 0.5, maxCenter);
+    float vertices = 1.0 - smoothstep(0.45 + hypercubePulse, 0.5, maxCenter);
     
     return max(lattice * 0.7, vertices);
 }
 
 float sphereLattice(vec3 p, float gridSize) {
     vec3 cell = fract(p * gridSize) - 0.5;
-    float sphere = 1.0 - smoothstep(0.15, 0.25, length(cell));
+    
+    // Subtle 4D sphere pulsing - each sphere has unique timing
+    float time4d = u_time * 0.0005 * u_speed;
+    float spherePhase = dot(cell, vec3(43.7, 89.3, 127.1));
+    float spherePulse = 0.03 * sin(time4d * 1.8 + spherePhase);
+    
+    float sphere = 1.0 - smoothstep(0.15 + spherePulse, 0.25, length(cell));
     
     float rings = 0.0;
     float ringRadius = length(cell.xy);
